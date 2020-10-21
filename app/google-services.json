@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "463919636520",
+    "firebase_url": "https://hethongthuenha.firebaseio.com",
+    "project_id": "hethongthuenha",
+    "storage_bucket": "hethongthuenha.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:463919636520:android:5648bee6fdc92c9e66151d",
+        "android_client_info": {
+          "package_name": "com.example.hethongthuenha"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "463919636520-ngtn50n985bf380lcvn3sdjonf5s5v93.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCytSBxCvns6oApeLC67YiofcrAwIWZS14"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "463919636520-ngtn50n985bf380lcvn3sdjonf5s5v93.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
