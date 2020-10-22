@@ -1,9 +1,12 @@
 package com.example.hethongthuenha.Login;
 
+import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.example.hethongthuenha.MainActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
@@ -12,11 +15,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 public class LoginPresenter implements LoginContract.Presenter {
-
     private LoginContract.View view;
     private FirebaseAuth mAuth;
-    private FirebaseAuth.AuthStateListener authStateListener;
-    private FirebaseUser currentUser;
 
 
     public LoginPresenter(LoginContract.View view) {
@@ -45,18 +45,4 @@ public class LoginPresenter implements LoginContract.Presenter {
         });
     }
 
-    @Override
-    public void HaveAccount() {
-        authStateListener=new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                currentUser=firebaseAuth.getCurrentUser();
-                if(currentUser!=null){
-                    Log.d("HistoryLogin", "onAuthStateChanged: Co' account nhe'");
-                }
-            }
-        };
-
-        mAuth.addAuthStateListener(authStateListener);
-    }
 }
