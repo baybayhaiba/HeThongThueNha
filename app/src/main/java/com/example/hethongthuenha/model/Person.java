@@ -1,29 +1,16 @@
 package com.example.hethongthuenha.model;
 
 public abstract class  Person {
-    private int id;
     private String fullName;
-    private String origin;
+    private String email;
     private String contact;
-    private static int count;
 
     public Person() { }
 
-    public Person(String fullName, String origin, String contact) {
-        ++count;
-
-        this.id = count;
+    public Person(String fullName, String email, String contact) {
         this.fullName = fullName;
-        this.origin = origin;
+        this.email = email;
         this.contact = contact;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getFullName() {
@@ -34,12 +21,12 @@ public abstract class  Person {
         this.fullName = fullName;
     }
 
-    public String getOrigin() {
-        return origin;
+    public String getEmail() {
+        return email;
     }
 
-    public void setOrigin(String origin) {
-        this.origin = origin;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getContact() {
@@ -53,9 +40,8 @@ public abstract class  Person {
     @Override
     public String toString() {
         return "Person{" +
-                "id=" + id +
-                ", fullName='" + fullName + '\'' +
-                ", origin='" + origin + '\'' +
+                " fullName='" + fullName + '\'' +
+                ", origin='" + email + '\'' +
                 ", contact='" + contact + '\'' +
                 '}';
     }

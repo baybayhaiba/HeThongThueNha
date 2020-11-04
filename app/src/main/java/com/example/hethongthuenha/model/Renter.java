@@ -5,7 +5,9 @@ public class Renter extends Person {
     public Renter() {
     }
 
-    public Renter(String fullName, String origin, String contact) {
-        super(fullName, origin, contact);
+    public Renter(String fullName, String email, String contact) {
+        super(fullName, email, contact);
     }
+
+
 }
