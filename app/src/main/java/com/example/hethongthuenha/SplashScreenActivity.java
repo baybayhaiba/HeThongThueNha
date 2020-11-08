@@ -5,9 +5,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 
 import com.example.hethongthuenha.Login.LoginActivity;
+import com.example.hethongthuenha.MainActivity.MainActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -29,7 +29,7 @@ public class SplashScreenActivity extends AppCompatActivity {
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 currentUser=firebaseAuth.getCurrentUser();
                 if(currentUser!=null){
-                   startActivity(new Intent(SplashScreenActivity.this,MainActivity.class));
+                   startActivity(new Intent(SplashScreenActivity.this, MainActivity.class));
                 }else
                     startActivity(new Intent(SplashScreenActivity.this, LoginActivity.class));
             }

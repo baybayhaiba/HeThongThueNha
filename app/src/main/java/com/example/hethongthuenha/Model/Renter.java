@@ -1,4 +1,4 @@
-package com.example.hethongthuenha.model;
+package com.example.hethongthuenha.Model;
 
 public class Renter extends Person {
 

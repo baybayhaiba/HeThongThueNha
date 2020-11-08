@@ -1,73 +1,102 @@
 package com.example.hethongthuenha.CreateRoom.Fragment;
 
+import android.content.Context;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.NumberPicker;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.Spinner;
 
+import com.example.hethongthuenha.Model.Description_Room;
 import com.example.hethongthuenha.R;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link fragment_description#newInstance} factory method to
- * create an instance of this fragment.
- */
+
 public class fragment_description extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    public fragment_description() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment fragment_description.
-     */
-    // TODO: Rename and change types and number of parameters
-
-
-
-
-    public static fragment_description newInstance(String param1, String param2) {
-        fragment_description fragment = new fragment_description();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
+    Button btFinishStage1;
+    IDataCommunication dataCommunication;
+    EditText etTitle,etDescription,etAddress,etPrice,etArea,etAccommodation,etAmout;
+    RadioButton radPhongTro,radNhaNguyenCan,radOGhep;
+    Spinner spDate;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+
+    }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        try {
+            dataCommunication = (IDataCommunication) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString()
+                    + " must implement DataCommunication");
         }
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view=inflater.inflate(R.layout.fragment_description,container,false);
+        View view = inflater.inflate(R.layout.fragment_description, container, false);
+        etTitle=view.findViewById(R.id.etTitle);
+        etDescription=view.findViewById(R.id.etDescription);
+        etAddress=view.findViewById(R.id.etAddress);
+        etPrice=view.findViewById(R.id.etPrice);
+        etAccommodation=view.findViewById(R.id.etAccommodation);
+        etAmout=view.findViewById(R.id.etAmout);
+        etArea=view.findViewById(R.id.etArea);
+        btFinishStage1=view.findViewById(R.id.btnFinishStage1);
+        radNhaNguyenCan=view.findViewById(R.id.radNhaNguyenCan);
+        radOGhep=view.findViewById(R.id.radOGhep);
+        radPhongTro=view.findViewById(R.id.radPhongTro);
+        spDate=view.findViewById(R.id.spDate);
+
+
+        btFinishStage1.setOnClickListener(v -> {
+            String title=etTitle.getText().toString();
+            String description=etDescription.getText().toString();
+            String address=etAddress.getText().toString();
+            double price=Double.parseDouble(etPrice.getText().toString());
+            double area=Double.parseDouble(etArea.getText().toString());
+            int amout=Integer.parseInt(etAmout.getText().toString());
+            int accommodation=Integer.parseInt(etAccommodation.getText().toString());
+            String typeDate=spDate.getSelectedItem().toString();
+            String typeRoom;
+            if(radPhongTro.isChecked())
+                typeRoom="Phòng trọ";
+            else if(radOGhep.isChecked())
+                typeRoom="Ở ghép";
+            else
+                typeRoom="Nhà nguyên căn";
+
+            Description_Room dataStage1=new Description_Room
+                    (title,description,address,typeDate,price,area,accommodation,amout,typeRoom);
+            dataCommunication.Description(dataStage1);
+
+            fragment_living_expenses fragment=new fragment_living_expenses();
+            FragmentManager fragmentManager = getFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.replace(R.id.frameContainer, fragment);
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
+        });
+
+
 
         return view;
     }
+
 }

@@ -1,18 +1,12 @@
 package com.example.hethongthuenha.Login;
 
-import android.content.Context;
-import android.content.Intent;
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 
-import com.example.hethongthuenha.MainActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
 public class LoginPresenter implements LoginContract.Presenter {
     private LoginContract.View view;

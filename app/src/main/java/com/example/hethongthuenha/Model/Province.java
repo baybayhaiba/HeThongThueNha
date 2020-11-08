@@ -1,4 +1,4 @@
-package com.example.hethongthuenha.model;
+package com.example.hethongthuenha.Model;
 
 import com.google.gson.annotations.SerializedName;
 

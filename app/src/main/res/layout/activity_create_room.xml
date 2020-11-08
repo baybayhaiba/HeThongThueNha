@@ -124,18 +124,19 @@
 
     </LinearLayout>
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="4sp"
+        android:background="@android:color/darker_gray"/>
+
     <FrameLayout
         android:id="@+id/frameContainer"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"/>
 
-    <Button
-        android:id="@+id/btnFinishStageRoom"
-        android:layout_width="match_parent"
-        android:backgroundTint="@android:color/holo_red_dark"
-        android:textColor="@color/white"
-        android:layout_height="wrap_content"
-        android:text="Hoàn tất"/>
+
+
 
 </LinearLayout>

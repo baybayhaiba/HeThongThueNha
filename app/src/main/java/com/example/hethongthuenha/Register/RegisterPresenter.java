@@ -2,30 +2,9 @@ package com.example.hethongthuenha.Register;
 
 import android.util.Log;
 
-import androidx.annotation.NonNull;
-
-import com.example.hethongthuenha.API.GetDataProvinceService;
-import com.example.hethongthuenha.Retrofit.RetrofitClientInstance;
-import com.example.hethongthuenha.model.District;
-import com.example.hethongthuenha.model.Province;
-import com.example.hethongthuenha.model.Renter;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
+import com.example.hethongthuenha.Model.Renter;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.internal.observers.BlockingBaseObserver;
-import io.reactivex.schedulers.Schedulers;
 
 public class RegisterPresenter implements RegisterContract.Presenter {
 

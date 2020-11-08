@@ -1,59 +1,42 @@
 package com.example.hethongthuenha.CreateRoom.Fragment;
 
+import android.content.Context;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
 
+import com.example.hethongthuenha.Model.LivingExpenses_Room;
 import com.example.hethongthuenha.R;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link fragment_living_expenses#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class fragment_living_expenses extends Fragment {
+import java.util.ArrayList;
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+public class fragment_living_expenses extends Fragment{
 
+    private EditText etWater,etElectricity,etInternet,etTV,etParkingSpace;
+    private IDataCommunication dataCommunication;
     public fragment_living_expenses() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment fragment_living_expenses.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static fragment_living_expenses newInstance(String param1, String param2) {
-        fragment_living_expenses fragment = new fragment_living_expenses();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        try {
+            dataCommunication = (IDataCommunication) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString()
+                    + " must implement DataCommunication");
         }
     }
 
@@ -61,6 +44,36 @@ public class fragment_living_expenses extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_living_expenses, container, false);
+        View view = inflater.inflate(R.layout.fragment_living_expenses, container, false);
+
+        etWater=view.findViewById(R.id.etWater);
+        etElectricity=view.findViewById(R.id.etElectricity);
+        etInternet=view.findViewById(R.id.etInternet);
+        etParkingSpace=view.findViewById(R.id.etParkingSpace);
+        etTV=view.findViewById(R.id.etTV);
+
+        Button btFinishStage2 = view.findViewById(R.id.btnFinishStage2);
+
+        btFinishStage2.setOnClickListener(v->{
+            double priceWater=Double.parseDouble(etWater.getText().toString());
+            double priceElectricity=Double.parseDouble(etElectricity.getText().toString());
+            double priceInternet=Double.parseDouble(etInternet.getText().toString());
+            double priceTV=Double.parseDouble(etTV.getText().toString());
+            double priceParkingSpace=Double.parseDouble(etParkingSpace.getText().toString());
+
+            LivingExpenses_Room stage2=new LivingExpenses_Room
+                    (priceWater,priceElectricity,priceInternet,priceTV,priceParkingSpace);
+
+            dataCommunication.LivingExpenses(stage2);
+
+            fragment_image fragment = new fragment_image();
+            FragmentManager fragmentManager = getFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.replace(R.id.frameContainer, fragment);
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
+        });
+        return view;
     }
+
 }

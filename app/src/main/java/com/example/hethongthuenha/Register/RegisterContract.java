@@ -1,11 +1,5 @@
 package com.example.hethongthuenha.Register;
 
-import com.example.hethongthuenha.model.District;
-import com.example.hethongthuenha.model.Province;
-
-import java.util.ArrayList;
-import java.util.List;
-
 public interface RegisterContract {
 
     interface Presenter{

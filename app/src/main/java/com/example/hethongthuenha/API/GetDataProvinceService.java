@@ -1,13 +1,12 @@
 package com.example.hethongthuenha.API;
 
-import com.example.hethongthuenha.model.District;
-import com.example.hethongthuenha.model.Province;
+import com.example.hethongthuenha.Model.District;
+import com.example.hethongthuenha.Model.Province;
 
 import java.util.List;
 
 import io.reactivex.Observable;
 import retrofit2.http.GET;
-import retrofit2.http.POST;
 
 public interface GetDataProvinceService {
 
