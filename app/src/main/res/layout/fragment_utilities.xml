@@ -29,6 +29,7 @@
                 android:src="@drawable/wifi" />
 
             <CheckBox
+                android:id="@+id/cbUtility1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Wifi" />
@@ -48,6 +49,7 @@
                 android:src="@drawable/wifi" />
 
             <CheckBox
+                android:id="@+id/cbUtility2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Wifi" />
@@ -67,6 +69,7 @@
                 android:src="@drawable/wifi" />
 
             <CheckBox
+                android:id="@+id/cbUtility3"
                 android:layout_width="wrap_content"
                 android:layout_height="35dp"
                 android:text="Wifi" />
@@ -93,6 +96,7 @@
                 android:src="@drawable/bolt" />
 
             <CheckBox
+                android:id="@+id/cbUtility4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Wifi" />
@@ -112,6 +116,7 @@
                 android:src="@drawable/bolt" />
 
             <CheckBox
+                android:id="@+id/cbUtility5"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Wifi" />
@@ -131,12 +136,84 @@
                 android:src="@drawable/bolt" />
 
             <CheckBox
+                android:id="@+id/cbUtility6"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Wifi" />
 
         </LinearLayout>
+
     </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_marginTop="30sp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:layout_width="30sp"
+                android:layout_height="30sp"
+                android:src="@drawable/bolt" />
+
+            <CheckBox
+                android:id="@+id/cbUtility7"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Wifi" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:layout_width="30sp"
+                android:layout_height="30sp"
+                android:src="@drawable/bolt" />
+
+            <CheckBox
+                android:id="@+id/cbUtility8"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Wifi" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:layout_width="30sp"
+                android:layout_height="30sp"
+                android:src="@drawable/bolt" />
+
+            <CheckBox
+                android:id="@+id/cbUtility9"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Wifi" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
 
     <TextView
         android:layout_width="0dp"

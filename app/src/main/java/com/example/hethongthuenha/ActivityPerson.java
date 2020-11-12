@@ -8,15 +8,18 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.google.firebase.auth.FirebaseAuth;
+
 import java.util.ArrayList;
 
 public class ActivityPerson extends AppCompatActivity {
     private ListView lvSetting;
+    private FirebaseAuth mAuth;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_person);
-
+        mAuth=FirebaseAuth.getInstance();
         lvSetting=findViewById(R.id.lvSettingPerson);
 
 
@@ -32,7 +35,9 @@ public class ActivityPerson extends AppCompatActivity {
         lvSetting.setAdapter(adapter);
 
         lvSetting.setOnItemClickListener((parent, view, position, id) -> {
-            if(position==4){}
+            if(position==4){
+                mAuth.signOut();
+            }
         });
     }
 }

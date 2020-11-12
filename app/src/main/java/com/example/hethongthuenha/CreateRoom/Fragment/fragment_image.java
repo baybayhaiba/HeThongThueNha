@@ -1,6 +1,11 @@
 package com.example.hethongthuenha.CreateRoom.Fragment;
 
 import android.Manifest;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -17,6 +22,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,43 +30,71 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.example.hethongthuenha.CreateRoom.CreateRoomActivity;
+import com.example.hethongthuenha.Model.Image_Room;
 import com.example.hethongthuenha.R;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.Timestamp;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class fragment_image extends Fragment {
 
 
-
+    IDataCommunication dataCommunication;
 
     public fragment_image() {
         // Required empty public constructor
     }
 
 
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        try {
+            dataCommunication = (IDataCommunication) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString()
+                    + " must implement DataCommunication");
+        }
+    }
 
     private static final int IMAGE_PICK_CODE = 1000;
     private static final int PERMISSION_CODE = 1001;
-    private ImageView[] listImgRoom=new ImageView[4];
-    private int imageAdded=0;
+    private ImageView[] listImgRoom = new ImageView[4];
+    private Uri[] uri = new Uri[4];
+    private int imageAdded = 0;
+    private StorageReference mStorageRef;
+    private List<String> imageUrl;
+    private ProgressDialog progressDialog;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_image, container, false);
-
-        Button btnFinishStage3=view.findViewById(R.id.btnFinishStage3);
-
-        for(int i=0;i<4;i++){
-            String textViewStageId="imgRoom"+(i+1);
-            int resId=getResources().getIdentifier(textViewStageId,"id",getActivity().getPackageName());
-            listImgRoom[i]=view.findViewById(resId);
+        mStorageRef = FirebaseStorage.getInstance().getReference();
+        Button btnFinishStage3 = view.findViewById(R.id.btnFinishStage3);
+        progressDialog = new ProgressDialog(getActivity());
+        progressDialog.setMessage("Làm ơn đợi");
+        imageUrl = new ArrayList<>();
+        for (int i = 0; i < 4; i++) {
+            String textViewStageId = "imgRoom" + (i + 1);
+            int resId = getResources().getIdentifier(textViewStageId, "id", getActivity().getPackageName());
+            listImgRoom[i] = view.findViewById(resId);
 
             listImgRoom[i].setOnClickListener(v -> {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -77,16 +111,44 @@ public class fragment_image extends Fragment {
         }
 
 
-
         btnFinishStage3.setOnClickListener(v -> {
-            fragment_utilities fragment = new fragment_utilities();
-            FragmentManager fragmentManager = getFragmentManager();
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.replace(R.id.frameContainer, fragment);
-            fragmentTransaction.addToBackStack(null);
-            fragmentTransaction.commit();
+            if (isValid()) {
+                progressDialog.show();
+                SaveImage();
+            }
+
         });
         return view;
+    }
+
+    private void SaveImage() {
+        StorageReference filepath;
+
+        for (int i = 0; i < uri.length;i++) {
+
+            filepath = mStorageRef.child("room_image").child(CreateRoomActivity.myID + "room_" + i);
+            StorageReference finalFilepath = filepath;
+
+            filepath.putFile(uri[i])
+                    .addOnSuccessListener(taskSnapshot -> finalFilepath.getDownloadUrl().
+                            addOnSuccessListener(uri -> {
+                                imageUrl.add(uri.toString());
+
+                                if (imageUrl.size() == 4) {
+                                    fragment_utilities fragment = new fragment_utilities();
+                                    FragmentManager fragmentManager = getFragmentManager();
+                                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                                    fragmentTransaction.replace(R.id.frameContainer, fragment);
+                                    fragmentTransaction.addToBackStack(null);
+                                    fragmentTransaction.commit();
+                                    dataCommunication.Image(new Image_Room(imageUrl));
+                                    progressDialog.dismiss();
+                                }
+                            })).
+                    addOnFailureListener(e -> Log.d("SIMPLE", "onFailure: " + e.getMessage()));
+
+        }
+
     }
 
     @Override
@@ -96,9 +158,10 @@ public class fragment_image extends Fragment {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
                 PickImageFromGallery();
             else
-                Toast.makeText(getActivity(), "Permisstion deny", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Permission deny", Toast.LENGTH_SHORT).show();
         }
     }
+
     public void PickImageFromGallery() {
         Intent intent = new Intent(Intent.ACTION_PICK);
         intent.setType("image/*");
@@ -108,16 +171,10 @@ public class fragment_image extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == getActivity().RESULT_OK && requestCode == IMAGE_PICK_CODE) {
-            Uri uri=data.getData();
+        if (resultCode == Activity.RESULT_OK && requestCode == IMAGE_PICK_CODE) {
+            uri[imageAdded] = data.getData();
 
-
-            File file=new File(getPath(uri));
-//            Bitmap myBitmap = BitmapFactory.decodeFile(file.getAbsolutePath());
-//            listImgRoom[imageAdded].setImageBitmap(myBitmap);
-            Uri newUri=Uri.parse(uri.toString());
-
-            listImgRoom[imageAdded].setImageURI(newUri);
+            listImgRoom[imageAdded].setImageURI(uri[imageAdded]);
 
             listImgRoom[imageAdded].setContentDescription("Added");
 
@@ -125,15 +182,28 @@ public class fragment_image extends Fragment {
         }
     }
 
-    public String getPath(Uri uri)
-    {
-        String[] projection = { MediaStore.Images.Media.DATA };
-        Cursor cursor = getActivity().getContentResolver().query(uri, projection, null, null, null);
-        if (cursor == null) return null;
-        int column_index =             cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-        cursor.moveToFirst();
-        String s=cursor.getString(column_index);
-        cursor.close();
-        return s;
+    private boolean isValid() {
+        String errorImg = "";
+        boolean valid = true;
+        for (int i = 0; i < listImgRoom.length; i++)
+            if (listImgRoom[i].getContentDescription() == null) {
+                errorImg += "Bạn chưa chọn ảnh " + (i + 1) + "\n";
+                valid = false;
+            }
+
+        if (!errorImg.equals(""))
+            NotificationInValid(errorImg);
+        return valid;
+    }
+
+    private AlertDialog NotificationInValid(String error) {
+        AlertDialog alertDialog = new AlertDialog.Builder(getActivity()).create();
+        alertDialog.setTitle("Thông báo");
+        alertDialog.setMessage(error);
+        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                (dialog, which) -> dialog.dismiss());
+        alertDialog.show();
+
+        return alertDialog;
     }
 }

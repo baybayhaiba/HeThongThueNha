@@ -2,7 +2,7 @@ package com.example.hethongthuenha.Register;
 
 import android.util.Log;
 
-import com.example.hethongthuenha.Model.Renter;
+import com.example.hethongthuenha.Model.Person;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -28,8 +28,9 @@ public class RegisterPresenter implements RegisterContract.Presenter {
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(task -> {
                     if(task.isSuccessful()){
+                        String id=task.getResult().getUser().getUid();
                         mFirebase.collection("User")
-                                .add(new Renter(email, username, contact))
+                                .add(new Person(id,username, email, contact))
                                 .addOnSuccessListener(documentReference -> Log.d(TAG, "onSuccess: "))
                                 .addOnFailureListener(e -> Log.d(TAG, "onFailure: "));
                         view.registerSuccess();

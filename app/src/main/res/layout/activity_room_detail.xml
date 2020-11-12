@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ActivityRoomDetail">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/img_room_main_detail"
+            android:layout_width="match_parent"
+            android:scaleType="fitXY"
+            android:src="@drawable/home"
+            android:layout_height="300sp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10sp"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_marginLeft="10sp"
+                android:layout_marginRight="10sp"
+                android:id="@+id/img_room1_detail"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:src="@drawable/home"
+                android:layout_height="50sp"/>
+            <ImageView
+                android:layout_marginLeft="10sp"
+                android:layout_marginRight="10sp"
+                android:id="@+id/img_room2_detail"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:src="@drawable/home"
+                android:layout_height="50sp"/>
+            <ImageView
+                android:layout_marginLeft="10sp"
+                android:layout_marginRight="10sp"
+                android:id="@+id/img_room3_detail"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:src="@drawable/home"
+                android:layout_height="50sp"/>
+            <ImageView
+                android:layout_marginLeft="10sp"
+                android:layout_marginRight="10sp"
+                android:id="@+id/img_room4_detail"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:src="@drawable/home"
+                android:layout_height="50sp"/>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_title_detail_room"
+            android:layout_marginTop="20sp"
+            android:layout_marginLeft="20sp"
+            android:layout_width="match_parent"
+            android:textSize="20sp"
+            android:fontFamily="@font/belleza"
+            android:textStyle="bold"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:text="Nha thoang mat sach se"/>
+        <TextView
+            android:id="@+id/tv_address_detail_room"
+            android:layout_marginTop="20sp"
+            android:textSize="20sp"
+            android:layout_marginLeft="20sp"
+            android:fontFamily="@font/belleza"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:text="Nha thoang mat sach se"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20sp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginLeft="20sp"
+                android:textColor="@color/black"
+                android:text="Gia:5Tr3/!thang"
+                android:id="@+id/tv_price_detail_room"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginLeft="20sp"
+                android:textColor="@color/black"
+                android:text="Suc chua:4 nguoi"
+                android:id="@+id/tv_accommodation_detail_room"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20sp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginLeft="20sp"
+                android:textColor="@color/black"
+                android:text="Loai:Phong tro"
+                android:id="@+id/tv_type_room_detail_room"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginLeft="20sp"
+                android:textColor="@color/black"
+                android:text="Dien tich:200m"
+                android:id="@+id/tv_area_detail_room"/>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_description_detail_room"
+            android:layout_marginTop="20sp"
+            android:layout_marginLeft="20sp"
+            android:layout_width="match_parent"
+            android:textSize="20sp"
+            android:fontFamily="@font/belleza"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:text="Nha thoang mat sach se"/>
+
+        <TextView
+            android:id="@+id/tv_amout_detail_room"
+            android:layout_marginTop="20sp"
+            android:layout_marginLeft="20sp"
+            android:textSize="20sp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:fontFamily="@font/belleza"
+            android:textStyle="bold"
+            android:text="So luong:12/15"/>
+
+        <TextView
+            android:id="@+id/tv_utilities_detail_room"
+            android:layout_marginTop="20sp"
+            android:layout_marginLeft="20sp"
+            android:textSize="20sp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:fontFamily="@font/belleza"
+            android:textStyle="bold"
+            android:text="Tiện ích chung"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20sp"
+            android:layout_marginLeft="30sp"
+            android:layout_marginRight="20sp"
+            android:layout_marginBottom="20sp"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_width="30sp"
+                    android:layout_height="30sp"
+                    android:src="@drawable/wifi"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="Wifi"/>
+            </LinearLayout>
+
+
+        </LinearLayout>
+    </LinearLayout>
+
+</ScrollView>

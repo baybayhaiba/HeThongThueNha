@@ -36,11 +36,14 @@
         android:inputType="text"
         android:drawableLeft="@drawable/ic_baseline_search_24"/>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/etSearch" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/roomRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@id/bottom_navigation"
+            android:layout_below="@id/etSearch" />
+
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/floatingActionButton"
@@ -62,5 +65,4 @@
         app:itemIconTint="@color/white"
         app:itemTextColor="@android:color/white"
         app:menu="@menu/menu_main_bottom" />
-
 </RelativeLayout>

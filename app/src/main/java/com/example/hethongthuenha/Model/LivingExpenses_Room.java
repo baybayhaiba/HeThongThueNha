@@ -1,6 +1,8 @@
 package com.example.hethongthuenha.Model;
 
-public class LivingExpenses_Room {
+import java.io.Serializable;
+
+public class LivingExpenses_Room implements Serializable{
     private double mWater;
     private double mEletric;
     private double mInternet;

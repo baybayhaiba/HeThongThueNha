@@ -1,16 +1,30 @@
 package com.example.hethongthuenha.Model;
 
-public abstract class  Person {
+import android.app.Application;
+
+public class  Person{
+    private String uid;
     private String fullName;
     private String email;
     private String contact;
 
-    public Person() { }
 
-    public Person(String fullName, String email, String contact) {
+    public Person() {
+    }
+
+    public Person(String uid, String fullName, String email, String contact) {
+        this.uid = uid;
         this.fullName = fullName;
         this.email = email;
         this.contact = contact;
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 
     public String getFullName() {
@@ -40,8 +54,9 @@ public abstract class  Person {
     @Override
     public String toString() {
         return "Person{" +
-                " fullName='" + fullName + '\'' +
-                ", origin='" + email + '\'' +
+                "uid='" + uid + '\'' +
+                ", fullName='" + fullName + '\'' +
+                ", email='" + email + '\'' +
                 ", contact='" + contact + '\'' +
                 '}';
     }

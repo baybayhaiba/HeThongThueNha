@@ -23,20 +23,12 @@ public class LoginPresenter implements LoginContract.Presenter {
         view.loginPeding();
 
         mAuth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful())
-                            view.loginSuccess();
-                        else
-                            view.loginFail("Đăng nhập thất bại !!!");
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                view.loginFail("Đăng nhập thất bại !!!");
-            }
-        });
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful())
+                        view.loginSuccess();
+                    else
+                        view.loginFail("Đăng nhập thất bại !!!");
+                }).addOnFailureListener(e -> view.loginFail("Đăng nhập thất bại !!!"));
     }
 
 }

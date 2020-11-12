@@ -1,8 +1,9 @@
 package com.example.hethongthuenha.Model;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class Utilities_Room {
+public class Utilities_Room implements Serializable{
     private List<String> description_utility;
 
     public Utilities_Room() {

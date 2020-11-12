@@ -1,6 +1,8 @@
 package com.example.hethongthuenha.Model;
 
-public class Description_Room {
+import java.io.Serializable;
+
+public class Description_Room implements Serializable{
     private String title;
     private String description;
     private String address;
