@@ -97,7 +97,7 @@ public class CreateRoomActivity extends AppCompatActivity implements IDataCommun
 
     private void setFragment() {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.add(R.id.frameContainer, new fragment_image());
+            ft.add(R.id.frameContainer, new fragment_description());
             ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
             ft.addToBackStack(null);
             ft.commit();

@@ -22,6 +22,7 @@ import com.example.hethongthuenha.Model.Room;
 import com.example.hethongthuenha.R;
 import com.squareup.picasso.Picasso;
 
+import java.text.NumberFormat;
 import java.util.List;
 
 public class RoomRecyclerView extends RecyclerView.Adapter<RoomRecyclerView.MyViewHolder> {
@@ -62,20 +63,21 @@ public class RoomRecyclerView extends RecyclerView.Adapter<RoomRecyclerView.MyVi
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         Room room=rooms.get(position);
-
         Description_Room stage1=room.getStage1();
         Image_Room stage3=room.getStage3();
 
+        NumberFormat formatter = NumberFormat.getCurrencyInstance();
+
         String title=stage1.getTitle();
         String address= stage1.getAddress();
-        String price=String.valueOf(stage1.getPrice());
+        String price=formatter.format(stage1.getPrice());
         String type_room=stage1.getType_room();
         String type_date=stage1.getType_date();
         String urlImg=stage3.getImagesURL().get(0);
 
         holder.tvTitle.setText(title);
         holder.tvAddress.setText(address);
-        holder.tvPrice.setText(price+"VNĐ/"+type_date);
+        holder.tvPrice.setText(price+"/"+type_date);
         holder.tvTypeRoom.setText(type_room);
 
         String timeAgo=(String) DateUtils.getRelativeTimeSpanString(room.getTimeAdded()
@@ -87,7 +89,6 @@ public class RoomRecyclerView extends RecyclerView.Adapter<RoomRecyclerView.MyVi
                 .placeholder(R.drawable.loading).into(holder.imgRoom);
 
         holder.cardView.setOnClickListener(v->{
-            Log.d("SIMPLE", "onBindViewHolder: "+room.toString());
             Intent intent=new Intent(context, ActivityRoomDetail.class);
             intent.putExtra("room",room);
             context.startActivity(intent);

@@ -47,15 +47,19 @@ public class SplashScreenActivity extends AppCompatActivity {
                                 PersonAPI personAPI = PersonAPI.getInstance();
                                 personAPI.setUid(person.getUid());
                                 personAPI.setName(person.getFullName());
-
+                                personAPI.setEmail(person.getEmail());
                                 startActivity(new Intent(SplashScreenActivity.this, MainActivity.class));
+                                finish();
                             }
                         }
 
                     }
                 }).addOnFailureListener(e -> Log.d("SplashScreen-Error", "onCreate: "+e.getMessage()));
-            } else
+            } else{
                 startActivity(new Intent(SplashScreenActivity.this, LoginActivity.class));
+                finish();
+            }
+
         }
 
         ;

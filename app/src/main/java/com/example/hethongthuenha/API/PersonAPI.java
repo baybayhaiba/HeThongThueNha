@@ -5,6 +5,7 @@ import android.app.Application;
 public class PersonAPI extends Application {
     private String uid;
     private String name;
+    private String email;
     private static PersonAPI instance;
 
     public static PersonAPI getInstance() {
@@ -35,6 +36,14 @@ public class PersonAPI extends Application {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     @Override

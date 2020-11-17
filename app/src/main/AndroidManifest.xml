@@ -15,8 +15,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.HeThongThueNha">
-        <activity android:name=".ActivityRoomDetail"></activity>
-        <activity android:name=".ActivityPerson" />
+        <activity android:name=".ActivityChat"></activity>
+        <activity android:name=".ActivityPerson"></activity>
+        <activity android:name=".ActivityRoomDetail" />
+        <activity android:name=".ActivitySettingPerson" />
         <activity android:name=".CreateRoom.CreateRoomActivity" />
         <activity android:name=".Register.RegisterActivity" />
         <activity android:name=".Login.LoginActivity" />

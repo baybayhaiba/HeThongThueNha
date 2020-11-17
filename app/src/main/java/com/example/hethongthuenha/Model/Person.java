@@ -7,16 +7,26 @@ public class  Person{
     private String fullName;
     private String email;
     private String contact;
+    private String url;
 
 
     public Person() {
     }
 
-    public Person(String uid, String fullName, String email, String contact) {
+    public Person(String uid, String fullName, String email, String contact,String url) {
         this.uid = uid;
         this.fullName = fullName;
         this.email = email;
         this.contact = contact;
+        this.url=url;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     public String getUid() {
