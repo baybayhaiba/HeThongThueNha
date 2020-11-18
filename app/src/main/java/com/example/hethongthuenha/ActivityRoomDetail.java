@@ -144,7 +144,7 @@ ActivityRoomDetail extends AppCompatActivity {
             builderSingle.setIcon(R.drawable.home);
             builderSingle.setTitle("Chọn hình thức thanh toán");
 
-            final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(ActivityRoomDetail.this, android.R.layout.select_dialog_singlechoice);
+            final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(ActivityRoomDetail.this, android.R.layout.select_dialog_item);
             arrayAdapter.add("Thanh toán trả trước");
             arrayAdapter.add("Thanh toán trả sau");
 

@@ -42,7 +42,8 @@
                 android:id="@+id/tv_custom_last_chat"
                 android:layout_marginBottom="10sp"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="20sp"
+                android:gravity="bottom"
                 android:text="Toi muon thue nha"/>
 
         </LinearLayout>

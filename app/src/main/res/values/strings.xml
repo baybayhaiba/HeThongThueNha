@@ -9,4 +9,10 @@
         <item>Tháng</item>
         <item>Năm</item>
     </string-array>
+
+    <string-array name="spTypeRoom">
+        <item>Nhà nguyên căn</item>
+        <item>Nhà trọ</item>
+        <item>Nhà ở ghép</item>
+    </string-array>
 </resources>

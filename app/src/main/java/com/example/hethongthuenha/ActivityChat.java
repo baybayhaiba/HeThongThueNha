@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -52,10 +53,8 @@ public class ActivityChat extends AppCompatActivity {
     private TextView tvNamePerson;
     private List<Chat> path;
     private ImageView imgAvatar, imgBack;
-    private FirebaseDatabase firebaseDatabase;
     private HistoryChat historyChat;
     CollectionReference history_chat_path;
-    HashMap<String, Object> myObject;
 
     public interface FireStoreCallBack {
         void onCallBack(String path);
@@ -89,25 +88,28 @@ public class ActivityChat extends AppCompatActivity {
         imgBack.setOnClickListener(v -> {
             onBackPressed();
         });
-        firebaseDatabase = FirebaseDatabase.getInstance();
         GetPath();
-        SendChat();
+
+        btnSend.setOnClickListener(v -> {
+            SendChat(edText.getText().toString());
+        });
     }
 
     private void GetPath() {
         FindPath(path -> {
-            collectionReference = db.collection(path);
+                    collectionReference = db.collection(path);
 
-            collectionReference.orderBy("id_chat").limitToLast(10).addSnapshotListener((value, error) -> {
-                chats.clear();
-                if (error == null) {
-                    for (QueryDocumentSnapshot query : value) {
-                        chats.add(query.toObject(Chat.class));
-                    }
-                    adapter.notifyDataSetChanged();
-                }
-            });
-        });
+                    collectionReference.orderBy("id_chat").limitToLast(10).addSnapshotListener((value, error) -> {
+                        chats.clear();
+                        if (error == null) {
+                            for (QueryDocumentSnapshot query : value) {
+                                chats.add(query.toObject(Chat.class));
+                            }
+                            adapter.notifyDataSetChanged();
+                            recyclerView.scrollToPosition(chats.size() - 1);
+                        }
+                    });
+                });
     }
 
 
@@ -128,42 +130,40 @@ public class ActivityChat extends AppCompatActivity {
                 });
     }
 
-    private void SendChat() {
-        btnSend.setOnClickListener(v -> {
-            String text = edText.getText().toString();
+    private void GetInformRequirement() {
+        String description = getIntent().getStringExtra("description");
 
-            if (!text.equals("")) {
-                history_chat_path = db.collection("History-chat");
-                Chat chat;
-                myObject = new HashMap<String, Object>();
-                historyChat.setPathChat(collectionReference.getPath());
+        if (description != null)
+            SendChat(description);
+    }
+
+    private void SendChat(String text) {
+        if (!text.equals("")) {
+            history_chat_path = db.collection("History-chat");
+            Chat chat;
+            historyChat.setPathChat(collectionReference.getPath());
+            historyChat.setChatAdded(new Timestamp(new Date()));
+            historyChat.setLastChat(text);
+            historyChat.setFromATo(tvNamePerson.getText().toString() + "-" + PersonAPI.getInstance().getName());
+            if (chats.isEmpty()) {
+                chat = new Chat(1, text, fromEmail, toEmail);
+                history_chat_path.add(historyChat);
+            } else {
+                chat = new Chat(chats.get(chats.size() - 1).getId_chat() + 1, text, fromEmail, toEmail);
                 historyChat.setChatAdded(new Timestamp(new Date()));
                 historyChat.setLastChat(text);
-                historyChat.setFromATo(tvNamePerson.getText().toString()+"-"+PersonAPI.getInstance().getName());
-                if (chats.isEmpty()) {
-                    chat = new Chat(1, text, fromEmail, toEmail);
-                    history_chat_path.add(historyChat);
-                } else {
-                    chat = new Chat(chats.get(chats.size() - 1).getId_chat() + 1, text, fromEmail, toEmail);
-                    myObject.put("lastChat", historyChat.getLastChat());
-                    myObject.put("chatAdded", new Timestamp(new Date()));
-                    history_chat_path.whereEqualTo("pathChat", historyChat.getPathChat())
-                            .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                            if(task.isSuccessful()){
-                                for(QueryDocumentSnapshot documentSnapshot:task.getResult()){
-                                    history_chat_path.document(documentSnapshot.getId())
-                                            .update(myObject);
-                                }
-                            }
+                history_chat_path.whereEqualTo("pathChat", historyChat.getPathChat())
+                        .get().addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot documentSnapshot : task.getResult()) {
+                            history_chat_path.document(documentSnapshot.getId())
+                                    .set(historyChat);
                         }
-                    });
-                }
-                collectionReference.add(chat);
-                edText.setText("");
+                    }
+                });
             }
-
-        });
+            collectionReference.add(chat);
+            edText.setText("");
+        }
     }
 }

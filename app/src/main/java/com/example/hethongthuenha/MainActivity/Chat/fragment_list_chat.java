@@ -75,7 +75,7 @@ public class fragment_list_chat extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
 
-        refHistoryChat.get().addOnSuccessListener((value) -> {
+        refHistoryChat.orderBy("chatAdded", Query.Direction.DESCENDING).get().addOnSuccessListener((value) -> {
             personChats.clear();
             for (QueryDocumentSnapshot historyChats : value) {
                 HistoryChat historyChat = historyChats.toObject(HistoryChat.class);
