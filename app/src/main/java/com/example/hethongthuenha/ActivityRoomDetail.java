@@ -20,8 +20,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.hethongthuenha.API.PersonAPI;
 import com.example.hethongthuenha.Adapter.UtilitieseRecyclerView;
-import com.example.hethongthuenha.Gesture.OnSwipeTouchListener;
 import com.example.hethongthuenha.Model.Description_Room;
 import com.example.hethongthuenha.Model.Image_Room;
 import com.example.hethongthuenha.Model.LivingExpenses_Room;
@@ -30,13 +30,13 @@ import com.example.hethongthuenha.Model.Room;
 import com.example.hethongthuenha.Model.Utilities_Room;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.squareup.picasso.Picasso;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 public class
 ActivityRoomDetail extends AppCompatActivity {
@@ -116,30 +116,54 @@ ActivityRoomDetail extends AppCompatActivity {
         formatter = NumberFormat.getCurrencyInstance();
 
 
-        etComment=findViewById(R.id.et_comment_detail);
-        cvPerson=findViewById(R.id.cv_person_detail);
+        etComment = findViewById(R.id.et_comment_detail);
+        cvPerson = findViewById(R.id.cv_person_detail);
 
         LoadUtilities(utilities_room);
-        LoadImage(image_room);
+        //LoadImage(image_room);
         LoadInformation(description_room);
         LoadInformPerson(room.getPerson_id());
         LoadLivingExpesens(livingExpenses_room);
-        TestNotification();
+        NotificationPay();
         CommentRoom();
         GoToPerson();
     }
 
-    private void GoToPerson(){
-        cvPerson.setOnClickListener(v->{
-            Intent intent=new Intent(ActivityRoomDetail.this,ActivityPerson.class);
-            intent.putExtra("id_person",room.getPerson_id());
+    private void GoToPerson() {
+        cvPerson.setOnClickListener(v -> {
+            Intent intent = new Intent(ActivityRoomDetail.this, ActivityPerson.class);
+            intent.putExtra("id_person", room.getPerson_id());
             startActivity(intent);
         });
     }
 
-    private void TestNotification(){
+    private void Prepayment() {
 
-        btnBookRoom.setOnClickListener(v->{
+        String contact = "0169xxxxxx";
+        String id_room = room.getRoom_id();
+        String id_person = PersonAPI.getInstance().getUid();
+        String text = "Nội dung cú pháp gửi tiền:\n" +
+                "\nRoom:" + id_room + "\n" +
+                "\nID:" + id_person + "\n" +
+                " \n" +
+                "-----------------------------------------------\n" +
+                "Số tài khoản:" + contact + "\n" +
+                " \n" +
+                "Tên chủ tài khoản:An a\n" +
+                " \n" +
+                "*Ít nhất bạn phải đóng ít nhất 10% tiền trọ nếu không sẽ hoàn tiền\n" +
+                "gửi lại sau 5-10 ngày\n";
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Thông báo trả trước");
+        builder.setMessage(text);
+        builder.setPositiveButton("Tôi đã hiểu", (dialog, which) -> dialog.dismiss());
+        builder.show();
+    }
+
+    private void NotificationPay() {
+
+        btnBookRoom.setOnClickListener(v -> {
             AlertDialog.Builder builderSingle = new AlertDialog.Builder(ActivityRoomDetail.this);
             builderSingle.setIcon(R.drawable.home);
             builderSingle.setTitle("Chọn hình thức thanh toán");
@@ -151,17 +175,36 @@ ActivityRoomDetail extends AppCompatActivity {
             builderSingle.setNegativeButton("Hủy", (dialog, which) -> dialog.dismiss());
 
             builderSingle.setAdapter(arrayAdapter, (dialog, which) -> {
-                String strName = arrayAdapter.getItem(which);
-//                AlertDialog.Builder builderInner = new AlertDialog.Builder(ActivityRoomDetail.this);
-//                builderInner.setMessage(strName);
-//                builderInner.setTitle("Your Selected Item is");
-//                builderInner.setPositiveButton("Ok", (dialog1, which1) -> dialog1.dismiss());
-//                builderInner.show();  
-                Toast.makeText(this, strName, Toast.LENGTH_SHORT).show();
+                //String strName = arrayAdapter.getItem(which);
+                switch (which) {
+                    case 0:
+                        Prepayment();
+                        break;
+                    case 1:
+                        PayLater();
+                        break;
+                }
             });
             builderSingle.show();
         });
 
+    }
+
+    private void PayLater() {
+        db.collection("User").whereEqualTo("uid", room.getPerson_id())
+                .get().addOnCompleteListener(value -> {
+            if (value.isSuccessful()) {
+                for (QueryDocumentSnapshot persons : value.getResult()) {
+                    Person person = persons.toObject(Person.class);
+                    Intent intent = new Intent(ActivityRoomDetail.this, ActivityChat.class);
+                    intent.putExtra("toEmail", person.getEmail());
+                    intent.putExtra("toName", person.getFullName());
+                    intent.putExtra("description_room", "Tôi muốn thuê căn nhà " + room.getStage1().getTitle());
+                    intent.putExtra("url", room.getStage3().getImagesURL().get(0));
+                    startActivity(intent);
+                }
+            }
+        });
     }
 
     private void LoadInformPerson(String id_person) {
@@ -243,7 +286,7 @@ ActivityRoomDetail extends AppCompatActivity {
         }
     }
 
-    private void CommentRoom(){
+    private void CommentRoom() {
         etComment.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_SEARCH ||
                     actionId == EditorInfo.IME_ACTION_DONE ||

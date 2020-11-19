@@ -5,16 +5,17 @@ public class Chat {
     private String text;
     private String from_email_person;
     private String to_email_person;
-
+    private String url;
 
     public Chat() {
     }
 
-    public Chat(int id_chat, String text, String from_id_person, String to_id_person) {
+    public Chat(int id_chat, String text, String from_email_person, String to_email_person, String url) {
         this.id_chat = id_chat;
         this.text = text;
-        this.from_email_person = from_id_person;
-        this.to_email_person = to_id_person;
+        this.from_email_person = from_email_person;
+        this.to_email_person = to_email_person;
+        this.url = url;
     }
 
     public int getId_chat() {
@@ -49,13 +50,11 @@ public class Chat {
         this.to_email_person = to_email_person;
     }
 
-    @Override
-    public String toString() {
-        return "Chat{" +
-                "id_chat='" + id_chat + '\'' +
-                ", text='" + text + '\'' +
-                ", from_id_person='" + from_email_person + '\'' +
-                ", to_id_person='" + to_email_person + '\'' +
-                '}';
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 }

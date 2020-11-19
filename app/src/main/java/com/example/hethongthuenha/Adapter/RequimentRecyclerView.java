@@ -29,7 +29,7 @@ public class RequimentRecyclerView extends RecyclerView.Adapter<RequimentRecycle
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     public ListenerRequirement listenerEdit;
     public ListenerRequirement listenerCardView;
-
+    NumberFormat formatter = NumberFormat.getCurrencyInstance();
     public interface ListenerRequirement {
         public void getRequirement(Requirement requirement);
     }
@@ -76,7 +76,7 @@ public class RequimentRecyclerView extends RecyclerView.Adapter<RequimentRecycle
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         Requirement requirement = requirements.get(position);
-        NumberFormat formatter = NumberFormat.getCurrencyInstance();
+
         db.collection("User").whereEqualTo("uid", requirement.getId_person())
                 .get().addOnSuccessListener(v -> {
             for (QueryDocumentSnapshot persons : v) {

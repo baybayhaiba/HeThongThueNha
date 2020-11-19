@@ -89,27 +89,28 @@ public class ActivityChat extends AppCompatActivity {
             onBackPressed();
         });
         GetPath();
-
+        GetInformRequirement();
+        GetInFormRoomDetail();
         btnSend.setOnClickListener(v -> {
-            SendChat(edText.getText().toString());
+            SendChat(chats, edText.getText().toString(), "");
         });
     }
 
     private void GetPath() {
         FindPath(path -> {
-                    collectionReference = db.collection(path);
+            collectionReference = db.collection(path);
 
-                    collectionReference.orderBy("id_chat").limitToLast(10).addSnapshotListener((value, error) -> {
-                        chats.clear();
-                        if (error == null) {
-                            for (QueryDocumentSnapshot query : value) {
-                                chats.add(query.toObject(Chat.class));
-                            }
-                            adapter.notifyDataSetChanged();
-                            recyclerView.scrollToPosition(chats.size() - 1);
-                        }
-                    });
-                });
+            collectionReference.orderBy("id_chat").limitToLast(10).addSnapshotListener((value, error) -> {
+                chats.clear();
+                if (error == null) {
+                    for (QueryDocumentSnapshot query : value) {
+                        chats.add(query.toObject(Chat.class));
+                    }
+                    adapter.notifyDataSetChanged();
+                    recyclerView.scrollToPosition(chats.size() - 1);
+                }
+            });
+        });
     }
 
 
@@ -121,7 +122,6 @@ public class ActivityChat extends AppCompatActivity {
                         for (QueryDocumentSnapshot query : value) {
                             path.add(query.toObject(Chat.class));
                         }
-
                         if (path.size() != 0)
                             fireStoreCallBack.onCallBack("Chat(" + fromEmail + "-" + toEmail + ")");
                         else
@@ -130,14 +130,55 @@ public class ActivityChat extends AppCompatActivity {
                 });
     }
 
+    //I dont wanna see >.<
     private void GetInformRequirement() {
-        String description = getIntent().getStringExtra("description");
+        FindPath(path -> {
+            String description = getIntent().getStringExtra("description");
+            if (description != null) {
+                collectionReference = db.collection(path);
 
-        if (description != null)
-            SendChat(description);
+                collectionReference.orderBy("id_chat").limitToLast(10).get()
+                        .addOnCompleteListener(task -> {
+                            List<Chat> chats1 = new ArrayList<>();
+                            if (task.isSuccessful()) {
+                                for (QueryDocumentSnapshot query : task.getResult())
+                                    chats1.add(query.toObject(Chat.class));
+                                if (task.isComplete()) {
+                                    if (description != null)
+                                        SendChat(chats1, description, "");
+                                }
+                            }
+                        });
+            }
+
+        });
     }
 
-    private void SendChat(String text) {
+    private void GetInFormRoomDetail() {
+        FindPath(path -> {
+            String description = getIntent().getStringExtra("description_room");
+            String url=getIntent().getStringExtra("url");
+            if(description!=null){
+                collectionReference = db.collection(path);
+
+                collectionReference.orderBy("id_chat").limitToLast(10).get()
+                        .addOnCompleteListener(task -> {
+                            List<Chat> chats1 = new ArrayList<>();
+
+                            if (task.isSuccessful()) {
+                                for (QueryDocumentSnapshot query : task.getResult())
+                                    chats1.add(query.toObject(Chat.class));
+                                if (task.isComplete()) {
+                                    if (description != null)
+                                        SendChat(chats1, description, url);
+                                }
+                            }
+                        });
+            }
+        });
+    }
+
+    private void SendChat(List<Chat> chats, String text, String url) {
         if (!text.equals("")) {
             history_chat_path = db.collection("History-chat");
             Chat chat;
@@ -146,10 +187,10 @@ public class ActivityChat extends AppCompatActivity {
             historyChat.setLastChat(text);
             historyChat.setFromATo(tvNamePerson.getText().toString() + "-" + PersonAPI.getInstance().getName());
             if (chats.isEmpty()) {
-                chat = new Chat(1, text, fromEmail, toEmail);
+                chat = new Chat(1, text, fromEmail, toEmail, url);
                 history_chat_path.add(historyChat);
             } else {
-                chat = new Chat(chats.get(chats.size() - 1).getId_chat() + 1, text, fromEmail, toEmail);
+                chat = new Chat(chats.get(chats.size() - 1).getId_chat() + 1, text, fromEmail, toEmail, url);
                 historyChat.setChatAdded(new Timestamp(new Date()));
                 historyChat.setLastChat(text);
                 history_chat_path.whereEqualTo("pathChat", historyChat.getPathChat())

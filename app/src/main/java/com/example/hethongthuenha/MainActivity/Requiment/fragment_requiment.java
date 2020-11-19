@@ -34,6 +34,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -50,7 +51,7 @@ public class fragment_requiment extends Fragment {
     private RequimentRecyclerView adapter;
     private RecyclerView recyclerView;
     private List<Requirement> requirements;
-
+    NumberFormat formatter;
     public fragment_requiment() {
         // Required empty public constructor
     }
@@ -67,6 +68,7 @@ public class fragment_requiment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_requiment, container, false);
         floatingActionButton = view.findViewById(R.id.floatingActionButton_requiment);
+        formatter= NumberFormat.getCurrencyInstance();
         LoadRequirement();
         InitAdapter(view);
         progressDialog = new ProgressDialog(getActivity());
@@ -135,7 +137,7 @@ public class fragment_requiment extends Fragment {
 
 
         String description="Hiện tại bên mình có "+requirement.getType_room()+" ở "+requirement.getAddress()
-                +" với giá "+requirement.getPrice();
+                +" với giá "+formatter.format(requirement.getPrice());
 
         //edDescription.setText("HAHAHHA TEST !!!");
 
