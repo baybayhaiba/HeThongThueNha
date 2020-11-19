@@ -1,43 +1,28 @@
 package com.example.hethongthuenha;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.hethongthuenha.API.PersonAPI;
 import com.example.hethongthuenha.Adapter.ChatRecyclerView;
 import com.example.hethongthuenha.Model.Chat;
 import com.example.hethongthuenha.Model.HistoryChat;
-import com.example.hethongthuenha.Model.Person;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
+import com.example.hethongthuenha.Model.Notification;
 import com.google.firebase.Timestamp;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class ActivityChat extends AppCompatActivity {
 
@@ -48,14 +33,14 @@ public class ActivityChat extends AppCompatActivity {
     private String fromEmail;
     private String toEmail;
     private List<Chat> chats;
-    private CollectionReference collectionReference;
+    private CollectionReference refChat;
     private ChatRecyclerView adapter;
     private TextView tvNamePerson;
     private List<Chat> path;
     private ImageView imgAvatar, imgBack;
     private HistoryChat historyChat;
-    CollectionReference history_chat_path;
-
+    private CollectionReference history_chat_path;
+    private CollectionReference refNotification;
     public interface FireStoreCallBack {
         void onCallBack(String path);
     }
@@ -98,9 +83,9 @@ public class ActivityChat extends AppCompatActivity {
 
     private void GetPath() {
         FindPath(path -> {
-            collectionReference = db.collection(path);
+            refChat = db.collection(path);
 
-            collectionReference.orderBy("id_chat").limitToLast(10).addSnapshotListener((value, error) -> {
+            refChat.orderBy("id_chat").limitToLast(10).addSnapshotListener((value, error) -> {
                 chats.clear();
                 if (error == null) {
                     for (QueryDocumentSnapshot query : value) {
@@ -132,12 +117,13 @@ public class ActivityChat extends AppCompatActivity {
 
     //I dont wanna see >.<
     private void GetInformRequirement() {
-        FindPath(path -> {
-            String description = getIntent().getStringExtra("description");
-            if (description != null) {
-                collectionReference = db.collection(path);
 
-                collectionReference.orderBy("id_chat").limitToLast(10).get()
+        String description = getIntent().getStringExtra("description");
+        if(description!=null){
+            //add last chat
+            FindPath(path -> {
+                refChat = db.collection(path);
+                refChat.orderBy("id_chat").limitToLast(10).get()
                         .addOnCompleteListener(task -> {
                             List<Chat> chats1 = new ArrayList<>();
                             if (task.isSuccessful()) {
@@ -149,19 +135,30 @@ public class ActivityChat extends AppCompatActivity {
                                 }
                             }
                         });
-            }
+            });
+            //add notification
+            String uid=getIntent().getStringExtra("toId");
+            Timestamp notificationAdded=new Timestamp(new Date());
+            refNotification=db.collection("Notification");
+            Notification notification=new Notification(PersonAPI.getInstance().getUid(),uid,description,notificationAdded);
 
-        });
+            refNotification.add(notification);
+
+        }
+
+
+        //add notification
     }
 
     private void GetInFormRoomDetail() {
+        //add last chat
         FindPath(path -> {
             String description = getIntent().getStringExtra("description_room");
             String url=getIntent().getStringExtra("url");
             if(description!=null){
-                collectionReference = db.collection(path);
+                refChat = db.collection(path);
 
-                collectionReference.orderBy("id_chat").limitToLast(10).get()
+                refChat.orderBy("id_chat").limitToLast(10).get()
                         .addOnCompleteListener(task -> {
                             List<Chat> chats1 = new ArrayList<>();
 
@@ -174,6 +171,13 @@ public class ActivityChat extends AppCompatActivity {
                                 }
                             }
                         });
+
+                String uid=getIntent().getStringExtra("toId");
+                Timestamp notificationAdded=new Timestamp(new Date());
+                refNotification=db.collection("Notification");
+                Notification notification=new Notification(PersonAPI.getInstance().getUid(),uid,description,notificationAdded);
+
+                refNotification.add(notification);
             }
         });
     }
@@ -182,7 +186,7 @@ public class ActivityChat extends AppCompatActivity {
         if (!text.equals("")) {
             history_chat_path = db.collection("History-chat");
             Chat chat;
-            historyChat.setPathChat(collectionReference.getPath());
+            historyChat.setPathChat(refChat.getPath());
             historyChat.setChatAdded(new Timestamp(new Date()));
             historyChat.setLastChat(text);
             historyChat.setFromATo(tvNamePerson.getText().toString() + "-" + PersonAPI.getInstance().getName());
@@ -203,7 +207,7 @@ public class ActivityChat extends AppCompatActivity {
                     }
                 });
             }
-            collectionReference.add(chat);
+            refChat.add(chat);
             edText.setText("");
         }
     }

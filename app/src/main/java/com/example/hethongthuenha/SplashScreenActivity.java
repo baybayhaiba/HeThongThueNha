@@ -5,7 +5,13 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
+import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.hethongthuenha.API.PersonAPI;
@@ -26,10 +32,31 @@ public class SplashScreenActivity extends AppCompatActivity {
     private FirebaseUser currentUser;
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
+
+    private static int SPLASH_TIMER = 3000;
+    Animation rightAnim, bottomAnim, rotateAnim, topAnim;
+    ImageView image, imagea, imageb;
+    TextView textView;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash_screen);
+
+
+        Animation();
+
+        Handler handler = new Handler();
+        handler.postDelayed(() -> {
+            GetInformPerson();
+            ExecutePerson();
+        }, SPLASH_TIMER);
+
+
+    }
+
+    public void GetInformPerson() {
 
         mAuth = FirebaseAuth.getInstance();
 
@@ -54,21 +81,42 @@ public class SplashScreenActivity extends AppCompatActivity {
                         }
 
                     }
-                }).addOnFailureListener(e -> Log.d("SplashScreen-Error", "onCreate: "+e.getMessage()));
-            } else{
+                }).addOnFailureListener(e -> Log.d("SplashScreen-Error", "onCreate: " + e.getMessage()));
+            } else {
                 startActivity(new Intent(SplashScreenActivity.this, LoginActivity.class));
                 finish();
             }
 
-        }
-
-        ;
+        };
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
+    public void Animation() {
+
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+
+        topAnim = AnimationUtils.loadAnimation(this, R.anim.top_animation);
+        bottomAnim = AnimationUtils.loadAnimation(this, R.anim.bottom_animation);
+        rightAnim = AnimationUtils.loadAnimation(this, R.anim.right_animation);
+        rotateAnim = AnimationUtils.loadAnimation(this, R.anim.rotate_animation);
+
+
+        textView = findViewById(R.id.chu);
+        textView.setAnimation(bottomAnim);
+
+        image = findViewById(R.id.may);
+        image.setAnimation(rightAnim);
+
+        imagea = findViewById(R.id.sun);
+        imagea.setAnimation(rotateAnim);
+
+        imageb = findViewById(R.id.anhtp);
+        imageb.setAnimation(topAnim);
+    }
+
+    public void ExecutePerson() {
         currentUser = mAuth.getCurrentUser();
         mAuth.addAuthStateListener(authStateListener);
     }
+
 }

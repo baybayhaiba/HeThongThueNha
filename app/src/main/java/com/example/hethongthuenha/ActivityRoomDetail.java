@@ -197,6 +197,7 @@ ActivityRoomDetail extends AppCompatActivity {
                 for (QueryDocumentSnapshot persons : value.getResult()) {
                     Person person = persons.toObject(Person.class);
                     Intent intent = new Intent(ActivityRoomDetail.this, ActivityChat.class);
+                    intent.putExtra("toId",person.getUid());
                     intent.putExtra("toEmail", person.getEmail());
                     intent.putExtra("toName", person.getFullName());
                     intent.putExtra("description_room", "Tôi muốn thuê căn nhà " + room.getStage1().getTitle());

@@ -52,6 +52,7 @@ public class fragment_requiment extends Fragment {
     private RecyclerView recyclerView;
     private List<Requirement> requirements;
     NumberFormat formatter;
+
     public fragment_requiment() {
         // Required empty public constructor
     }
@@ -68,7 +69,7 @@ public class fragment_requiment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_requiment, container, false);
         floatingActionButton = view.findViewById(R.id.floatingActionButton_requiment);
-        formatter= NumberFormat.getCurrencyInstance();
+        formatter = NumberFormat.getCurrencyInstance();
         LoadRequirement();
         InitAdapter(view);
         progressDialog = new ProgressDialog(getActivity());
@@ -136,8 +137,8 @@ public class fragment_requiment extends Fragment {
         tvDescription.setText(requirement.getDescription());
 
 
-        String description="Hiện tại bên mình có "+requirement.getType_room()+" ở "+requirement.getAddress()
-                +" với giá "+formatter.format(requirement.getPrice());
+        String description = "Hiện tại bên mình có " + requirement.getType_room() + " ở " + requirement.getAddress()
+                + " với giá " + formatter.format(requirement.getPrice());
 
         //edDescription.setText("HAHAHHA TEST !!!");
 
@@ -147,19 +148,24 @@ public class fragment_requiment extends Fragment {
             show.dismiss();
         });
         btnContact.setOnClickListener(v -> {
-            db.collection("User").whereEqualTo("uid", requirement.getId_person())
-                    .get().addOnCompleteListener(value -> {
-                if (value.isSuccessful()) {
-                    for (QueryDocumentSnapshot persons : value.getResult()) {
-                        Person person = persons.toObject(Person.class);
-                        Intent intent = new Intent(getActivity(), ActivityChat.class);
-                        intent.putExtra("toEmail", person.getEmail());
-                        intent.putExtra("toName", person.getFullName());
-                        intent.putExtra("description",description);
-                        startActivity(intent);
+            if (!requirement.getId_person().equals(PersonAPI.getInstance().getUid())) {
+                db.collection("User").whereEqualTo("uid", requirement.getId_person())
+                        .get().addOnCompleteListener(value -> {
+                    if (value.isSuccessful()) {
+                        for (QueryDocumentSnapshot persons : value.getResult()) {
+                            Person person = persons.toObject(Person.class);
+                            Intent intent = new Intent(getActivity(), ActivityChat.class);
+                            intent.putExtra("toId", person.getUid());
+                            intent.putExtra("toEmail", person.getEmail());
+                            intent.putExtra("toName", person.getFullName());
+                            intent.putExtra("description", description);
+                            startActivity(intent);
+                        }
                     }
-                }
-            });
+                });
+            } else
+                Toast.makeText(getActivity(), "Không thể liên lạc với chính mình", Toast.LENGTH_SHORT).show();
+
             show.dismiss();
         });
     }
