@@ -31,10 +31,6 @@
                 android:textColor="@color/black"
                 android:fontFamily="@font/belleza"
                 android:text="Thanh Huy"/>
-            <Spinner
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:entries="@array/spDate"/>
         </LinearLayout>
     </LinearLayout>
 

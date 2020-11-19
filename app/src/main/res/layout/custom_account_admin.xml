@@ -3,7 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:cardCornerRadius="10sp"
     android:layout_width="match_parent"
-    app:contentPadding="16sp"
     android:id="@+id/cv_custom_person_chat"
     app:cardUseCompatPadding="true"
     android:backgroundTint="@color/endGColor"
@@ -11,6 +10,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
+        android:padding="16sp"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
@@ -20,7 +20,8 @@
             android:layout_height="80sp"
             android:src="@drawable/ic_baseline_person_24"/>
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_marginLeft="10sp"
             android:layout_height="match_parent"
             android:orientation="vertical">
@@ -28,27 +29,38 @@
             <TextView
                 android:id="@+id/tv_custom_name_chat"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
                 android:text="Pham Thanh Huy"
                 android:gravity="bottom"
-                android:textSize="18sp"
+                android:textSize="12sp"
+                android:layout_weight="1"
                 android:fontFamily="@font/belleza"
                 android:textColor="@color/black"
                 android:textStyle="bold"
-                android:layout_marginBottom="10sp"
-                android:layout_weight="1"/>
+                android:layout_marginBottom="10sp" />
 
             <TextView
                 android:id="@+id/tv_custom_last_chat"
-                android:layout_marginBottom="15sp"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:lines="1"
+                android:textSize="10sp"
                 android:layout_weight="1"
-                android:gravity="bottom"
-                android:text="Toi muon thue nha"/>
+                android:layout_marginLeft="10sp"
+                android:text="phamthanhhuy332@mgail.com"/>
+
+
+            <Spinner
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10sp"
+                android:entries="@array/spAccount"
+                android:backgroundTint="@color/white"
+                android:spinnerMode="dropdown" />
 
         </LinearLayout>
+
+
 
     </LinearLayout>
 

@@ -1,13 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity.Notification.fragment_notification">
+    android:orientation="vertical"
+    tools:context=".MainActivity.Fragment.Notification.fragment_notification">
 
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/notificationRecyclerview"/>
 
-</FrameLayout>
+    <TextView
+        android:id="@+id/tv_notification_empty"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="Danh sách rỗng"
+        android:gravity="center"
+        android:textSize="30sp"/>
+</LinearLayout>

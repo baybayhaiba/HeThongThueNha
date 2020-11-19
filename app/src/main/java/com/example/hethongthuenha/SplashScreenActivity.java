@@ -46,13 +46,7 @@ public class SplashScreenActivity extends AppCompatActivity {
 
 
         Animation();
-
-        Handler handler = new Handler();
-        handler.postDelayed(() -> {
-            GetInformPerson();
-            ExecutePerson();
-        }, SPLASH_TIMER);
-
+        GetInformPerson();
 
     }
 
@@ -64,24 +58,21 @@ public class SplashScreenActivity extends AppCompatActivity {
             currentUser = firebaseAuth.getCurrentUser();
             if (currentUser != null) {
                 db.collection("User").whereEqualTo("uid", currentUser.getUid())
-                        .get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                    @Override
-                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                        if (!queryDocumentSnapshots.isEmpty()) {
-                            for (DocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                                Person person = documentSnapshot.toObject(Person.class);
+                        .get().addOnSuccessListener(queryDocumentSnapshots -> {
+                            if (!queryDocumentSnapshots.isEmpty()) {
+                                for (DocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                                    Person person = documentSnapshot.toObject(Person.class);
 
-                                PersonAPI personAPI = PersonAPI.getInstance();
-                                personAPI.setUid(person.getUid());
-                                personAPI.setName(person.getFullName());
-                                personAPI.setEmail(person.getEmail());
-                                startActivity(new Intent(SplashScreenActivity.this, MainActivity.class));
-                                finish();
+                                    PersonAPI personAPI = PersonAPI.getInstance();
+                                    personAPI.setUid(person.getUid());
+                                    personAPI.setName(person.getFullName());
+                                    personAPI.setEmail(person.getEmail());
+                                    startActivity(new Intent(SplashScreenActivity.this, MainActivity.class));
+                                    finish();
+                                }
                             }
-                        }
 
-                    }
-                }).addOnFailureListener(e -> Log.d("SplashScreen-Error", "onCreate: " + e.getMessage()));
+                        }).addOnFailureListener(e -> Log.d("SplashScreen-Error", "onCreate: " + e.getMessage()));
             } else {
                 startActivity(new Intent(SplashScreenActivity.this, LoginActivity.class));
                 finish();
@@ -114,9 +105,12 @@ public class SplashScreenActivity extends AppCompatActivity {
         imageb.setAnimation(topAnim);
     }
 
-    public void ExecutePerson() {
+    @Override
+    protected void onStart() {
+        super.onStart();
         currentUser = mAuth.getCurrentUser();
         mAuth.addAuthStateListener(authStateListener);
     }
+
 
 }

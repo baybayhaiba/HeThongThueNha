@@ -120,7 +120,7 @@ ActivityRoomDetail extends AppCompatActivity {
         cvPerson = findViewById(R.id.cv_person_detail);
 
         LoadUtilities(utilities_room);
-        //LoadImage(image_room);
+        LoadImage(image_room);
         LoadInformation(description_room);
         LoadInformPerson(room.getPerson_id());
         LoadLivingExpesens(livingExpenses_room);

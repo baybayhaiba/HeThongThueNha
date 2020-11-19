@@ -1,8 +1,7 @@
-package com.example.hethongthuenha.MainActivity.Notification;
+package com.example.hethongthuenha.MainActivity.Fragment.Notification;
 
 import android.os.Bundle;
 
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -15,15 +14,10 @@ import com.example.hethongthuenha.API.PersonAPI;
 import com.example.hethongthuenha.Adapter.NotficationRecyclerView;
 import com.example.hethongthuenha.Model.Notification;
 import com.example.hethongthuenha.R;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -67,6 +61,9 @@ public class fragment_notification extends Fragment {
                             return (int) (o2.getNotificationAdded().getSeconds() - o1.getNotificationAdded().getSeconds());
                         });
                         adapter.notifyDataSetChanged();
+
+                        if(notifications.size()==0)
+                            recyclerView.setVisibility(View.GONE);
                     }
                 });
 

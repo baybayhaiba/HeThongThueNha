@@ -15,4 +15,13 @@
         <item>Nhà trọ</item>
         <item>Nhà ở ghép</item>
     </string-array>
+
+
+    <string-array name="spAccount">
+        <item>Khóa</item>
+        <item>Mở khóa</item>
+    </string-array>
+
+    <string name="navigation_open_drawer">Navigation Open</string>
+    <string name="navigation_close_drawer">Navigation Close</string>
 </resources>

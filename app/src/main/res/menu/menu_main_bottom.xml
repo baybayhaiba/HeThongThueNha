@@ -17,4 +17,8 @@
         app:showAsAction="always"
         android:icon="@drawable/ic_baseline_chat_24"
         android:title="Chat"/>
+    <item android:id="@+id/mnAdmin"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_baseline_admin_panel_settings_24"
+        android:title="Admin" />
 </menu>
