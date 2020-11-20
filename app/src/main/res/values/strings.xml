@@ -18,8 +18,20 @@
 
 
     <string-array name="spAccount">
-        <item>Khóa</item>
         <item>Mở khóa</item>
+        <item>Khóa</item>
+    </string-array>
+
+    <string-array name="spReport">
+        <item>Không giống như hình</item>
+        <item>Không giống với giá đã đưa</item>
+        <item>Thái độ chủ trọ tiêu cực</item>
+    </string-array>
+
+    <string-array name="spAds">
+        <item>60000VNĐ/7 Ngày</item>
+        <item>160000VNĐ/17 Ngày</item>
+        <item>360000VNĐ/27 Ngày</item>
     </string-array>
 
     <string name="navigation_open_drawer">Navigation Open</string>

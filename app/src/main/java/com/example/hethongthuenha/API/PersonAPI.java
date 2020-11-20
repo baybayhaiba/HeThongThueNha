@@ -6,6 +6,9 @@ public class PersonAPI extends Application {
     private String uid;
     private String name;
     private String email;
+    private int type_person;
+    private boolean isLocked;
+    private double point;
     private static PersonAPI instance;
 
     public static PersonAPI getInstance() {
@@ -14,12 +17,20 @@ public class PersonAPI extends Application {
         return instance;
     }
 
-    public PersonAPI() {
+    public int getType_person() {
+        return type_person;
     }
 
-    public PersonAPI(String uid, String name) {
-        this.uid = uid;
-        this.name = name;
+    public boolean isLocked() {
+        return isLocked;
+    }
+
+    public void setLocked(boolean locked) {
+        isLocked = locked;
+    }
+
+    public void setType_person(int type_person) {
+        this.type_person = type_person;
     }
 
     public String getUid() {
@@ -44,6 +55,14 @@ public class PersonAPI extends Application {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public double getPoint() {
+        return point;
+    }
+
+    public void setPoint(double point) {
+        this.point = point;
     }
 
     @Override

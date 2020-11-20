@@ -38,6 +38,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -48,11 +49,13 @@ public class CreateRoomActivity extends AppCompatActivity implements IDataCommun
     private ImageView imgStage1, imgStage2, imgStage3, imgStage4;
     //private Button btnFinishStage;
     private Toolbar toolbar;
-    private TextView[] tvStage=new TextView[4];
-    private static FirebaseFirestore db=FirebaseFirestore.getInstance();
+    private TextView[] tvStage = new TextView[4];
+    private static FirebaseFirestore db = FirebaseFirestore.getInstance();
     private Room room;
-    static DocumentReference ref=db.collection("Room").document();
-    public static final String myID=ref.getId();
+    static DocumentReference ref = db.collection("Room").document();
+    public static Room roomExist;
+    public static final String myID = ref.getId();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,17 +65,16 @@ public class CreateRoomActivity extends AppCompatActivity implements IDataCommun
     }
 
 
-
     private void init() {
         tvStage1 = findViewById(R.id.tvStage1);
         tvStage2 = findViewById(R.id.tvStage2);
         tvStage3 = findViewById(R.id.tvStage3);
         tvStage4 = findViewById(R.id.tvStage4);
 
-        for(int i=0;i<4;i++){
-            String textViewStageId="tvStage"+(i+1);
-            int resId=getResources().getIdentifier(textViewStageId,"id",getPackageName());
-            tvStage[i]=findViewById(resId);
+        for (int i = 0; i < 4; i++) {
+            String textViewStageId = "tvStage" + (i + 1);
+            int resId = getResources().getIdentifier(textViewStageId, "id", getPackageName());
+            tvStage[i] = findViewById(resId);
         }
 
         imgStage1 = findViewById(R.id.imgStage1);
@@ -89,18 +91,26 @@ public class CreateRoomActivity extends AppCompatActivity implements IDataCommun
             return false;
         });
 
-        room=new Room();
+        room = new Room();
 
         room.setRoom_id(myID);
         room.setPerson_id(PersonAPI.getInstance().getUid());
+        room.setOrder(1);
+
+        String UpdateMyRoom = getIntent().getStringExtra("update");
+
+        if (UpdateMyRoom != null) {
+            roomExist = (Room) getIntent().getSerializableExtra("room");
+        } else
+            roomExist = null;
     }
 
     private void setFragment() {
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.add(R.id.frameContainer, new fragment_description());
-            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-            ft.addToBackStack(null);
-            ft.commit();
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.add(R.id.frameContainer, new fragment_description());
+        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+        ft.addToBackStack(null);
+        ft.commit();
     }
 
     @Override
@@ -126,23 +136,41 @@ public class CreateRoomActivity extends AppCompatActivity implements IDataCommun
 
     @Override
     public void LivingExpenses(LivingExpenses_Room dataStage2) {
-      room.setStage2(dataStage2);
+        room.setStage2(dataStage2);
     }
 
     @Override
     public void Image(Image_Room dataStage3) {
         room.setStage3(dataStage3);
-        Log.d("SIMPLE", "Image: "+dataStage3.toString());
     }
 
     @Override
-    public void Utilities(Utilities_Room dataStage4){
+    public void Utilities(Utilities_Room dataStage4) {
         room.setStage4(dataStage4);
         room.setTimeAdded(new Timestamp(new Date()));
-        db.collection("Room").add(room)
-                .addOnSuccessListener(documentReference ->
-                        Toast.makeText(CreateRoomActivity.this, "tao thanh cong", Toast.LENGTH_SHORT).show()).
-                addOnFailureListener(e ->
-                        Toast.makeText(CreateRoomActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show());
+        if (roomExist == null) {
+            db.collection("Room").add(room)
+                    .addOnSuccessListener(documentReference ->
+                            Toast.makeText(CreateRoomActivity.this, "Tạo thành công", Toast.LENGTH_SHORT).show()).
+                    addOnFailureListener(e ->
+                            Toast.makeText(CreateRoomActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show());
+        } else if (roomExist != null) {
+            room.setRoom_id(roomExist.getRoom_id());
+            room.setTimeAdded((Timestamp) getIntent().getExtras().get("roomAdded"));
+            db.collection("Room")
+                    .whereEqualTo("room_id", room.getRoom_id())
+                    .get().addOnCompleteListener(v -> {
+                if (v.isSuccessful()) {
+                    for (QueryDocumentSnapshot value : v.getResult()) {
+                        Log.d("Test", "Utilities: " + value.getId() + "||" + room.getRoom_id());
+                        db.collection("Room").document(value.getId())
+                                .set(room).addOnCompleteListener(c -> {
+                            Toast.makeText(this, "Sửa thành công", Toast.LENGTH_SHORT).show();
+                        });
+                    }
+                }
+            });
+        }
+
     }
 }

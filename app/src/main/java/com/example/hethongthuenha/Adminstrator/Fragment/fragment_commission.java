@@ -2,65 +2,100 @@ package com.example.hethongthuenha.Adminstrator.Fragment;
 
 import android.os.Bundle;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.hethongthuenha.R;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link fragment_commission#newInstance} factory method to
- * create an instance of this fragment.
- */
+import java.util.HashMap;
+import java.util.Map;
+
+
 public class fragment_commission extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private TextView tvTotalPerson, tvTotalRoom, tvCommission;
+    private Map<String, Double> commission;
+    private Button btnFinish;
+    private EditText edCommission;
 
     public fragment_commission() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment fragment_commission.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static fragment_commission newInstance(String param1, String param2) {
-        fragment_commission fragment = new fragment_commission();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_commission, container, false);
+        commission = new HashMap<>();
+        View view = inflater.inflate(R.layout.fragment_commission, container, false);
+        btnFinish = view.findViewById(R.id.btnCommission);
+        edCommission = view.findViewById(R.id.etCommission);
+        tvCommission = view.findViewById(R.id.tv_number_commission);
+        tvTotalPerson = view.findViewById(R.id.tv_totalPerson_commission);
+        tvTotalRoom = view.findViewById(R.id.tv_totalRoom_commission);
+
+        db.collection("Room").get().addOnCompleteListener(v -> {
+            int countRoom = 0;
+            if (v.isSuccessful()) {
+                for (QueryDocumentSnapshot value : v.getResult()) {
+                    countRoom++;
+                }
+                if (v.isComplete())
+                    tvTotalRoom.setText("Tất cả phòng trọ:" + countRoom);
+            }
+        });
+
+        db.collection("User").get().addOnCompleteListener(v -> {
+            int countPerson = 0;
+            if (v.isSuccessful()) {
+                for (QueryDocumentSnapshot value : v.getResult()) {
+                    countPerson++;
+                }
+                if (v.isComplete())
+                    tvTotalPerson.setText("Tất cả người dùng:" + countPerson);
+            }
+        });
+
+        db.collection("Commission").addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                if (error == null) {
+                    for (QueryDocumentSnapshot v : value) {
+                        tvCommission.setText("Hoa hồng hiện tại:" + v.get("commission"));
+                    }
+                }
+            }
+        });
+
+        btnFinish.setOnClickListener(v -> {
+            commission.put("commission", Double.parseDouble(edCommission.getText().toString()));
+            db.collection("Commission").document()
+                    .set(commission).addOnCompleteListener(c -> {
+                Toast.makeText(getActivity(), "Cập nhật thành công", Toast.LENGTH_SHORT).show();
+                edCommission.setText("");
+            });
+        });
+
+        return view;
     }
 }

@@ -5,18 +5,13 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16sp"
-    tools:context=".Adminstrator.Fragment.fragment_repay">
+    tools:context=".Adminstrator.Fragment.fragment_add_point">
 
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Id Người Thuê" />
+        android:hint="Mã người dùng" />
 
-    <EditText
-        android:layout_marginTop="20sp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Id Phòng trọ" />
 
     <EditText
         android:layout_marginTop="20sp"
@@ -29,7 +24,7 @@
         android:layout_width="match_parent"
         android:layout_marginTop="20sp"
         android:layout_height="wrap_content"
-        android:hint="Số tiền trả trước"
+        android:hint="Số tiền nạp"
         android:textColorHint="@android:color/darker_gray">
 
         <com.google.android.material.textfield.TextInputEditText

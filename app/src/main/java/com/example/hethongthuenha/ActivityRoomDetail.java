@@ -1,5 +1,6 @@
 package com.example.hethongthuenha;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
@@ -17,6 +18,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,8 +28,13 @@ import com.example.hethongthuenha.Model.Description_Room;
 import com.example.hethongthuenha.Model.Image_Room;
 import com.example.hethongthuenha.Model.LivingExpenses_Room;
 import com.example.hethongthuenha.Model.Person;
+import com.example.hethongthuenha.Model.Report;
 import com.example.hethongthuenha.Model.Room;
 import com.example.hethongthuenha.Model.Utilities_Room;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -36,6 +43,7 @@ import com.squareup.picasso.Picasso;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class
@@ -47,17 +55,20 @@ ActivityRoomDetail extends AppCompatActivity {
     TextView tvTitle, tvDescription, tvPrice, tvAccommodation,
             tvAmout, tvAddress, tvArea, tvTypeRoom, tvNamePerson, tvContactPerson,
             tvWaterPrice, tvElectricityPrice, tvTvPrice, tvInternetPrice, tvParkingPrice;
-    EditText etComment;
-    Button btnWatchMore, btnBookRoom;
+    EditText etComment, etDescriptionReport;
+    Button btnWatchMore, btnBookRoom, btnReport, btnSendReport, btnCancelReport;
     LinearLayout[] linearLiving;
     CardView cvPerson;
     //Model
     Room room;
     //Firebase
     FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private DocumentReference ref = db.collection("Report").document();
     //Other
     DecimalFormat deciFormat;
     NumberFormat formatter;
+    Spinner spReport;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,6 +116,7 @@ ActivityRoomDetail extends AppCompatActivity {
 
         btnWatchMore = findViewById(R.id.btn_watchmore_detail);
         btnBookRoom = findViewById(R.id.btnBookRoom);
+        btnReport = findViewById(R.id.btnReport);
 
         tvWaterPrice = findViewById(R.id.custom_water_price);
         tvElectricityPrice = findViewById(R.id.custom_electricity_price);
@@ -127,6 +139,7 @@ ActivityRoomDetail extends AppCompatActivity {
         NotificationPay();
         CommentRoom();
         GoToPerson();
+        ShowDialogReport();
     }
 
     private void GoToPerson() {
@@ -190,6 +203,44 @@ ActivityRoomDetail extends AppCompatActivity {
 
     }
 
+    public void ShowDialogReport() {
+        btnReport.setOnClickListener(v -> {
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            View viewLayout = getLayoutInflater().inflate(R.layout.layout_report, null);
+
+            builder.setView(viewLayout);
+
+            spReport = viewLayout.findViewById(R.id.sp_report);
+            etDescriptionReport = viewLayout.findViewById(R.id.et_description_report);
+            btnCancelReport = viewLayout.findViewById(R.id.btn_cancel_report);
+            btnSendReport = viewLayout.findViewById(R.id.btn_send_report);
+
+            final AlertDialog show = builder.show();
+
+            btnCancelReport.setOnClickListener(c -> show.dismiss());
+            btnSendReport.setOnClickListener(c -> {
+                String typeReport = spReport.getSelectedItem().toString();
+                String description = etDescriptionReport.getText().toString();
+                Timestamp reportAdded = new Timestamp(new Date());
+
+                Report report = new Report(ref.getId(), PersonAPI.getInstance().getUid(), room.getRoom_id(),
+                        typeReport, description, reportAdded);
+
+                db.collection("Report").add(report)
+                        .addOnCompleteListener(task -> {
+                            if (task.isSuccessful())
+                                Toast.makeText(ActivityRoomDetail.this, "Gửi thành công", Toast.LENGTH_SHORT).show();
+                            else
+                                Toast.makeText(ActivityRoomDetail.this, "Gửi thất  bại", Toast.LENGTH_SHORT).show();
+                            show.dismiss();
+                        });
+            });
+        });
+
+    }
+
+
     private void PayLater() {
         db.collection("User").whereEqualTo("uid", room.getPerson_id())
                 .get().addOnCompleteListener(value -> {
@@ -197,7 +248,7 @@ ActivityRoomDetail extends AppCompatActivity {
                 for (QueryDocumentSnapshot persons : value.getResult()) {
                     Person person = persons.toObject(Person.class);
                     Intent intent = new Intent(ActivityRoomDetail.this, ActivityChat.class);
-                    intent.putExtra("toId",person.getUid());
+                    intent.putExtra("toId", person.getUid());
                     intent.putExtra("toEmail", person.getEmail());
                     intent.putExtra("toName", person.getFullName());
                     intent.putExtra("description_room", "Tôi muốn thuê căn nhà " + room.getStage1().getTitle());
@@ -236,7 +287,6 @@ ActivityRoomDetail extends AppCompatActivity {
 
     private void LoadInformation(Description_Room description_room) {
 
-
         tvTitle.setText(description_room.getTitle());
         tvAddress.setText("Địa chỉ:" + description_room.getAddress());
         tvAmout.setText("Sức chứa:" + description_room.getAmout() + " người");
@@ -252,8 +302,15 @@ ActivityRoomDetail extends AppCompatActivity {
         List<String> utilityLimit = new ArrayList<>();
         Utilities_Room utilitiesRoom = new Utilities_Room();
         utilitiesRoom.setDescription_utility(utilityLimit);
-        for (int i = 0; i < 3; i++)
-            utilityLimit.add(utilities_room.getDescription_utility().get(i));
+
+
+        for (int i = 0; i < 3; i++) {
+            if (i < utilities_room.getDescription_utility().size())
+                utilityLimit.add(utilities_room.getDescription_utility().get(i));
+            else
+                break;
+        }
+
 
         RecyclerView utilitiesRecyclerView = findViewById(R.id.UtilitiesRecyclerview);
         utilitiesRecyclerView.setLayoutManager(new GridLayoutManager(this, 3));

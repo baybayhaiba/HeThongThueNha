@@ -16,7 +16,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.hethongthuenha.CreateRoom.CreateRoomActivity;
 import com.example.hethongthuenha.Model.LivingExpenses_Room;
+import com.example.hethongthuenha.Model.Room;
 import com.example.hethongthuenha.R;
 
 import java.util.ArrayList;
@@ -55,6 +57,15 @@ public class fragment_living_expenses extends Fragment {
         etTV = view.findViewById(R.id.etTV);
 
         Button btFinishStage2 = view.findViewById(R.id.btnFinishStage2);
+
+        if (CreateRoomActivity.roomExist != null) {
+            Room room = CreateRoomActivity.roomExist;
+            etWater.setText("" + room.getStage2().getmWater());
+            etTV.setText("" + room.getStage2().getmTivi());
+            etInternet.setText("" + room.getStage2().getmInternet());
+            etParkingSpace.setText("" + room.getStage2().getmParkingSpace());
+            etElectricity.setText("" + room.getStage2().getmEletric());
+        }
 
         btFinishStage2.setOnClickListener(v -> {
             if (isValid()) {

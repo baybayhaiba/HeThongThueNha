@@ -41,6 +41,14 @@ public class UtilitieseRecyclerView extends RecyclerView.Adapter<UtilitieseRecyc
 
         if(description.equals("Wifi"))
             holder.imageUtilities.setImageResource(R.drawable.wifi);
+        else if(description.equals("Hồ bơi"))
+            holder.imageUtilities.setImageResource(R.drawable.pool);
+        else if(description.equals("Máy lạnh"))
+            holder.imageUtilities.setImageResource(R.drawable.airconditioner);
+        else if(description.equals("Tủ lạnh"))
+            holder.imageUtilities.setImageResource(R.drawable.fridge);
+        else
+            holder.imageUtilities.setImageResource(R.drawable.verified);
     }
 
     @Override

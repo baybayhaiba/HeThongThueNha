@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
+    android:id="@+id/cv_custom_report"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:contentPadding="16sp"
     app:cardCornerRadius="10sp"
@@ -15,6 +16,7 @@
         android:layout_height="wrap_content">
 
         <TextView
+            android:id="@+id/tv_custom_title_report"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="@color/white"
@@ -23,6 +25,7 @@
             android:text="Phòng Trọ:trọ linh xuân cao cấp "/>
 
         <TextView
+            android:id="@+id/tv_custom_type_report"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="@color/yellow_100"
@@ -31,6 +34,7 @@
             android:text="LOẠI:Không đúng với yêu cầu gốc "/>
 
         <TextView
+            android:id="@+id/tv_custom_description_report"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="@color/black"

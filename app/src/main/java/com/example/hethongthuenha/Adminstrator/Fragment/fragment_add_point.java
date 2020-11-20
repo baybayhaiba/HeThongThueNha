@@ -12,10 +12,10 @@ import com.example.hethongthuenha.R;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link fragment_repay#newInstance} factory method to
+ * Use the {@link fragment_add_point#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class fragment_repay extends Fragment {
+public class fragment_add_point extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -26,7 +26,7 @@ public class fragment_repay extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    public fragment_repay() {
+    public fragment_add_point() {
         // Required empty public constructor
     }
 
@@ -39,8 +39,8 @@ public class fragment_repay extends Fragment {
      * @return A new instance of fragment fragment_repay.
      */
     // TODO: Rename and change types and number of parameters
-    public static fragment_repay newInstance(String param1, String param2) {
-        fragment_repay fragment = new fragment_repay();
+    public static fragment_add_point newInstance(String param1, String param2) {
+        fragment_add_point fragment = new fragment_add_point();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -61,6 +61,6 @@ public class fragment_repay extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_repay, container, false);
+        return inflater.inflate(R.layout.fragment_credit, container, false);
     }
 }

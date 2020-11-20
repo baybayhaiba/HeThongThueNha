@@ -8,29 +8,40 @@ import com.google.firebase.Timestamp;
 import java.io.Serializable;
 import java.util.List;
 
-public class Room implements Serializable{
+public class Room implements Serializable {
 
     //Document:How send object by intent
     //https://stackoverflow.com/questions/2139134/how-to-send-an-object-from-one-android-activity-to-another-using-intents
     //https://stackoverflow.com/questions/23142893/parcelable-encountered-ioexception-writing-serializable-object-getactivity
     private String room_id;
     private String person_id;
-    private  Description_Room stage1;
-    private  LivingExpenses_Room stage2;
-    private  Image_Room stage3;
-    private  Utilities_Room stage4;
+    private int order;
+    private Description_Room stage1;
+    private LivingExpenses_Room stage2;
+    private Image_Room stage3;
+    private Utilities_Room stage4;
     private transient Timestamp timeAdded;
+
     public Room() {
     }
 
-    public Room(String room_id, String person_id, Description_Room stage1, LivingExpenses_Room stage2, Image_Room stage3, Utilities_Room stage4, Timestamp timeAdded) {
+    public Room(String room_id, String person_id, int order, Description_Room stage1, LivingExpenses_Room stage2, Image_Room stage3, Utilities_Room stage4, Timestamp timeAdded) {
         this.room_id = room_id;
         this.person_id = person_id;
+        this.order = order;
         this.stage1 = stage1;
         this.stage2 = stage2;
         this.stage3 = stage3;
         this.stage4 = stage4;
         this.timeAdded = timeAdded;
+    }
+
+    public int getOrder() {
+        return order;
+    }
+
+    public void setOrder(int order) {
+        this.order = order;
     }
 
     public Timestamp getTimeAdded() {

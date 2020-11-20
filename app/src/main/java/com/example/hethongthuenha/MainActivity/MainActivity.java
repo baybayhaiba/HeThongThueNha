@@ -8,8 +8,10 @@ import androidx.fragment.app.FragmentTransaction;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Toast;
 
 
+import com.example.hethongthuenha.API.PersonAPI;
 import com.example.hethongthuenha.ActivitySettingPerson;
 import com.example.hethongthuenha.Adminstrator.ActivityAdmintrators;
 import com.example.hethongthuenha.MainActivity.Fragment.Chat.fragment_list_chat;
@@ -36,6 +38,13 @@ public class MainActivity extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbar);
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         setFragment(R.id.mnRoom);
+        SetBottomNavigation();
+    }
+
+    private void SetBottomNavigation() {
+        //neu khongg phai la admin
+        if (PersonAPI.getInstance().getType_person() == 1)
+            bottomNavigationView.getMenu().removeItem(R.id.mnAdmin);
     }
 
     private void Event() {

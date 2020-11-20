@@ -13,14 +13,13 @@ import androidx.fragment.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.example.hethongthuenha.Adminstrator.Fragment.fragment_account;
 import com.example.hethongthuenha.Adminstrator.Fragment.fragment_ads;
 import com.example.hethongthuenha.Adminstrator.Fragment.fragment_commission;
 import com.example.hethongthuenha.Adminstrator.Fragment.fragment_pay;
 import com.example.hethongthuenha.Adminstrator.Fragment.fragment_refund;
-import com.example.hethongthuenha.Adminstrator.Fragment.fragment_repay;
+import com.example.hethongthuenha.Adminstrator.Fragment.fragment_add_point;
 import com.example.hethongthuenha.Adminstrator.Fragment.fragment_report;
 import com.example.hethongthuenha.MainActivity.MainActivity;
 import com.example.hethongthuenha.R;
@@ -73,24 +72,31 @@ public class ActivityAdmintrators extends AppCompatActivity {
         switch (id) {
             case R.id.mnCommission:
                 fragment = new fragment_commission();
+                toolbar.setTitle("Hoa hồng");
                 break;
             case R.id.mnPay:
                 fragment = new fragment_pay();
+                toolbar.setTitle("Thanh Toán");
                 break;
             case R.id.mnAccount:
                 fragment = new fragment_account();
+                toolbar.setTitle("Quản lý tài khoản");
                 break;
             case R.id.mnAds:
                 fragment = new fragment_ads();
+                toolbar.setTitle("Quảng cáo");
                 break;
             case R.id.mnRepay:
-                fragment = new fragment_repay();
+                fragment = new fragment_add_point();
+                toolbar.setTitle("Nạp tiền");
                 break;
             case R.id.mnReport:
                 fragment = new fragment_report();
+                toolbar.setTitle("Báo cáo");
                 break;
             case R.id.mnRefund:
                 fragment = new fragment_refund();
+                toolbar.setTitle("Hoàn tiền");
                 break;
             case R.id.mnExit:
                 startActivity(new Intent(ActivityAdmintrators.this, MainActivity.class));

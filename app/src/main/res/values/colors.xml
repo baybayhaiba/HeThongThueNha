@@ -8,6 +8,7 @@
     <color name="black">#FF000000</color>
     <color name="red_400">#EF5350</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="red_200">#EF9A9A</color>
     <color name="pink_300">#f186c0</color>
     <color name="startGColor">#3a1c71</color>
     <color name="centerGColor">#d76d77</color>

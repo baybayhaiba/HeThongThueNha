@@ -8,9 +8,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import android.text.Editable;
 import android.text.TextUtils;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,10 +16,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import com.example.hethongthuenha.CreateRoom.CreateRoomActivity;
 import com.example.hethongthuenha.Model.Description_Room;
+import com.example.hethongthuenha.Model.Room;
 import com.example.hethongthuenha.R;
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -72,12 +70,39 @@ public class fragment_description extends Fragment {
         radPhongTro = view.findViewById(R.id.radPhongTro);
         spDate = view.findViewById(R.id.spDate);
         tipTitle = view.findViewById(R.id.filledTitle);
-        tipAmout=view.findViewById(R.id.filledAmout);
-        tipPrice=view.findViewById(R.id.filledPrice);
-        tipAddress=view.findViewById(R.id.filledAddress);
-        tipAccommodation=view.findViewById(R.id.filledAccommodation);
-        tipArea=view.findViewById(R.id.filledArea);
-        tipDescription=view.findViewById(R.id.filledDescription);
+        tipAmout = view.findViewById(R.id.filledAmout);
+        tipPrice = view.findViewById(R.id.filledPrice);
+        tipAddress = view.findViewById(R.id.filledAddress);
+        tipAccommodation = view.findViewById(R.id.filledAccommodation);
+        tipArea = view.findViewById(R.id.filledArea);
+        tipDescription = view.findViewById(R.id.filledDescription);
+
+
+        if (CreateRoomActivity.roomExist != null) {
+            Room room = CreateRoomActivity.roomExist;
+
+            etTitle.setText(room.getStage1().getTitle());
+            etDescription.setText(room.getStage1().getDescription());
+            etAddress.setText(room.getStage1().getAddress());
+            etPrice.setText("" + room.getStage1().getPrice());
+            etArea.setText("" + room.getStage1().getArea());
+            etAccommodation.setText("" + room.getStage1().getAccommodation());
+            etAmout.setText("" + room.getStage1().getAmout());
+
+            if (room.getStage1().getType_date().equals("Ngày"))
+                spDate.setSelection(0);
+            else if (room.getStage1().getType_date().equals("Tháng"))
+                spDate.setSelection(1);
+            else
+                spDate.setSelection(2);
+
+            if (room.getStage1().getType_room().equals("Phòng trọ"))
+                radPhongTro.setChecked(true);
+            else if (room.getStage1().getType_room().equals("Nhà nguyên căn"))
+                radNhaNguyenCan.setChecked(true);
+            else
+                radOGhep.setChecked(true);
+        }
 
         btFinishStage1.setOnClickListener(v -> {
 
@@ -131,19 +156,19 @@ public class fragment_description extends Fragment {
         }
         if (TextUtils.isEmpty(etAccommodation.getText())) {
             etAccommodation.setError("Làm ơn không bỏ trống");
-            valid=false;
+            valid = false;
         }
         if (TextUtils.isEmpty(etAddress.getText())) {
             etAddress.setError("Làm ơn không bỏ trống");
-            valid=false;
+            valid = false;
         }
         if (TextUtils.isEmpty(etAmout.getText())) {
             etAmout.setError("Làm ơn không bỏ trống");
-            valid=false;
+            valid = false;
         }
         if (TextUtils.isEmpty(etPrice.getText())) {
             etPrice.setError("Làm ơn không bỏ trống");
-            valid=false;
+            valid = false;
         }
         return valid;
     }

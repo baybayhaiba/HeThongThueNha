@@ -19,7 +19,7 @@
 
     <item
         android:id="@+id/mnRepay"
-        android:title="Trả trước" />
+        android:title="Nạp tiền" />
     <item
         android:id="@+id/mnReport"
         android:title="Báo cáo" />

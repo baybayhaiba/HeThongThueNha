@@ -32,6 +32,7 @@ import android.widget.Toast;
 
 import com.example.hethongthuenha.CreateRoom.CreateRoomActivity;
 import com.example.hethongthuenha.Model.Image_Room;
+import com.example.hethongthuenha.Model.Room;
 import com.example.hethongthuenha.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -39,6 +40,7 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.net.URI;
@@ -110,21 +112,48 @@ public class fragment_image extends Fragment {
             });
         }
 
+        if (CreateRoomActivity.roomExist != null) {
+            Room room = CreateRoomActivity.roomExist;
+            int i = 0;
+            for (String url : room.getStage3().getImagesURL()) {
+                ImageView imageView = listImgRoom[i++];
+                Picasso.with(getActivity()).load(url)
+                        .placeholder(R.drawable.insert_image).into(imageView);
+                imageView.setContentDescription("Added");
+                imageUrl.add(url);
+            }
+
+        }
+
 
         btnFinishStage3.setOnClickListener(v -> {
             if (isValid()) {
                 progressDialog.show();
-                SaveImage();
+                if (CreateRoomActivity.roomExist == null)
+                    SaveImage();
+                else
+                    ChangeFragment();
             }
 
         });
         return view;
     }
 
+    private void ChangeFragment() {
+        fragment_utilities fragment = new fragment_utilities();
+        FragmentManager fragmentManager = getFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.frameContainer, fragment);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
+        dataCommunication.Image(new Image_Room(imageUrl));
+        progressDialog.dismiss();
+    }
+
     private void SaveImage() {
         StorageReference filepath;
 
-        for (int i = 0; i < uri.length;i++) {
+        for (int i = 0; i < uri.length; i++) {
 
             filepath = mStorageRef.child("room_image").child(CreateRoomActivity.myID + "room_" + i);
             StorageReference finalFilepath = filepath;
@@ -133,16 +162,8 @@ public class fragment_image extends Fragment {
                     .addOnSuccessListener(taskSnapshot -> finalFilepath.getDownloadUrl().
                             addOnSuccessListener(uri -> {
                                 imageUrl.add(uri.toString());
-
                                 if (imageUrl.size() == 4) {
-                                    fragment_utilities fragment = new fragment_utilities();
-                                    FragmentManager fragmentManager = getFragmentManager();
-                                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                                    fragmentTransaction.replace(R.id.frameContainer, fragment);
-                                    fragmentTransaction.addToBackStack(null);
-                                    fragmentTransaction.commit();
-                                    dataCommunication.Image(new Image_Room(imageUrl));
-                                    progressDialog.dismiss();
+                                    ChangeFragment();
                                 }
                             })).
                     addOnFailureListener(e -> Log.d("SIMPLE", "onFailure: " + e.getMessage()));

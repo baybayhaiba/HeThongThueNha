@@ -1,8 +1,10 @@
 package com.example.hethongthuenha;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -17,12 +19,14 @@ import android.widget.Toast;
 import com.example.hethongthuenha.API.PersonAPI;
 import com.example.hethongthuenha.Login.LoginActivity;
 import com.example.hethongthuenha.MainActivity.MainActivity;
+import com.example.hethongthuenha.Model.CreditCard;
 import com.example.hethongthuenha.Model.Person;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 public class SplashScreenActivity extends AppCompatActivity {
@@ -59,26 +63,61 @@ public class SplashScreenActivity extends AppCompatActivity {
             if (currentUser != null) {
                 db.collection("User").whereEqualTo("uid", currentUser.getUid())
                         .get().addOnSuccessListener(queryDocumentSnapshots -> {
-                            if (!queryDocumentSnapshots.isEmpty()) {
-                                for (DocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                                    Person person = documentSnapshot.toObject(Person.class);
+                    if (!queryDocumentSnapshots.isEmpty()) {
+                        for (DocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                            Person person = documentSnapshot.toObject(Person.class);
 
-                                    PersonAPI personAPI = PersonAPI.getInstance();
-                                    personAPI.setUid(person.getUid());
-                                    personAPI.setName(person.getFullName());
-                                    personAPI.setEmail(person.getEmail());
+                            PersonAPI personAPI = PersonAPI.getInstance();
+                            personAPI.setUid(person.getUid());
+                            personAPI.setName(person.getFullName());
+                            personAPI.setEmail(person.getEmail());
+                            personAPI.setType_person(person.getType_person());
+
+
+                            //Get Point
+                            db.collection("CreditCard").whereEqualTo("id_person", person.getUid())
+                                    .get().addOnSuccessListener(v -> {
+                                if (v.isEmpty()){
+                                    personAPI.setPoint(0);
+                                }
+
+                                else {
+                                    for (QueryDocumentSnapshot value : v) {
+                                        CreditCard creditCard = value.toObject(CreditCard.class);
+                                        personAPI.setPoint(creditCard.getPoint());
+                                    }
+                                }
+
+                                //Set Lock Account
+                                if (person.isLocked())
+                                    NotificationLock();
+                                else {
                                     startActivity(new Intent(SplashScreenActivity.this, MainActivity.class));
                                     finish();
                                 }
-                            }
+                            });
+                        }
 
-                        }).addOnFailureListener(e -> Log.d("SplashScreen-Error", "onCreate: " + e.getMessage()));
+                    }
+
+                }).addOnFailureListener(e -> Log.d("SplashScreen-Error", "onCreate: " + e.getMessage()));
             } else {
                 startActivity(new Intent(SplashScreenActivity.this, LoginActivity.class));
                 finish();
             }
 
         };
+    }
+
+    private void NotificationLock() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Thông báo");
+        builder.setMessage("Tài khoản của bạn đã bị khóa muốn biết chi tiết xin liên hệ ******");
+        builder.setPositiveButton("Ok", (dialog, which) -> {
+            dialog.dismiss();
+            mAuth.signOut();
+        });
+        builder.show();
     }
 
     public void Animation() {

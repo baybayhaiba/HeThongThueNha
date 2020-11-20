@@ -58,6 +58,16 @@
                 android:text="STK:0111xxxx"/>
 
             <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:layout_weight="1"
+                android:layout_marginBottom="10sp"
+                android:gravity="bottom"
+                android:text="Hủy đặt phòng"/>
+
+
+            <TextView
                 android:id="@+id/tv_custom_last_chat"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

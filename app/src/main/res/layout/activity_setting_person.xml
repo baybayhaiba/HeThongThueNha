@@ -20,7 +20,7 @@
             
             android:layout_gravity="center"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:orientation="vertical">
 
             <TextView
@@ -29,8 +29,20 @@
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
                 android:textColor="@color/black"
+                android:layout_weight="1"
+                android:gravity="bottom"
                 android:fontFamily="@font/belleza"
                 android:text="Thanh Huy"/>
+            <TextView
+                android:id="@+id/tv_point_setting_person"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:gravity="center"
+                android:layout_weight="1"
+                android:textColor="@color/black"
+                android:fontFamily="@font/belleza"
+                android:text="0.0VNĐ"/>
         </LinearLayout>
     </LinearLayout>
 

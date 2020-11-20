@@ -3,10 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp"
     android:layout_marginTop="10sp"
     android:background="@color/white"
+    android:orientation="vertical"
+    android:padding="16dp"
     tools:context=".CreateRoom.Fragment.fragment_utilities">
 
     <!-- TODO: Update blank fragment layout -->
@@ -46,13 +46,13 @@
             <de.hdodenhof.circleimageview.CircleImageView
                 android:layout_width="30sp"
                 android:layout_height="30sp"
-                android:src="@drawable/wifi" />
+                android:src="@drawable/fridge" />
 
             <CheckBox
                 android:id="@+id/cbUtility2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Wifi" />
+                android:text="Tủ lạnh" />
 
         </LinearLayout>
 
@@ -66,21 +66,21 @@
             <de.hdodenhof.circleimageview.CircleImageView
                 android:layout_width="30sp"
                 android:layout_height="30sp"
-                android:src="@drawable/wifi" />
+                android:src="@drawable/airconditioner" />
 
             <CheckBox
                 android:id="@+id/cbUtility3"
                 android:layout_width="wrap_content"
                 android:layout_height="35dp"
-                android:text="Wifi" />
+                android:text="Máy lạnh" />
 
         </LinearLayout>
     </LinearLayout>
 
     <LinearLayout
-        android:layout_marginTop="30sp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="30sp"
         android:orientation="horizontal">
 
         <LinearLayout
@@ -93,13 +93,13 @@
             <de.hdodenhof.circleimageview.CircleImageView
                 android:layout_width="30sp"
                 android:layout_height="30sp"
-                android:src="@drawable/bolt" />
+                android:src="@drawable/verified" />
 
             <CheckBox
                 android:id="@+id/cbUtility4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Wifi" />
+                android:text="An ninh" />
 
         </LinearLayout>
 
@@ -113,104 +113,16 @@
             <de.hdodenhof.circleimageview.CircleImageView
                 android:layout_width="30sp"
                 android:layout_height="30sp"
-                android:src="@drawable/bolt" />
+                android:src="@drawable/pool" />
 
             <CheckBox
                 android:id="@+id/cbUtility5"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Wifi" />
+                android:text="Hồ bơi" />
 
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:layout_width="30sp"
-                android:layout_height="30sp"
-                android:src="@drawable/bolt" />
-
-            <CheckBox
-                android:id="@+id/cbUtility6"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Wifi" />
-
-        </LinearLayout>
-
-    </LinearLayout>
-
-
-    <LinearLayout
-        android:layout_marginTop="30sp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:layout_width="30sp"
-                android:layout_height="30sp"
-                android:src="@drawable/bolt" />
-
-            <CheckBox
-                android:id="@+id/cbUtility7"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Wifi" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:layout_width="30sp"
-                android:layout_height="30sp"
-                android:src="@drawable/bolt" />
-
-            <CheckBox
-                android:id="@+id/cbUtility8"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Wifi" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:layout_width="30sp"
-                android:layout_height="30sp"
-                android:src="@drawable/bolt" />
-
-            <CheckBox
-                android:id="@+id/cbUtility9"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Wifi" />
-
-        </LinearLayout>
 
     </LinearLayout>
 
@@ -218,13 +130,14 @@
     <TextView
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_weight="1"/>
+        android:layout_weight="1" />
+
     <Button
         android:id="@+id/btnFinishStage4"
         android:layout_width="match_parent"
-        android:backgroundTint="@android:color/holo_red_dark"
-        android:textColor="@color/white"
         android:layout_height="wrap_content"
-        android:text="Hoàn tất"/>
+        android:backgroundTint="@android:color/holo_red_dark"
+        android:text="Hoàn tất"
+        android:textColor="@color/white" />
 
 </LinearLayout>
