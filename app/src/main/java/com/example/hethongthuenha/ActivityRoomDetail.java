@@ -1,15 +1,18 @@
 package com.example.hethongthuenha;
 
-import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -23,26 +26,39 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.hethongthuenha.API.PersonAPI;
+import com.example.hethongthuenha.Adapter.CommentRecyclerView;
+import com.example.hethongthuenha.Adapter.RoomRecyclerView;
 import com.example.hethongthuenha.Adapter.UtilitieseRecyclerView;
+import com.example.hethongthuenha.Model.BookRoom;
+import com.example.hethongthuenha.Model.Comment;
+import com.example.hethongthuenha.Model.CreditCard;
 import com.example.hethongthuenha.Model.Description_Room;
 import com.example.hethongthuenha.Model.Image_Room;
 import com.example.hethongthuenha.Model.LivingExpenses_Room;
+import com.example.hethongthuenha.Model.Notification;
 import com.example.hethongthuenha.Model.Person;
+import com.example.hethongthuenha.Model.Refund;
 import com.example.hethongthuenha.Model.Report;
 import com.example.hethongthuenha.Model.Room;
 import com.example.hethongthuenha.Model.Utilities_Room;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.squareup.picasso.Picasso;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -50,31 +66,37 @@ public class
 ActivityRoomDetail extends AppCompatActivity {
 
     //Component
-    ImageView imgRoomMain;
-    ImageView[] images;
-    TextView tvTitle, tvDescription, tvPrice, tvAccommodation,
+    private ImageView imgRoomMain, imgAvatar;
+    private ImageView[] images;
+    private TextView tvTitle, tvDescription, tvPrice, tvAccommodation,
             tvAmout, tvAddress, tvArea, tvTypeRoom, tvNamePerson, tvContactPerson,
             tvWaterPrice, tvElectricityPrice, tvTvPrice, tvInternetPrice, tvParkingPrice;
-    EditText etComment, etDescriptionReport;
-    Button btnWatchMore, btnBookRoom, btnReport, btnSendReport, btnCancelReport;
-    LinearLayout[] linearLiving;
-    CardView cvPerson;
+    private EditText etComment, etDescriptionReport;
+    private Button btnWatchMore, btnBookRoom, btnReport, btnSendReport, btnCancelReport, btnCareBookRoom;
+    private LinearLayout[] linearLiving;
+    private CardView cvPerson;
     //Model
-    Room room;
+    private Room room;
     //Firebase
-    FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private DocumentReference ref = db.collection("Report").document();
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private DocumentReference refReport = db.collection("Report").document();
+    private DocumentReference refBookRoom = db.collection("BookRoom").document();
+    private DocumentReference refComment = db.collection("Comment").document();
+    private List<Comment> comments;
+    private RecyclerView recyclerViewComment;
+    private CommentRecyclerView adapter;
     //Other
-    DecimalFormat deciFormat;
-    NumberFormat formatter;
-    Spinner spReport;
+    private DecimalFormat deciFormat;
+    private NumberFormat formatter;
+    private Spinner spReport;
+    private ProgressDialog progressDialog;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_room_detail);
-
+        progressDialog = new ProgressDialog(this);
         room = (Room) getIntent().getSerializableExtra("room");
         Init();
     }
@@ -117,6 +139,7 @@ ActivityRoomDetail extends AppCompatActivity {
         btnWatchMore = findViewById(R.id.btn_watchmore_detail);
         btnBookRoom = findViewById(R.id.btnBookRoom);
         btnReport = findViewById(R.id.btnReport);
+        btnCareBookRoom = findViewById(R.id.btnCareBookRoom);
 
         tvWaterPrice = findViewById(R.id.custom_water_price);
         tvElectricityPrice = findViewById(R.id.custom_electricity_price);
@@ -124,9 +147,17 @@ ActivityRoomDetail extends AppCompatActivity {
         tvTvPrice = findViewById(R.id.custom_tv_price);
         tvParkingPrice = findViewById(R.id.custom_parking_price);
 
+        imgAvatar = findViewById(R.id.img_avater_person_room);
+
         deciFormat = new DecimalFormat();
         formatter = NumberFormat.getCurrencyInstance();
 
+        comments = new ArrayList<>();
+
+        recyclerViewComment = findViewById(R.id.commentRecyclerview);
+        recyclerViewComment.setLayoutManager(new LinearLayoutManager(this));
+        adapter = new CommentRecyclerView(this, comments);
+        recyclerViewComment.setAdapter(adapter);
 
         etComment = findViewById(R.id.et_comment_detail);
         cvPerson = findViewById(R.id.cv_person_detail);
@@ -140,6 +171,15 @@ ActivityRoomDetail extends AppCompatActivity {
         CommentRoom();
         GoToPerson();
         ShowDialogReport();
+        CheckBookRoom();
+        ListBookRoom();
+        ShowComment();
+    }
+
+    private void ListBookRoom() {
+        btnCareBookRoom.setOnClickListener(v -> {
+            RoomRecyclerView.ShowDialogBookRoom(room, this);
+        });
     }
 
     private void GoToPerson() {
@@ -151,57 +191,174 @@ ActivityRoomDetail extends AppCompatActivity {
     }
 
     private void Prepayment() {
+        AlertDialog.Builder builderSingle = new AlertDialog.Builder(ActivityRoomDetail.this);
+        builderSingle.setIcon(R.drawable.home);
+        builderSingle.setTitle("Chọn dạng trả trước");
 
-        String contact = "0169xxxxxx";
-        String id_room = room.getRoom_id();
-        String id_person = PersonAPI.getInstance().getUid();
-        String text = "Nội dung cú pháp gửi tiền:\n" +
-                "\nRoom:" + id_room + "\n" +
-                "\nID:" + id_person + "\n" +
-                " \n" +
-                "-----------------------------------------------\n" +
-                "Số tài khoản:" + contact + "\n" +
-                " \n" +
-                "Tên chủ tài khoản:An a\n" +
-                " \n" +
-                "*Ít nhất bạn phải đóng ít nhất 10% tiền trọ nếu không sẽ hoàn tiền\n" +
-                "gửi lại sau 5-10 ngày\n";
+        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(ActivityRoomDetail.this, android.R.layout.select_dialog_singlechoice);
+        arrayAdapter.add("Trả trước 10%");
+        arrayAdapter.add("Trả trước 25%");
+        arrayAdapter.add("Trả trước 50%");
+        arrayAdapter.add("Trả trước 75%");
+        arrayAdapter.add("Trả trước 100%");
+        builderSingle.setNegativeButton("Hủy", (dialog, which) -> dialog.dismiss());
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Thông báo trả trước");
-        builder.setMessage(text);
-        builder.setPositiveButton("Tôi đã hiểu", (dialog, which) -> dialog.dismiss());
-        builder.show();
+        builderSingle.setAdapter(arrayAdapter, (dialog, which) -> {
+            progressDialog.setMessage("Xin vui lòng đợi");
+            int percent_repay = 0;
+            switch (which) {
+                case 0:
+                    percent_repay = 10;
+                    break;
+                case 1:
+                    percent_repay = 25;
+                    break;
+                case 2:
+                    percent_repay = 50;
+                    break;
+                case 3:
+                    percent_repay = 75;
+                    break;
+                case 4:
+                    percent_repay = 100;
+                    break;
+            }
+
+            double price_percent = (double) ((room.getStage1().getPrice() * percent_repay) / 100);
+
+            if (price_percent <= PersonAPI.getInstance().getPoint()) {
+                String description = "Trả trước " + percent_repay + "% ";
+                Timestamp timestamp = new Timestamp(new Date());
+                BookRoom bookRoom = new BookRoom(refBookRoom.getId(), PersonAPI.getInstance().getUid(),
+                        room.getRoom_id(), description, timestamp, price_percent);
+
+                db.collection("BookRoom")
+                        .add(bookRoom).addOnSuccessListener(v -> {
+                    db.collection("CreditCard").whereEqualTo("email_person",
+                            PersonAPI.getInstance().getEmail())
+                            .get().addOnSuccessListener(queryDocumentSnapshots -> {
+                        if (!queryDocumentSnapshots.isEmpty()) {
+                            for (QueryDocumentSnapshot value : queryDocumentSnapshots) {
+                                CreditCard card = value.toObject(CreditCard.class);
+                                //set point again
+                                card.setPoint(card.getPoint() - price_percent);
+                                PersonAPI.getInstance().setPoint(card.getPoint());
+                                //update point
+                                db.collection("CreditCard").document(value.getId())
+                                        .set(card);
+                                //update button
+                                btnBookRoom.setText("Hủy đặt phòng");
+                                //update notification
+                                Notification notification = new Notification(PersonAPI.getInstance().getUid(),
+                                        room.getPerson_id(), description.concat(room.getStage1().getTitle())
+                                        , 2, timestamp);
+
+                                db.collection("Notification").add(notification);
+
+                                Toast.makeText(ActivityRoomDetail.this, "Bạn đã được thêm vào danh sách trả trước", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+
+                });
+            } else {
+                ActivitySettingPerson.AddPoint("Bạn không đủ tiền", this);
+            }
+        });
+        builderSingle.show();
     }
 
     private void NotificationPay() {
 
         btnBookRoom.setOnClickListener(v -> {
-            AlertDialog.Builder builderSingle = new AlertDialog.Builder(ActivityRoomDetail.this);
-            builderSingle.setIcon(R.drawable.home);
-            builderSingle.setTitle("Chọn hình thức thanh toán");
 
-            final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(ActivityRoomDetail.this, android.R.layout.select_dialog_item);
-            arrayAdapter.add("Thanh toán trả trước");
-            arrayAdapter.add("Thanh toán trả sau");
+            if (btnBookRoom.getText().toString().equals("Đặt phòng")) {
 
-            builderSingle.setNegativeButton("Hủy", (dialog, which) -> dialog.dismiss());
+                AlertDialog.Builder builderSingle = new AlertDialog.Builder(ActivityRoomDetail.this);
+                builderSingle.setIcon(R.drawable.home);
+                builderSingle.setTitle("Chọn hình thức thanh toán");
 
-            builderSingle.setAdapter(arrayAdapter, (dialog, which) -> {
-                //String strName = arrayAdapter.getItem(which);
-                switch (which) {
-                    case 0:
-                        Prepayment();
-                        break;
-                    case 1:
-                        PayLater();
-                        break;
-                }
-            });
-            builderSingle.show();
+                final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(ActivityRoomDetail.this, android.R.layout.select_dialog_item);
+                arrayAdapter.add("Thanh toán trả trước");
+                arrayAdapter.add("Thanh toán trả sau");
+
+                builderSingle.setNegativeButton("Hủy", (dialog, which) -> dialog.dismiss());
+
+                builderSingle.setAdapter(arrayAdapter, (dialog, which) -> {
+                    //String strName = arrayAdapter.getItem(which);
+                    switch (which) {
+                        case 0:
+                            Prepayment();
+                            break;
+                        case 1:
+                            PayLater();
+                            break;
+                    }
+                });
+                builderSingle.show();
+            } else {
+                CancelBookRoom();
+            }
         });
 
     }
+
+    private void CancelBookRoom() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Thông báo !");
+        builder.setMessage("Bạn có muốn hủy đặt phòng không ?");
+        builder.setNegativeButton("Không", (dialog, which) -> dialog.dismiss());
+        builder.setPositiveButton("Đồng ý", (dialog, which) -> {
+
+            db.collection("CreditCard").whereEqualTo("email_person",
+                    PersonAPI.getInstance().getEmail())
+                    .get().addOnSuccessListener(queryDocumentSnapshots -> {
+                if (!queryDocumentSnapshots.isEmpty()) {
+                    for (QueryDocumentSnapshot value : queryDocumentSnapshots) {
+                        CreditCard card = value.toObject(CreditCard.class);
+                        card.setPoint(card.getPoint());
+                        PersonAPI.getInstance().setPoint(card.getPoint());
+
+                        db.collection("BookRoom")
+                                .whereEqualTo("id_person", PersonAPI.getInstance().getUid())
+                                .whereEqualTo("id_room", room.getRoom_id())
+                                .get().addOnSuccessListener(queryDocumentSnapshots1 -> {
+                            if (!queryDocumentSnapshots1.isEmpty()) {
+                                for (QueryDocumentSnapshot v : queryDocumentSnapshots1) {
+                                    BookRoom bookRoom = v.toObject(BookRoom.class);
+                                    card.setPoint(card.getPoint() + bookRoom.getPricePaied());
+
+                                    db.collection("BookRoom").document(v.getId())
+                                            .delete();
+                                    btnBookRoom.setText("Đặt phòng");
+                                    db.collection("CreditCard").document(value.getId())
+                                            .set(card);
+                                }
+                            }
+                        });
+
+
+                        Toast.makeText(ActivityRoomDetail.this, "Bạn đã hủy danh sách trả trước", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+        });
+
+        builder.show();
+    }
+
+    private void CheckBookRoom() {
+        db.collection("BookRoom")
+                .whereEqualTo("id_person", PersonAPI.getInstance().getUid())
+                .whereEqualTo("id_room", room.getRoom_id())
+                .get().addOnSuccessListener(queryDocumentSnapshots -> {
+            if (queryDocumentSnapshots.isEmpty())
+                btnBookRoom.setText("Đặt phòng");
+            else
+                btnBookRoom.setText("Hủy đặt phòng");
+        });
+    }
+
 
     public void ShowDialogReport() {
         btnReport.setOnClickListener(v -> {
@@ -224,7 +381,7 @@ ActivityRoomDetail extends AppCompatActivity {
                 String description = etDescriptionReport.getText().toString();
                 Timestamp reportAdded = new Timestamp(new Date());
 
-                Report report = new Report(ref.getId(), PersonAPI.getInstance().getUid(), room.getRoom_id(),
+                Report report = new Report(refReport.getId(), PersonAPI.getInstance().getUid(), room.getRoom_id(),
                         typeReport, description, reportAdded);
 
                 db.collection("Report").add(report)
@@ -265,6 +422,13 @@ ActivityRoomDetail extends AppCompatActivity {
             if (!queryDocumentSnapshots.isEmpty()) {
                 for (DocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
                     Person person = documentSnapshot.toObject(Person.class);
+
+                    if (!person.getUrl().equals("")) {
+                        Picasso.with(this)
+                                .load(person.getUrl()).placeholder(R.drawable.ic_baseline_person_24)
+                                .into(imgAvatar);
+                    }
+
                     tvNamePerson.setText(person.getFullName());
                     tvContactPerson.setText("SĐT:" + person.getContact());
                 }
@@ -289,8 +453,8 @@ ActivityRoomDetail extends AppCompatActivity {
 
         tvTitle.setText(description_room.getTitle());
         tvAddress.setText("Địa chỉ:" + description_room.getAddress());
-        tvAmout.setText("Sức chứa:" + description_room.getAmout() + " người");
-        tvAccommodation.setText("Số lượng:" + description_room.getAccommodation());
+        tvAmout.setText("Số lượng:" + description_room.getAmout());
+        tvAccommodation.setText("Sức chứa:" + description_room.getAccommodation() + "/người");
         tvPrice.setText("Giá:" + formatter.format(description_room.getPrice()) + "/" + description_room.getType_date());
         tvArea.setText("Diện tích:" + description_room.getArea() + "m2");
         tvTypeRoom.setText("Loại:" + description_room.getType_room());
@@ -345,6 +509,7 @@ ActivityRoomDetail extends AppCompatActivity {
     }
 
     private void CommentRoom() {
+
         etComment.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_SEARCH ||
                     actionId == EditorInfo.IME_ACTION_DONE ||
@@ -352,13 +517,53 @@ ActivityRoomDetail extends AppCompatActivity {
                             event.getAction() == KeyEvent.ACTION_DOWN &&
                             event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
                 if (event == null || !event.isShiftPressed()) {
-                    Toast.makeText(ActivityRoomDetail.this, v.getText().toString(), Toast.LENGTH_SHORT).show();
+
+                    db.collection("Comment").whereEqualTo("id_room", room.getRoom_id())
+                            .whereEqualTo("id_person", PersonAPI.getInstance().getUid())
+                            .get().addOnSuccessListener(queryDocumentSnapshots -> {
+                        if (queryDocumentSnapshots.isEmpty()) {
+                            Comment comment = new Comment(refComment.getId(), room.getRoom_id(),
+                                    PersonAPI.getInstance().getUid(), v.getText().toString(),
+                                    new Timestamp(new Date()));
+                            db.collection("Comment").add(comment)
+                                    .addOnSuccessListener(c -> {
+                                        Toast.makeText(ActivityRoomDetail.this, "Bình luận thành công", Toast.LENGTH_SHORT).show();
+                                    });
+                        } else {
+                            for (QueryDocumentSnapshot value : queryDocumentSnapshots) {
+                                Comment comment = value.toObject(Comment.class);
+                                comment.setText(v.getText().toString());
+                                db.collection("Comment").document(value.getId())
+                                        .set(comment).addOnSuccessListener(x -> {
+                                    Toast.makeText(ActivityRoomDetail.this, "Cập nhật thành công", Toast.LENGTH_SHORT).show();
+                                    etComment.setText("");
+                                });
+                            }
+                        }
+                    });
 
                     return true; // consume.
                 }
             }
             return false; // pass on to other listeners.
         });
+    }
+
+    private void ShowComment() {
+        db.collection("Comment").whereEqualTo("id_room", room.getRoom_id())
+                .addSnapshotListener((value, error) -> {
+                    comments.clear();
+                    if (error == null) {
+                        for (QueryDocumentSnapshot v : value) {
+                            Comment comment = v.toObject(Comment.class);
+                            Log.d("SIMPLE", "ShowComment: " + comment.toString());
+                            comments.add(comment);
+                        }
+                        Collections.sort(comments, (o1, o2) ->
+                                (int) (o2.getTime_added().getSeconds()-o1.getTime_added().getSeconds()));
+                        adapter.notifyDataSetChanged();
+                    }
+                });
     }
 
 

@@ -6,17 +6,27 @@ public class Notification {
     private String id_person_needed;
     private String id_person_created;
     private String description;
+    private int type_notification;
     private Timestamp notificationAdded;
 
 
     public Notification() {
     }
 
-    public Notification(String id_person_needed, String id_person_created, String description, Timestamp notificationAdded) {
+    public Notification(String id_person_needed, String id_person_created, String description, int type_notification, Timestamp notificationAdded) {
         this.id_person_needed = id_person_needed;
         this.id_person_created = id_person_created;
         this.description = description;
+        this.type_notification = type_notification;
         this.notificationAdded = notificationAdded;
+    }
+
+    public int getType_notification() {
+        return type_notification;
+    }
+
+    public void setType_notification(int type_notification) {
+        this.type_notification = type_notification;
     }
 
     public String getId_person_needed() {

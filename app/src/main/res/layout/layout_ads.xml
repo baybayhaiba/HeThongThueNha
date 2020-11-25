@@ -2,7 +2,8 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
     android:orientation="vertical"
-    android:padding="16sp"
+    android:padding="20sp"
+    android:background="@color/green_200"
     android:layout_height="wrap_content">
 
     <Spinner
@@ -11,18 +12,33 @@
         android:layout_height="wrap_content"
         android:entries="@array/spAds"
         android:padding="16sp"/>
-    <TextView
-        android:layout_marginTop="20sp"
-        android:id="@+id/tv_layout_content"
+    <LinearLayout
+        android:layout_marginTop="10sp"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"/>
-    <Button
-        android:id="@+id/btn_layout_ads"
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="right"
-        android:textColor="@color/black"
-        android:background="@android:color/transparent"
-        android:text="Tôi đã hiểu"/>
+        android:gravity="right"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btn_cancel_ads"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:background="@android:color/transparent"
+            android:text="Hủy"/>
+
+        <Button
+            android:id="@+id/btn_register_ads"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20sp"
+            android:textStyle="bold"
+            android:layout_gravity="right"
+            android:textColor="@color/black"
+            android:background="@android:color/transparent"
+            android:text="Đăng ký"/>
+    </LinearLayout>
+
 </LinearLayout>

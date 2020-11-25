@@ -17,14 +17,25 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hethongthuenha.API.PersonAPI;
+import com.example.hethongthuenha.ActivityRoomDetail;
+import com.example.hethongthuenha.Model.BookRoom;
 import com.example.hethongthuenha.Model.Chat;
+import com.example.hethongthuenha.Model.Notification;
+import com.example.hethongthuenha.Model.Person;
 import com.example.hethongthuenha.Model.Room;
 import com.example.hethongthuenha.R;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.squareup.picasso.Picasso;
 
 import java.text.NumberFormat;
+import java.util.Date;
 import java.util.List;
 
 
@@ -34,6 +45,7 @@ public class ChatRecyclerView extends RecyclerView.Adapter<ChatRecyclerView.MyVi
     private List<Chat> chats;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     NumberFormat formatter = NumberFormat.getCurrencyInstance();
+
     public ChatRecyclerView(Context context, List<Chat> chats) {
         this.context = context;
         this.chats = chats;
@@ -42,7 +54,7 @@ public class ChatRecyclerView extends RecyclerView.Adapter<ChatRecyclerView.MyVi
     public static class MyViewHolder extends RecyclerView.ViewHolder {
         private TextView tvChat, tvAddress, tvPrice, tvTypeRoom;
         private LinearLayout linearChat;
-        private ImageView imgChat, imgAgree, imgRefuse;
+        private ImageView imgChat, imgAgree;
         private CardView cvChat;
 
         public MyViewHolder(@NonNull View itemView) {
@@ -51,7 +63,6 @@ public class ChatRecyclerView extends RecyclerView.Adapter<ChatRecyclerView.MyVi
             linearChat = itemView.findViewById(R.id.linear_custom_chat);
             imgChat = itemView.findViewById(R.id.img_custom_chat);
             imgAgree = itemView.findViewById(R.id.img_agree_chat);
-            imgRefuse = itemView.findViewById(R.id.img_refuse_chat);
             tvAddress = itemView.findViewById(R.id.tv_address_chat);
             tvPrice = itemView.findViewById(R.id.tv_price_chat);
             tvTypeRoom = itemView.findViewById(R.id.tv_type_room_chat);
@@ -87,15 +98,18 @@ public class ChatRecyclerView extends RecyclerView.Adapter<ChatRecyclerView.MyVi
         if (chat.getUrl().equals("")) {
             holder.imgChat.setVisibility(View.GONE);
             holder.imgAgree.setVisibility(View.GONE);
-            holder.imgRefuse.setVisibility(View.GONE);
             holder.tvAddress.setVisibility(View.GONE);
             holder.tvPrice.setVisibility(View.GONE);
             holder.tvTypeRoom.setVisibility(View.GONE);
             holder.cvChat.setVisibility(View.GONE);
         } else {
             holder.imgChat.setVisibility(View.VISIBLE);
-            holder.imgAgree.setVisibility(View.VISIBLE);
-            holder.imgRefuse.setVisibility(View.VISIBLE);
+            if (!chat.getFrom_email_person().equals(PersonAPI.getInstance().getEmail())) {
+                holder.imgAgree.setVisibility(View.VISIBLE);
+            } else {
+                holder.imgAgree.setVisibility(View.GONE);
+            }
+
             holder.tvAddress.setVisibility(View.VISIBLE);
             holder.tvPrice.setVisibility(View.VISIBLE);
             holder.tvTypeRoom.setVisibility(View.VISIBLE);
@@ -103,6 +117,9 @@ public class ChatRecyclerView extends RecyclerView.Adapter<ChatRecyclerView.MyVi
             Picasso.with(context).load(chat.getUrl()).placeholder(R.drawable.home)
                     .into(holder.imgChat);
 
+
+            DocumentReference ref = db.collection("BookRoom").document();
+            Timestamp timestamp = new Timestamp(new Date());
             db.collection("Room").get()
                     .addOnCompleteListener(v -> {
                         if (v.isSuccessful()) {
@@ -110,20 +127,61 @@ public class ChatRecyclerView extends RecyclerView.Adapter<ChatRecyclerView.MyVi
                                 Room room = value.toObject(Room.class);
                                 for (String s : room.getStage3().getImagesURL())
                                     if (s.equals(chat.getUrl())) {
-                                        holder.tvAddress.setText("Địa chỉ:"+room.getStage1().getAddress());
+                                        holder.tvAddress.setText("Địa chỉ:" + room.getStage1().getAddress());
                                         holder.tvPrice.setText("Giá:" + formatter.format(room.getStage1().getPrice()));
                                         holder.tvTypeRoom.setText(room.getStage1().getType_room());
+
+
+                                        holder.cvChat.setOnClickListener(z -> {
+                                            Intent intent = new Intent(context, ActivityRoomDetail.class);
+                                            intent.putExtra("room", room);
+                                            context.startActivity(intent);
+                                        });
+
+                                        holder.imgAgree.setOnClickListener(c -> {
+                                            db.collection("User").whereEqualTo("email", chat.getFrom_email_person())
+                                                    .get().addOnCompleteListener(task -> {
+                                                if (task.isSuccessful()) {
+                                                    for (QueryDocumentSnapshot users : task.getResult()) {
+                                                        Person person = users.toObject(Person.class);
+
+                                                        db.collection("BookRoom").whereEqualTo("id_person", person.getUid())
+                                                                .whereEqualTo("id_room", room.getRoom_id())
+                                                                .get().addOnSuccessListener(queryDocumentSnapshots -> {
+                                                            if (queryDocumentSnapshots.isEmpty()) {
+                                                                BookRoom bookRoom = new BookRoom(ref.getId(),
+                                                                        person.getUid(), room.getRoom_id(), "Trả sau", timestamp, 0);
+
+                                                                db.collection("BookRoom").add(bookRoom);
+
+                                                                Notification notification = new Notification(room.getPerson_id(),
+                                                                        person.getUid(), "Trả sau thành công tại phòng " + room.getStage1().getTitle(), 2, timestamp);
+
+                                                                db.collection("Notification").add(notification).addOnCompleteListener(x -> {
+                                                                    Toast.makeText(context, "Bạn đã đưa vào danh sách xem sau  ", Toast.LENGTH_SHORT).show();
+                                                                });
+                                                            } else {
+                                                                Toast.makeText(context, "Người này đã được đưa vào rồi ", Toast.LENGTH_SHORT).show();
+                                                            }
+                                                        });
+
+
+                                                    }
+                                                }
+                                            });
+                                        });
                                     }
                             }
                         }
                     });
 
-            holder.imgAgree.setOnClickListener(v -> {
-                Toast.makeText(context, "I'm agree", Toast.LENGTH_SHORT).show();
+
+            holder.cvChat.setOnClickListener(z -> {
+                Toast.makeText(context, "Phòng đã bị xóa hoặc chưa tải xong ! ", Toast.LENGTH_SHORT).show();
             });
 
-            holder.imgRefuse.setOnClickListener(v -> {
-                Toast.makeText(context, "I'm refuse", Toast.LENGTH_SHORT).show();
+            holder.imgAgree.setOnClickListener(v -> {
+                Toast.makeText(context, "Phòng đã bị xóa hoặc bị lỗi", Toast.LENGTH_SHORT).show();
             });
         }
 

@@ -21,6 +21,11 @@ import com.example.hethongthuenha.MainActivity.Fragment.Requiment.fragment_requi
 import com.example.hethongthuenha.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
 public class MainActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private BottomNavigationView bottomNavigationView;
@@ -31,6 +36,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Init();
+
+
         Event();
     }
 

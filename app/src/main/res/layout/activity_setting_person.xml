@@ -12,12 +12,13 @@
         android:layout_marginTop="30sp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-        <ImageView
-            android:layout_width="80sp"
-            android:layout_height="80sp"
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/img_avatar_person"
+            android:layout_width="100sp"
+            android:layout_height="100sp"
             android:src="@drawable/ic_baseline_person_24"/>
         <LinearLayout
-            
+            android:layout_marginLeft="20sp"
             android:layout_gravity="center"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -30,9 +31,16 @@
                 android:textSize="20sp"
                 android:textColor="@color/black"
                 android:layout_weight="1"
-                android:gravity="bottom"
                 android:fontFamily="@font/belleza"
-                android:text="Thanh Huy"/>
+                android:text=""/>
+            <TextView
+                android:id="@+id/tv_email_setting_person"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:layout_weight="1"
+                android:fontFamily="@font/belleza"
+                android:text=""/>
             <TextView
                 android:id="@+id/tv_point_setting_person"
                 android:layout_width="wrap_content"
@@ -40,9 +48,8 @@
                 android:textSize="12sp"
                 android:gravity="center"
                 android:layout_weight="1"
-                android:textColor="@color/black"
                 android:fontFamily="@font/belleza"
-                android:text="0.0VNĐ"/>
+                android:text=""/>
         </LinearLayout>
     </LinearLayout>
 

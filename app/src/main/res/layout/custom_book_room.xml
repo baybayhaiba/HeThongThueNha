@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/cv_custom_person_chat"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:backgroundTint="@color/yellow_100"
     app:cardCornerRadius="10sp"
+    android:layout_width="match_parent"
+    app:contentPadding="16sp"
+    android:id="@+id/cv_custom_person_chat"
     app:cardUseCompatPadding="true"
-    app:contentPadding="16sp">
+    android:backgroundTint="@color/yellow_100"
+    android:layout_height="wrap_content">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -15,60 +15,60 @@
         android:orientation="horizontal">
 
         <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/img_room_ads"
+            android:id="@+id/img_custom_book_room"
             android:layout_width="80sp"
             android:layout_height="80sp"
             android:layout_gravity="center"
-            android:src="@drawable/home" />
-
+            android:src="@drawable/ic_baseline_person_24"/>
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:layout_marginLeft="10sp"
             android:layout_weight="1"
+            android:layout_height="wrap_content"
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/tv_title_ads"
+                android:id="@+id/tv_custom_name_bookroom"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="10sp"
-                android:fontFamily="@font/belleza"
+                android:text=""
                 android:gravity="bottom"
-                android:text="Pham Thanh Huy"
-                android:textColor="@color/black"
                 android:textSize="18sp"
-                android:textStyle="bold" />
+                android:fontFamily="@font/belleza"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                android:layout_marginBottom="10sp"/>
 
 
             <TextView
-                android:id="@+id/tv_price_ads"
+                android:id="@+id/tv_description_bookroom"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="10sp"
+                android:textSize="12sp"
                 android:layout_weight="1"
+                android:layout_marginBottom="10sp"
                 android:gravity="bottom"
-                android:text="Hủy đặt phòng"
-                android:textSize="12sp" />
+                android:text=""/>
 
 
             <TextView
-                android:id="@+id/tv_timestamp_ads"
+                android:id="@+id/tv_custom_bookroom_added"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="bottom"
                 android:lines="1"
-                android:text="1 ngày trước"
-                android:textSize="12sp" />
+                android:textSize="12sp"
+                android:gravity="bottom"
+                android:text=""/>
 
         </LinearLayout>
 
         <ImageView
-            android:id="@+id/img_remove_ads"
+            android:id="@+id/imgCancelBookRoom"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:visibility="gone"
             android:layout_gravity="center"
-            android:src="@drawable/ic_baseline_remove_circle_24" />
+            android:src="@drawable/ic_baseline_remove_circle_24"/>
     </LinearLayout>
 
 </androidx.cardview.widget.CardView>

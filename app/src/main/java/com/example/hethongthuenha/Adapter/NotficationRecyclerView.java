@@ -14,6 +14,7 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hethongthuenha.ActivityChat;
+import com.example.hethongthuenha.ActivityPerson;
 import com.example.hethongthuenha.Model.Notification;
 import com.example.hethongthuenha.Model.Person;
 import com.example.hethongthuenha.R;
@@ -78,10 +79,17 @@ public class NotficationRecyclerView extends RecyclerView.Adapter<NotficationRec
                     holder.tvName.setText(person.getFullName());
 
                     holder.cvNotfication.setOnClickListener(v -> {
-                        Intent intent = new Intent(context, ActivityChat.class);
-                        intent.putExtra("toEmail", person.getEmail());
-                        intent.putExtra("toName", person.getFullName());
-                        context.startActivity(intent);
+
+                        if (notification.getType_notification() == 1) {
+                            Intent intent = new Intent(context, ActivityChat.class);
+                            intent.putExtra("toEmail", person.getEmail());
+                            intent.putExtra("toName", person.getFullName());
+                            context.startActivity(intent);
+                        } else {
+                            Intent intent = new Intent(context, ActivityPerson.class);
+                            intent.putExtra("id_person", notification.getId_person_needed());
+                            context.startActivity(intent);
+                        }
                     });
                 }
             }

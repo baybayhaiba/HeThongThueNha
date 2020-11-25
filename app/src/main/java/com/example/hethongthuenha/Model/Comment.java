@@ -3,6 +3,7 @@ package com.example.hethongthuenha.Model;
 import com.google.firebase.Timestamp;
 
 public class Comment {
+    private String id;
     private String id_room;
     private String id_person;
     private String text;
@@ -11,11 +12,22 @@ public class Comment {
     public Comment() {
     }
 
-    public Comment(String id_room, String id_person, String text, Timestamp time_added) {
+    public Comment(String id, String id_room, String id_person, String text, Timestamp time_added) {
+        this.id = id;
         this.id_room = id_room;
         this.id_person = id_person;
         this.text = text;
         this.time_added = time_added;
+    }
+
+
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getId_room() {

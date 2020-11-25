@@ -67,24 +67,21 @@ public class SplashScreenActivity extends AppCompatActivity {
                         for (DocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
                             Person person = documentSnapshot.toObject(Person.class);
 
-                            PersonAPI personAPI = PersonAPI.getInstance();
-                            personAPI.setUid(person.getUid());
-                            personAPI.setName(person.getFullName());
-                            personAPI.setEmail(person.getEmail());
-                            personAPI.setType_person(person.getType_person());
+                            PersonAPI.getInstance().setUid(person.getUid());
+                            PersonAPI.getInstance().setName(person.getFullName());
+                            PersonAPI.getInstance().setEmail(person.getEmail());
+                            PersonAPI.getInstance().setType_person(person.getType_person());
 
 
                             //Get Point
-                            db.collection("CreditCard").whereEqualTo("id_person", person.getUid())
+                            db.collection("CreditCard").whereEqualTo("email_person", person.getEmail())
                                     .get().addOnSuccessListener(v -> {
-                                if (v.isEmpty()){
-                                    personAPI.setPoint(0);
-                                }
-
-                                else {
+                                if (v.isEmpty()) {
+                                    PersonAPI.getInstance().setPoint(0);
+                                } else {
                                     for (QueryDocumentSnapshot value : v) {
                                         CreditCard creditCard = value.toObject(CreditCard.class);
-                                        personAPI.setPoint(creditCard.getPoint());
+                                        PersonAPI.getInstance().setPoint(creditCard.getPoint());
                                     }
                                 }
 
@@ -96,8 +93,8 @@ public class SplashScreenActivity extends AppCompatActivity {
                                     finish();
                                 }
                             });
-                        }
 
+                        }
                     }
 
                 }).addOnFailureListener(e -> Log.d("SplashScreen-Error", "onCreate: " + e.getMessage()));
@@ -110,14 +107,18 @@ public class SplashScreenActivity extends AppCompatActivity {
     }
 
     private void NotificationLock() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Thông báo");
-        builder.setMessage("Tài khoản của bạn đã bị khóa muốn biết chi tiết xin liên hệ ******");
-        builder.setPositiveButton("Ok", (dialog, which) -> {
-            dialog.dismiss();
-            mAuth.signOut();
-        });
-        builder.show();
+        try {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Thông báo");
+            builder.setMessage("Tài khoản của bạn đã bị khóa muốn biết chi tiết xin liên hệ ******");
+            builder.setPositiveButton("Ok", (dialog, which) -> {
+                dialog.dismiss();
+                mAuth.signOut();
+            });
+            builder.show();
+        } catch (Exception ex) {
+            Toast.makeText(this, "Tài khoản của bạn đã bị khóa", Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void Animation() {

@@ -1,6 +1,7 @@
 package com.example.hethongthuenha.Adapter;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.text.format.DateUtils;
 import android.util.Log;
@@ -18,21 +19,36 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.cardview.widget.CardView;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hethongthuenha.API.PersonAPI;
 import com.example.hethongthuenha.ActivityRoomDetail;
+import com.example.hethongthuenha.ActivitySettingPerson;
 import com.example.hethongthuenha.CreateRoom.CreateRoomActivity;
+import com.example.hethongthuenha.Model.Ads;
+import com.example.hethongthuenha.Model.BookRoom;
+import com.example.hethongthuenha.Model.CreditCard;
 import com.example.hethongthuenha.Model.Description_Room;
 import com.example.hethongthuenha.Model.Image_Room;
 import com.example.hethongthuenha.Model.Notification;
 import com.example.hethongthuenha.Model.Room;
 import com.example.hethongthuenha.R;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.squareup.picasso.Picasso;
 
 import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 public class RoomRecyclerView extends RecyclerView.Adapter<RoomRecyclerView.MyViewHolder> {
@@ -40,7 +56,7 @@ public class RoomRecyclerView extends RecyclerView.Adapter<RoomRecyclerView.MyVi
 
     private List<Room> rooms;
     private Context context;
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private static FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     public RoomRecyclerView(Context context, List<Room> rooms) {
         this.rooms = rooms;
@@ -157,7 +173,7 @@ public class RoomRecyclerView extends RecyclerView.Adapter<RoomRecyclerView.MyVi
                     ShowDialogRequirement(room);
                     break;
                 case 3:
-                    Toast.makeText(context, "4", Toast.LENGTH_SHORT).show();
+                    ShowDialogBookRoom(room, context);
                     break;
             }
         });
@@ -171,59 +187,108 @@ public class RoomRecyclerView extends RecyclerView.Adapter<RoomRecyclerView.MyVi
         builder.setView(viewLayout);
 
         Spinner spinner = viewLayout.findViewById(R.id.sp_layout_ads);
-        TextView content = viewLayout.findViewById(R.id.tv_layout_content);
-        Button button = viewLayout.findViewById(R.id.btn_layout_ads);
+        Button buttonRegister = viewLayout.findViewById(R.id.btn_register_ads);
+        Button buttonCancel = viewLayout.findViewById(R.id.btn_cancel_ads);
 
-
-        String contact = "0169xxxxxx";
-
-        String text = "Nội dung cú pháp quảng cáo:\n" +
-                "\nId:" + room.getPerson_id() + "\n" +
-                "\nRoom:" + room.getRoom_id() + "\n" +
-                "\nType:" + spinner.getSelectedItem().toString() + "\n" +
-                " \n" +
-                "-----------------------------------------------\n" +
-                "Số tài khoản:" + contact + "\n" +
-                " \n" +
-                "Tên chủ tài khoản:An a\n" +
-                " \n" +
-                "Nếu tiền chênh lệch với mức giá sẽ hoãn loại với số dư trừ cho gói có thể đăng ký\n" +
-                "gửi lại sau 5-10 ngày\n";
-
-        content.setText(text);
-
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-                String text = "Nội dung cú pháp quảng cáo:\n" +
-                        "\nRoom:" + room.getRoom_id() + "\n" +
-                        "\nType:" + spinner.getSelectedItem().toString() + "\n" +
-                        " \n" +
-                        "-----------------------------------------------\n" +
-                        "Số tài khoản:" + contact + "\n" +
-                        " \n" +
-                        "Số tiền:Tương ứng với dãy đầu của type" + "\n" +
-                        " \n" +
-                        "Tên chủ tài khoản:An a\n" +
-                        " \n" +
-                        "Nếu tiền chênh lệch với mức giá sẽ hoãn loại với số dư trừ cho gói có thể đăng ký\n" +
-                        "gửi lại sau 5-10 ngày\n";
-
-                content.setText(text);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
 
         final AlertDialog show = builder.show();
 
-        button.setOnClickListener(v -> {
+        buttonRegister.setOnClickListener(v -> {
+            String[] typeAds = spinner.getSelectedItem().toString().split("VNĐ/");
+            double price = Double.parseDouble(typeAds[0]);
+            DocumentReference ref = db.collection("Ads").document();
+
+            try {
+                if (price <= PersonAPI.getInstance().getPoint()) {
+                    Calendar cal = Calendar.getInstance();
+                    cal.setTime(new Date());
+
+
+                    if (price == 60000)
+                        cal.add(Calendar.DATE, 7);
+                    else if (price == 160000)
+                        cal.add(Calendar.DATE, 17);
+                    else
+                        cal.add(Calendar.DATE, 27);
+                    Date date = cal.getTime();
+                    Timestamp timestamp = new Timestamp(date);
+
+
+                    db.collection("Room").whereEqualTo("room_id", room.getRoom_id()).get()
+                            .addOnSuccessListener(queryDocumentSnapshots -> {
+                                if (!queryDocumentSnapshots.isEmpty()) {
+                                    for (QueryDocumentSnapshot value : queryDocumentSnapshots) {
+                                        Room room1 = value.toObject(Room.class);
+                                        if (room1.getOrder() == 2) {
+                                            Toast.makeText(context, "Đã quảng cáo rồi !", Toast.LENGTH_SHORT).show();
+                                        } else {
+                                            Ads ads = new Ads(ref.getId(), room.getRoom_id(), price, timestamp);
+                                            db.collection("Ads").add(ads);
+                                            db.collection("CreditCard").whereEqualTo("email_person", PersonAPI.getInstance().getEmail())
+                                                    .get().addOnSuccessListener(queryDocumentSnapshots1 -> {
+                                                if (!queryDocumentSnapshots1.isEmpty()) {
+                                                    for (QueryDocumentSnapshot value1 : queryDocumentSnapshots1) {
+                                                        CreditCard card = value1.toObject(CreditCard.class);
+                                                        card.setPoint(card.getPoint() - ads.getPrice());
+                                                        PersonAPI.getInstance().setPoint(card.getPoint());
+                                                        db.collection("CreditCard").document(value1.getId())
+                                                                .set(card);
+                                                    }
+                                                }
+                                            });
+
+                                            room1.setOrder(2);
+                                            db.collection("Room").document(value.getId())
+                                                    .set(room1);
+                                            Toast.makeText(context, "Quảng cáo thành công", Toast.LENGTH_SHORT).show();
+                                        }
+
+                                    }
+                                }
+                            });
+
+
+                } else {
+                    ActivitySettingPerson.AddPoint("Bạn không đủ tiền", context);
+                }
+            } catch (Exception ex) {
+                Toast.makeText(context, "Lỗi !", Toast.LENGTH_SHORT).show();
+            } finally {
+                show.dismiss();
+            }
+
+        });
+
+        buttonCancel.setOnClickListener(v -> {
             show.dismiss();
         });
+    }
+
+    public static void ShowDialogBookRoom(Room room, Context context) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View viewLayout = inflater.inflate(R.layout.layout_book_room, null);
+        builder.setView(viewLayout);
+
+        List<BookRoom> bookRooms = new ArrayList<>();
+        RecyclerView recyclerView = viewLayout.findViewById(R.id.bookRoomrecyclerview);
+        recyclerView.setLayoutManager(new LinearLayoutManager(context));
+        BookRoomRecyclerView adapter = new BookRoomRecyclerView(context, bookRooms);
+        recyclerView.setAdapter(adapter);
+        db.collection("BookRoom").whereEqualTo("id_room", room.getRoom_id()).addSnapshotListener((v, e) -> {
+            bookRooms.clear();
+            if (e == null) {
+                for (QueryDocumentSnapshot value : v) {
+                    BookRoom bookRoom = value.toObject(BookRoom.class);
+                    bookRooms.add(bookRoom);
+                }
+                Collections.sort(bookRooms, (o1, o2) -> (int) (o2.getBookRoomAdded().getSeconds() - o1.getBookRoomAdded().getSeconds()));
+                adapter.notifyDataSetChanged();
+            }
+        });
+        builder.setPositiveButton("Ok", (dialog, which) -> dialog.dismiss());
+
+        builder.show();
     }
 
 

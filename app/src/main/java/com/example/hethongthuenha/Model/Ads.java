@@ -1,31 +1,30 @@
 package com.example.hethongthuenha.Model;
 
+
+import com.google.firebase.Timestamp;
+
 public class Ads {
     private String id;
     private String id_room;
-    private String id_person;
-    private String type_ads;
-    private String bankCard;
     private Double price;
+    private Timestamp count_down;
 
     public Ads() {
     }
 
-    public Ads(String id, String id_room, String id_person, String type_ads, String bankCard, Double price) {
+    public Ads(String id, String id_room, Double price, Timestamp count_down) {
         this.id = id;
         this.id_room = id_room;
-        this.id_person = id_person;
-        this.type_ads = type_ads;
-        this.bankCard = bankCard;
         this.price = price;
+        this.count_down = count_down;
     }
 
-    public String getId_person() {
-        return id_person;
+    public Timestamp getCount_down() {
+        return count_down;
     }
 
-    public void setId_person(String id_person) {
-        this.id_person = id_person;
+    public void setCount_down(Timestamp count_down) {
+        this.count_down = count_down;
     }
 
     public String getId() {
@@ -44,22 +43,6 @@ public class Ads {
         this.id_room = id_room;
     }
 
-    public String getType_ads() {
-        return type_ads;
-    }
-
-    public void setType_ads(String type_ads) {
-        this.type_ads = type_ads;
-    }
-
-    public String getBankCard() {
-        return bankCard;
-    }
-
-    public void setBankCard(String bankCard) {
-        this.bankCard = bankCard;
-    }
-
     public Double getPrice() {
         return price;
     }
@@ -73,8 +56,6 @@ public class Ads {
         return "Ads{" +
                 "id='" + id + '\'' +
                 ", id_room='" + id_room + '\'' +
-                ", type_ads='" + type_ads + '\'' +
-                ", bankCard='" + bankCard + '\'' +
                 ", price=" + price +
                 '}';
     }

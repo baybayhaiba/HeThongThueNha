@@ -218,19 +218,9 @@ public class fragment_requiment extends Fragment {
         builder.setTitle("Thông báo xóa");
         builder.setMessage("Bạn có thật sự muốn xóa ?");
 
-        builder.setNegativeButton("Không", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
+        builder.setNegativeButton("Không", (dialog, which) -> dialog.dismiss());
 
-        builder.setPositiveButton("Có", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                DeleteRequirement(requirement);
-            }
-        });
+        builder.setPositiveButton("Có", (dialog, which) -> DeleteRequirement(requirement));
 
         AlertDialog show = builder.show();
 

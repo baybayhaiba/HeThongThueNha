@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -27,6 +28,7 @@ import java.util.ArrayList;
 public class fragment_living_expenses extends Fragment {
 
     private EditText etWater, etElectricity, etInternet, etTV, etParkingSpace;
+    private CheckBox cbWater, cbElectricity, cbInternet, cbTV, cbParkingSpace;
     private IDataCommunication dataCommunication;
 
     public fragment_living_expenses() {
@@ -55,6 +57,14 @@ public class fragment_living_expenses extends Fragment {
         etInternet = view.findViewById(R.id.etInternet);
         etParkingSpace = view.findViewById(R.id.etParkingSpace);
         etTV = view.findViewById(R.id.etTV);
+
+        cbWater = view.findViewById(R.id.cbFreeWater);
+        cbElectricity = view.findViewById(R.id.cbFreeElectricity);
+        cbInternet = view.findViewById(R.id.cbFreeInternet);
+        cbParkingSpace = view.findViewById(R.id.cbParkingspace);
+        cbTV = view.findViewById(R.id.cbFreeTV);
+
+        CheckFree();
 
         Button btFinishStage2 = view.findViewById(R.id.btnFinishStage2);
 
@@ -89,6 +99,44 @@ public class fragment_living_expenses extends Fragment {
             }
         });
         return view;
+    }
+
+    private void CheckFree() {
+        cbWater.setOnClickListener(v -> {
+            if (cbWater.isChecked()) {
+                etWater.setText("0");
+                etWater.setEnabled(false);
+            } else
+                etWater.setEnabled(true);
+        });
+        cbElectricity.setOnClickListener(v -> {
+            if (cbWater.isChecked()) {
+                etElectricity.setText("0");
+                etElectricity.setEnabled(false);
+            } else
+                etElectricity.setEnabled(true);
+        });
+        cbTV.setOnClickListener(v -> {
+            if (cbTV.isChecked()) {
+                etTV.setText("0");
+                etTV.setEnabled(false);
+            } else
+                etTV.setEnabled(true);
+        });
+        cbParkingSpace.setOnClickListener(v -> {
+            if (cbParkingSpace.isChecked()) {
+                etParkingSpace.setText("0");
+                etParkingSpace.setEnabled(false);
+            } else
+                etParkingSpace.setEnabled(true);
+        });
+        cbInternet.setOnClickListener(v -> {
+            if (cbInternet.isChecked()) {
+                etInternet.setText("0");
+                etInternet.setEnabled(false);
+            } else
+                etInternet.setEnabled(true);
+        });
     }
 
     private boolean isValid() {

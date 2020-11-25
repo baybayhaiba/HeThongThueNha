@@ -15,7 +15,7 @@
         android:orientation="horizontal">
 
         <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/img_custom_person_chat"
+            android:id="@+id/img_custom_person_refund"
             android:layout_width="80sp"
             android:layout_height="80sp"
             android:layout_gravity="center"
@@ -28,7 +28,7 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/tv_custom_name_chat"
+                android:id="@+id/tv_custom_name_refund"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Pham Thanh Huy"
@@ -40,6 +40,7 @@
                 android:layout_marginBottom="10sp"/>
 
             <TextView
+                android:id="@+id/tv_custom_price_refund"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:lines="1"
@@ -49,6 +50,7 @@
                 android:text="59.394 VNĐ"/>
 
             <TextView
+                android:id="@+id/tv_bank_card_refund"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="12sp"
@@ -57,18 +59,10 @@
                 android:gravity="bottom"
                 android:text="STK:0111xxxx"/>
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="12sp"
-                android:layout_weight="1"
-                android:layout_marginBottom="10sp"
-                android:gravity="bottom"
-                android:text="Hủy đặt phòng"/>
 
 
             <TextView
-                android:id="@+id/tv_custom_last_chat"
+                android:id="@+id/tv_custom_timestamp_refund"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:lines="1"
@@ -79,6 +73,7 @@
         </LinearLayout>
 
         <ImageView
+            android:id="@+id/img_done_refund"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"

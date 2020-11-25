@@ -7,28 +7,19 @@ public class Refund {
     private String id_person;
     private Double price;
     private String bankCard;
-    private String type;
     private Timestamp refundAdded;
 
     public Refund() {
     }
 
-    public Refund(String id, String id_person, Double price, String bankCard, String type, Timestamp refundAdded) {
+    public Refund(String id, String id_person, Double price, String bankCard,Timestamp refundAdded) {
         this.id = id;
         this.id_person = id_person;
         this.price = price;
         this.bankCard = bankCard;
-        this.type = type;
         this.refundAdded = refundAdded;
     }
 
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
 
     public String getId() {
         return id;

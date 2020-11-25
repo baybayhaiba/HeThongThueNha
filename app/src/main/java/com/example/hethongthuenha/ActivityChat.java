@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -15,10 +16,13 @@ import com.example.hethongthuenha.Adapter.ChatRecyclerView;
 import com.example.hethongthuenha.Model.Chat;
 import com.example.hethongthuenha.Model.HistoryChat;
 import com.example.hethongthuenha.Model.Notification;
+import com.example.hethongthuenha.Model.Person;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -41,6 +45,7 @@ public class ActivityChat extends AppCompatActivity {
     private HistoryChat historyChat;
     private CollectionReference history_chat_path;
     private CollectionReference refNotification;
+
     public interface FireStoreCallBack {
         void onCallBack(String path);
     }
@@ -76,8 +81,34 @@ public class ActivityChat extends AppCompatActivity {
         GetPath();
         GetInformRequirement();
         GetInFormRoomDetail();
+        LoadInformPerson();
         btnSend.setOnClickListener(v -> {
             SendChat(chats, edText.getText().toString(), "");
+        });
+    }
+
+    private void LoadInformPerson() {
+        db.collection("User").whereEqualTo("email", toEmail)
+                .get().addOnSuccessListener(queryDocumentSnapshots -> {
+            if (!queryDocumentSnapshots.isEmpty()) {
+                for (DocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                    Person person = documentSnapshot.toObject(Person.class);
+
+                    if (!person.getUrl().equals("")) {
+                        Picasso.with(this)
+                                .load(person.getUrl()).placeholder(R.drawable.ic_baseline_person_24)
+                                .into(imgAvatar);
+                    }
+
+                    tvNamePerson.setText(person.getFullName());
+
+                    imgAvatar.setOnClickListener(v -> {
+                        Intent intent = new Intent(ActivityChat.this, ActivityPerson.class);
+                        intent.putExtra("id_person", person.getUid());
+                        startActivity(intent);
+                    });
+                }
+            }
         });
     }
 
@@ -119,7 +150,7 @@ public class ActivityChat extends AppCompatActivity {
     private void GetInformRequirement() {
 
         String description = getIntent().getStringExtra("description");
-        if(description!=null){
+        if (description != null) {
             //add last chat
             FindPath(path -> {
                 refChat = db.collection(path);
@@ -137,10 +168,10 @@ public class ActivityChat extends AppCompatActivity {
                         });
             });
             //add notification
-            String uid=getIntent().getStringExtra("toId");
-            Timestamp notificationAdded=new Timestamp(new Date());
-            refNotification=db.collection("Notification");
-            Notification notification=new Notification(PersonAPI.getInstance().getUid(),uid,description,notificationAdded);
+            String uid = getIntent().getStringExtra("toId");
+            Timestamp notificationAdded = new Timestamp(new Date());
+            refNotification = db.collection("Notification");
+            Notification notification = new Notification(PersonAPI.getInstance().getUid(), uid, description, 1, notificationAdded);
 
             refNotification.add(notification);
 
@@ -154,8 +185,8 @@ public class ActivityChat extends AppCompatActivity {
         //add last chat
         FindPath(path -> {
             String description = getIntent().getStringExtra("description_room");
-            String url=getIntent().getStringExtra("url");
-            if(description!=null){
+            String url = getIntent().getStringExtra("url");
+            if (description != null) {
                 refChat = db.collection(path);
 
                 refChat.orderBy("id_chat").limitToLast(10).get()
@@ -172,10 +203,10 @@ public class ActivityChat extends AppCompatActivity {
                             }
                         });
 
-                String uid=getIntent().getStringExtra("toId");
-                Timestamp notificationAdded=new Timestamp(new Date());
-                refNotification=db.collection("Notification");
-                Notification notification=new Notification(PersonAPI.getInstance().getUid(),uid,description,notificationAdded);
+                String uid = getIntent().getStringExtra("toId");
+                Timestamp notificationAdded = new Timestamp(new Date());
+                refNotification = db.collection("Notification");
+                Notification notification = new Notification(PersonAPI.getInstance().getUid(), uid, description, 1, notificationAdded);
 
                 refNotification.add(notification);
             }

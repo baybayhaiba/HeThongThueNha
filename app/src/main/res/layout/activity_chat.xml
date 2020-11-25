@@ -20,10 +20,10 @@
             android:layout_marginRight="20sp"
             android:src="@drawable/ic_baseline_arrow_back_ios_24" />
 
-        <ImageView
+        <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/imgPersonChat"
-            android:layout_width="30sp"
-            android:layout_height="30sp"
+            android:layout_width="60sp"
+            android:layout_height="60sp"
             android:src="@drawable/ic_baseline_person_24" />
 
         <TextView

@@ -2,65 +2,145 @@ package com.example.hethongthuenha.Adminstrator.Fragment;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.hethongthuenha.API.PersonAPI;
+import com.example.hethongthuenha.ActivityRoomDetail;
+import com.example.hethongthuenha.Model.Comment;
+import com.example.hethongthuenha.Model.CreditCard;
+import com.example.hethongthuenha.Model.Person;
 import com.example.hethongthuenha.R;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link fragment_add_point#newInstance} factory method to
- * create an instance of this fragment.
- */
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+
 public class fragment_add_point extends Fragment {
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
 
     public fragment_add_point() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment fragment_repay.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static fragment_add_point newInstance(String param1, String param2) {
-        fragment_add_point fragment = new fragment_add_point();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
+
+    private EditText edEmailPerson, edNumberBankCard, edNumberAddPoint;
+    private Button btnFinish;
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private CollectionReference ref = db.collection("CreditCard");
+    private List<Person> persons;
+    private ArrayAdapter<String> adapterId, adapterEmail;
+    private ArrayList<String> convertIDToAdapter;
+    private ArrayList<String> convertEmailToAdapter;
+    private Spinner spUID, spEmail;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_credit, container, false);
+        View view = inflater.inflate(R.layout.fragment_credit, container, false);
+        edNumberBankCard = view.findViewById(R.id.ed_bank_credit);
+        persons = new ArrayList<>();
+        edNumberAddPoint = view.findViewById(R.id.etNumberPointAdded);
+        convertIDToAdapter = new ArrayList<String>();
+        convertEmailToAdapter = new ArrayList<String>();
+        adapterId = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_dropdown_item, convertIDToAdapter);
+        adapterEmail = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_dropdown_item, convertEmailToAdapter);
+        btnFinish = view.findViewById(R.id.btnFinishCredit);
+        spUID = view.findViewById(R.id.sp_id_person_credit);
+        spEmail = view.findViewById(R.id.sp_email_person_credit);
+        spUID.setAdapter(adapterId);
+        spUID.setEnabled(false);
+        spEmail.setAdapter(adapterEmail);
+        db.collection("User").orderBy("email").get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot value : task.getResult()) {
+                            Person person = value.toObject(Person.class);
+                            persons.add(person);
+                        }
+                        if (task.isSuccessful()) {
+                            for (Person person : persons) {
+                                convertIDToAdapter.add(person.getUid());
+                                convertEmailToAdapter.add(person.getEmail());
+                            }
+
+                            adapterEmail.notifyDataSetChanged();
+                            adapterId.notifyDataSetChanged();
+                        }
+                    }
+                });
+
+        spEmail.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                spUID.setSelection(position);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+
+        btnFinish.setOnClickListener(v ->
+        {
+            db.collection("CreditCard").whereEqualTo("email_person", spEmail.getSelectedItem().toString())
+                    .whereEqualTo("id_person", spUID.getSelectedItem().toString())
+                    .get().addOnSuccessListener(queryDocumentSnapshots -> {
+                double point = Double.parseDouble(edNumberAddPoint.getText().toString());
+                if (!queryDocumentSnapshots.isEmpty()) {
+                    for (QueryDocumentSnapshot value : queryDocumentSnapshots) {
+                        CreditCard card = value.toObject(CreditCard.class);
+                        card.setPoint(card.getPoint() + point);
+                        card.setNumber_bankcard(edNumberBankCard.getText().toString());
+                        ref.document(value.getId()).set(card);
+
+                    }
+                } else {
+                    DocumentReference id = ref.document();
+                    CreditCard card = new CreditCard(id.getId(), spUID.getSelectedItem().toString(),
+                            spEmail.getSelectedItem().toString(), point, edNumberBankCard.getText().toString());
+                    ref.add(card);
+                }
+                ClearField();
+            });
+        });
+
+
+        return view;
+    }
+
+    private void ClearField() {
+        edNumberBankCard.setText("");
+        edNumberAddPoint.setText("");
     }
 }
