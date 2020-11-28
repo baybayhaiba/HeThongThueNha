@@ -65,19 +65,17 @@ public class fragment_ads extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setAdapter(adapter);
         progressDialog.show();
-        db.collection("Ads").orderBy("count_down").get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        for (QueryDocumentSnapshot value : task.getResult()) {
-                            Ads ads = value.toObject(Ads.class);
-                            adsList.add(ads);
-                        }
-                        if (task.isComplete()) {
-                            adapter.notifyDataSetChanged();
-                            progressDialog.dismiss();
-                        }
-                    }
-                });
+        db.collection("Ads").orderBy("count_down").addSnapshotListener((v, e) -> {
+            if (e == null) {
+                adsList.clear();
+                for (QueryDocumentSnapshot value : v) {
+                    Ads ads = value.toObject(Ads.class);
+                    adsList.add(ads);
+                }
+                adapter.notifyDataSetChanged();
+                progressDialog.dismiss();
+            }
+        });
         return view;
     }
 }

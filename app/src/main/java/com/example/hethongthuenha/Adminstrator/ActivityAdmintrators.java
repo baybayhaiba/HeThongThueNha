@@ -21,6 +21,7 @@ import com.example.hethongthuenha.Adminstrator.Fragment.fragment_pay;
 import com.example.hethongthuenha.Adminstrator.Fragment.fragment_refund;
 import com.example.hethongthuenha.Adminstrator.Fragment.fragment_add_point;
 import com.example.hethongthuenha.Adminstrator.Fragment.fragment_report;
+import com.example.hethongthuenha.Adminstrator.Fragment.fragmment_history_credit;
 import com.example.hethongthuenha.MainActivity.MainActivity;
 import com.example.hethongthuenha.R;
 import com.google.android.material.navigation.NavigationView;
@@ -98,7 +99,11 @@ public class ActivityAdmintrators extends AppCompatActivity {
                 fragment = new fragment_refund();
                 toolbar.setTitle("Hoàn tiền");
                 break;
-            case R.id.mnExit:
+            case R.id.mnHistory:
+                fragment = new fragmment_history_credit();
+                toolbar.setTitle("Lịch sử giao dịch");
+                break;
+                case R.id.mnExit:
                 startActivity(new Intent(ActivityAdmintrators.this, MainActivity.class));
                 finish();
                 break;

@@ -150,7 +150,7 @@ public class ChatRecyclerView extends RecyclerView.Adapter<ChatRecyclerView.MyVi
                                                                 .get().addOnSuccessListener(queryDocumentSnapshots -> {
                                                             if (queryDocumentSnapshots.isEmpty()) {
                                                                 BookRoom bookRoom = new BookRoom(ref.getId(),
-                                                                        person.getUid(), room.getRoom_id(), "Trả sau", timestamp, 0);
+                                                                        person.getUid(), room.getRoom_id(), "Trả sau", timestamp, false, 0);
 
                                                                 db.collection("BookRoom").add(bookRoom);
 

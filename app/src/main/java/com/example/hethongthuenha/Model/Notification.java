@@ -3,7 +3,7 @@ package com.example.hethongthuenha.Model;
 import com.google.firebase.Timestamp;
 
 public class Notification {
-    private String id_person_needed;
+    private String id_person_provide;
     private String id_person_created;
     private String description;
     private int type_notification;
@@ -13,8 +13,8 @@ public class Notification {
     public Notification() {
     }
 
-    public Notification(String id_person_needed, String id_person_created, String description, int type_notification, Timestamp notificationAdded) {
-        this.id_person_needed = id_person_needed;
+    public Notification(String id_person_provide, String id_person_created, String description, int type_notification, Timestamp notificationAdded) {
+        this.id_person_provide = id_person_provide;
         this.id_person_created = id_person_created;
         this.description = description;
         this.type_notification = type_notification;
@@ -29,12 +29,12 @@ public class Notification {
         this.type_notification = type_notification;
     }
 
-    public String getId_person_needed() {
-        return id_person_needed;
+    public String getId_person_provide() {
+        return id_person_provide;
     }
 
-    public void setId_person_needed(String id_person_needed) {
-        this.id_person_needed = id_person_needed;
+    public void setId_person_provide(String id_person_provide) {
+        this.id_person_provide = id_person_provide;
     }
 
     public String getId_person_created() {
@@ -61,12 +61,14 @@ public class Notification {
         this.notificationAdded = notificationAdded;
     }
 
+
     @Override
     public String toString() {
         return "Notification{" +
-                "id_person_needed='" + id_person_needed + '\'' +
-                ", id_person_create='" + id_person_created + '\'' +
+                "id_person_provide='" + id_person_provide + '\'' +
+                ", id_person_created='" + id_person_created + '\'' +
                 ", description='" + description + '\'' +
+                ", type_notification=" + type_notification +
                 ", notificationAdded=" + notificationAdded +
                 '}';
     }

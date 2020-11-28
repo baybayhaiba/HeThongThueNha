@@ -62,13 +62,31 @@
 
         </LinearLayout>
 
-        <ImageView
-            android:id="@+id/imgCancelBookRoom"
+        <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
+            android:orientation="vertical"
             android:layout_gravity="center"
-            android:src="@drawable/ic_baseline_remove_circle_24"/>
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/imgAgreeBookRoom"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:layout_marginBottom="10sp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_baseline_check_circle_outline_24"/>
+
+            <ImageView
+                android:id="@+id/imgCancelBookRoom"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_baseline_remove_circle_24"/>
+        </LinearLayout>
+
+
     </LinearLayout>
 
 </androidx.cardview.widget.CardView>

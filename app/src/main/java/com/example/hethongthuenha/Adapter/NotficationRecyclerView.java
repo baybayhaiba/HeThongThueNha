@@ -67,7 +67,7 @@ public class NotficationRecyclerView extends RecyclerView.Adapter<NotficationRec
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         Notification notification = notifications.get(position);
 
-        db.collection("User").whereEqualTo("uid", notification.getId_person_needed())
+        db.collection("User").whereEqualTo("uid", notification.getId_person_provide())
                 .get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 for (QueryDocumentSnapshot value : task.getResult()) {
@@ -87,7 +87,7 @@ public class NotficationRecyclerView extends RecyclerView.Adapter<NotficationRec
                             context.startActivity(intent);
                         } else {
                             Intent intent = new Intent(context, ActivityPerson.class);
-                            intent.putExtra("id_person", notification.getId_person_needed());
+                            intent.putExtra("id_person", notification.getId_person_provide());
                             context.startActivity(intent);
                         }
                     });

@@ -35,6 +35,8 @@
         android:layout_marginTop="20sp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:imeOptions="actionNext"
+        android:inputType="text"
         android:hint="Số tài khoản" />
 
     <com.google.android.material.textfield.TextInputLayout

@@ -49,6 +49,7 @@ import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -60,8 +61,9 @@ public class ActivitySettingPerson extends AppCompatActivity {
     private ImageView imgAvatar;
     private Button btnRefund, btnCancel;
     private CreditCard card;
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private CollectionReference collectionReference = db.collection("User");
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private final CollectionReference collectionReference = db.collection("User");
+    private final NumberFormat formatter = NumberFormat.getCurrencyInstance();
     private Uri imageUri;
     private StorageReference storageReference;
     private static final int IMAGE_PICK_CODE = 1000;
@@ -101,7 +103,7 @@ public class ActivitySettingPerson extends AppCompatActivity {
                     if (error == null) {
                         for (QueryDocumentSnapshot v : value) {
                             CreditCard card = v.toObject(CreditCard.class);
-                            tvPoint.setText(card.getPoint() + " VNĐ");
+                            tvPoint.setText(formatter.format(card.getPoint()));
                             PersonAPI.getInstance().setPoint(card.getPoint());
                         }
                     }

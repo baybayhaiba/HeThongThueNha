@@ -2,37 +2,29 @@ package com.example.hethongthuenha.Adminstrator.Fragment;
 
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.hethongthuenha.API.PersonAPI;
-import com.example.hethongthuenha.ActivityRoomDetail;
-import com.example.hethongthuenha.Model.Comment;
 import com.example.hethongthuenha.Model.CreditCard;
+import com.example.hethongthuenha.Model.HistoryCreditCard;
+import com.example.hethongthuenha.Model.Notification;
 import com.example.hethongthuenha.Model.Person;
 import com.example.hethongthuenha.R;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -49,7 +41,9 @@ public class fragment_add_point extends Fragment {
     private EditText edEmailPerson, edNumberBankCard, edNumberAddPoint;
     private Button btnFinish;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private CollectionReference ref = db.collection("CreditCard");
+    private CollectionReference refCreditCard = db.collection("CreditCard");
+    private CollectionReference refHistoryCard = db.collection("History-CreditCard");
+    private CollectionReference refNotification = db.collection("Notification");
     private List<Person> persons;
     private ArrayAdapter<String> adapterId, adapterEmail;
     private ArrayList<String> convertIDToAdapter;
@@ -122,15 +116,29 @@ public class fragment_add_point extends Fragment {
                         CreditCard card = value.toObject(CreditCard.class);
                         card.setPoint(card.getPoint() + point);
                         card.setNumber_bankcard(edNumberBankCard.getText().toString());
-                        ref.document(value.getId()).set(card);
+                        refCreditCard.document(value.getId()).set(card);
 
                     }
                 } else {
-                    DocumentReference id = ref.document();
+                    DocumentReference id = refCreditCard.document();
                     CreditCard card = new CreditCard(id.getId(), spUID.getSelectedItem().toString(),
                             spEmail.getSelectedItem().toString(), point, edNumberBankCard.getText().toString());
-                    ref.add(card);
+                    refCreditCard.add(card);
                 }
+
+                HistoryCreditCard historyCreditCard = new HistoryCreditCard(refHistoryCard.getId(),
+                        spUID.getSelectedItem().toString(), "Đã nạp thành công ",
+                        Double.parseDouble(edNumberAddPoint.getText().toString()), new Timestamp(new Date()));
+
+                Notification notification = new Notification(null, spUID.getSelectedItem().toString(), historyCreditCard
+                        .getDescription() + historyCreditCard.getPoint(), 3, new Timestamp(new Date()));
+
+                refNotification.add(notification);
+
+                refHistoryCard.add(historyCreditCard)
+                        .addOnSuccessListener(documentReference ->
+                                Toast.makeText(getActivity(), "Nạp tiền thành công", Toast.LENGTH_SHORT)
+                                        .show());
                 ClearField();
             });
         });

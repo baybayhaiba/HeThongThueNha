@@ -8,26 +8,36 @@ public class BookRoom {
     private String id_room;
     private String type_description;
     private Timestamp bookRoomAdded;
-    private double pricePaied;
+    private boolean isConfirm;
+    private double pricePaid;
 
     public BookRoom() {
     }
 
-    public BookRoom(String id, String id_person, String id_room, String type_description, Timestamp bookRoomAdded, double pricePaied) {
+    public BookRoom(String id, String id_person, String id_room, String type_description, Timestamp bookRoomAdded, boolean isConfirm, double pricePaid) {
         this.id = id;
         this.id_person = id_person;
         this.id_room = id_room;
         this.type_description = type_description;
         this.bookRoomAdded = bookRoomAdded;
-        this.pricePaied = pricePaied;
+        this.isConfirm = isConfirm;
+        this.pricePaid = pricePaid;
     }
 
-    public double getPricePaied() {
-        return pricePaied;
+    public boolean isConfirm() {
+        return isConfirm;
     }
 
-    public void setPricePaied(double pricePaied) {
-        this.pricePaied = pricePaied;
+    public void setConfirm(boolean confirm) {
+        isConfirm = confirm;
+    }
+
+    public double getPricePaid() {
+        return pricePaid;
+    }
+
+    public void setPricePaid(double pricePaid) {
+        this.pricePaid = pricePaid;
     }
 
     public String getId() {

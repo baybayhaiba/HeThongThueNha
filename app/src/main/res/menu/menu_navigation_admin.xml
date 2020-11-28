@@ -26,6 +26,28 @@
     <item
         android:id="@+id/mnRefund"
         android:title="Hoàn tiền" />
-    <item android:id="@+id/mnExit"
-        android:title="Thoát"/>
+
+
+    <item android:title="Thống kê">
+        <menu>
+            <group android:checkableBehavior="single">
+                <item
+                    android:id="@+id/mnHistory"
+                    android:title="Xem lịch sử giao dịch" />
+            </group>
+        </menu>
+
+    </item>
+
+    <item android:title="Hành động">
+        <menu>
+            <group android:checkableBehavior="single">
+                <item
+                    android:id="@+id/mnExit"
+                    android:title="Thoát" />
+            </group>
+        </menu>
+
+    </item>
+
 </menu>

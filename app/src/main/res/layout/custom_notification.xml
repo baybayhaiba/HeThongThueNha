@@ -20,7 +20,7 @@
             android:layout_width="80sp"
             android:layout_gravity="center"
             android:layout_height="80sp"
-            android:src="@drawable/ic_baseline_person_24"/>
+            android:src="@drawable/ic_baseline_security_24"/>
         <LinearLayout
             android:layout_width="0dp"
             android:layout_weight="1"
@@ -31,7 +31,7 @@
                 android:id="@+id/tv_custom_name_notification"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Huy"
+                android:text="Quản trị viên"
                 android:gravity="bottom"
                 android:textSize="18sp"
                 android:fontFamily="@font/belleza"

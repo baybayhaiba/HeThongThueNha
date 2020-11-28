@@ -1,6 +1,5 @@
 package com.example.hethongthuenha;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
@@ -9,7 +8,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -37,28 +35,21 @@ import com.example.hethongthuenha.Model.Image_Room;
 import com.example.hethongthuenha.Model.LivingExpenses_Room;
 import com.example.hethongthuenha.Model.Notification;
 import com.example.hethongthuenha.Model.Person;
-import com.example.hethongthuenha.Model.Refund;
 import com.example.hethongthuenha.Model.Report;
 import com.example.hethongthuenha.Model.Room;
 import com.example.hethongthuenha.Model.Utilities_Room;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.squareup.picasso.Picasso;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Calendar;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -90,7 +81,6 @@ ActivityRoomDetail extends AppCompatActivity {
     private NumberFormat formatter;
     private Spinner spReport;
     private ProgressDialog progressDialog;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -230,7 +220,7 @@ ActivityRoomDetail extends AppCompatActivity {
                 String description = "Trả trước " + percent_repay + "% ";
                 Timestamp timestamp = new Timestamp(new Date());
                 BookRoom bookRoom = new BookRoom(refBookRoom.getId(), PersonAPI.getInstance().getUid(),
-                        room.getRoom_id(), description, timestamp, price_percent);
+                        room.getRoom_id(), description, timestamp, false, price_percent);
 
                 db.collection("BookRoom")
                         .add(bookRoom).addOnSuccessListener(v -> {
@@ -326,7 +316,7 @@ ActivityRoomDetail extends AppCompatActivity {
                             if (!queryDocumentSnapshots1.isEmpty()) {
                                 for (QueryDocumentSnapshot v : queryDocumentSnapshots1) {
                                     BookRoom bookRoom = v.toObject(BookRoom.class);
-                                    card.setPoint(card.getPoint() + bookRoom.getPricePaied());
+                                    card.setPoint(card.getPoint() + bookRoom.getPricePaid());
 
                                     db.collection("BookRoom").document(v.getId())
                                             .delete();
@@ -354,8 +344,35 @@ ActivityRoomDetail extends AppCompatActivity {
                 .get().addOnSuccessListener(queryDocumentSnapshots -> {
             if (queryDocumentSnapshots.isEmpty())
                 btnBookRoom.setText("Đặt phòng");
-            else
-                btnBookRoom.setText("Hủy đặt phòng");
+            else {
+                for (QueryDocumentSnapshot value : queryDocumentSnapshots) {
+                    BookRoom bookRoom = value.toObject(BookRoom.class);
+
+                    if (bookRoom.isConfirm()) {
+                        Timestamp now = new Timestamp(new Date());
+
+                        Calendar calCompare1 = Calendar.getInstance();
+                        Calendar calCompare2 = Calendar.getInstance();
+
+                        calCompare1.setTime(now.toDate());
+                        calCompare2.setTime(bookRoom.getBookRoomAdded().toDate());
+
+                        calCompare1.add(Calendar.DAY_OF_MONTH, -10);
+                        //kiem tra neu sau 10 ngay se tat nut huy dat phong di
+                        if (calCompare1.get(Calendar.DAY_OF_YEAR) == calCompare2.get(Calendar.DAY_OF_YEAR)
+                                && calCompare1.get(Calendar.MONTH) == calCompare2.get(Calendar.MONTH)
+                                && calCompare1.get(Calendar.YEAR) == calCompare2.get(Calendar.YEAR)) {
+                            btnBookRoom.setVisibility(View.GONE);
+                        } else {
+                            btnBookRoom.setText("Hủy đặt phòng");
+                        }
+
+
+                    } else {
+                        btnBookRoom.setText("Hủy đặt phòng");
+                    }
+                }
+            }
         });
     }
 
@@ -560,7 +577,7 @@ ActivityRoomDetail extends AppCompatActivity {
                             comments.add(comment);
                         }
                         Collections.sort(comments, (o1, o2) ->
-                                (int) (o2.getTime_added().getSeconds()-o1.getTime_added().getSeconds()));
+                                (int) (o2.getTime_added().getSeconds() - o1.getTime_added().getSeconds()));
                         adapter.notifyDataSetChanged();
                     }
                 });

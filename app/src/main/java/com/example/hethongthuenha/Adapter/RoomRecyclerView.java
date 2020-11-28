@@ -3,6 +3,7 @@ package com.example.hethongthuenha.Adapter;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -35,6 +36,7 @@ import com.example.hethongthuenha.Model.Notification;
 import com.example.hethongthuenha.Model.Room;
 import com.example.hethongthuenha.R;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -270,12 +272,52 @@ public class RoomRecyclerView extends RecyclerView.Adapter<RoomRecyclerView.MyVi
         View viewLayout = inflater.inflate(R.layout.layout_book_room, null);
         builder.setView(viewLayout);
 
-        List<BookRoom> bookRooms = new ArrayList<>();
+        List<BookRoom> bookRoomsCare = new ArrayList<>();
+        List<BookRoom> bookRoomsConfirm = new ArrayList<>();
         RecyclerView recyclerView = viewLayout.findViewById(R.id.bookRoomrecyclerview);
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        BookRoomRecyclerView adapter = new BookRoomRecyclerView(context, bookRooms);
-        recyclerView.setAdapter(adapter);
-        db.collection("BookRoom").whereEqualTo("id_room", room.getRoom_id()).addSnapshotListener((v, e) -> {
+        BookRoomRecyclerView adapterCare = new BookRoomRecyclerView(context, bookRoomsCare);
+        BookRoomRecyclerView adapterConfirm = new BookRoomRecyclerView(context, bookRoomsConfirm);
+        Button btnCare, btnConfirm;
+        btnCare = viewLayout.findViewById(R.id.btn_list_care_book_room);
+        btnConfirm = viewLayout.findViewById(R.id.btn_list_confirm_book_room);
+
+
+        BookRoomCare(adapterCare, bookRoomsCare, room);
+        recyclerView.setAdapter(adapterCare);
+
+        btnCare.setOnClickListener(v -> {
+            btnConfirm.setTextColor(Color.GRAY);
+            btnCare.setTextColor(Color.WHITE);
+            if (bookRoomsCare.size() == 0) {
+                BookRoomCare(adapterCare, bookRoomsCare, room);
+                recyclerView.setAdapter(adapterCare);
+            } else {
+                recyclerView.setAdapter(adapterCare);
+            }
+
+        });
+
+        btnConfirm.setOnClickListener(v -> {
+            btnConfirm.setTextColor(Color.WHITE);
+            btnCare.setTextColor(Color.GRAY);
+            if (bookRoomsConfirm.size() == 0) {
+                BookRoomConfirm(adapterConfirm, bookRoomsConfirm, room);
+                recyclerView.setAdapter(adapterConfirm);
+            } else
+                recyclerView.setAdapter(adapterConfirm);
+
+        });
+
+
+        builder.setPositiveButton("Ok", (dialog, which) -> dialog.dismiss());
+
+        builder.show();
+    }
+
+    private static void BookRoomCare(BookRoomRecyclerView adapter, List<BookRoom> bookRooms, Room room) {
+        db.collection("BookRoom").whereEqualTo("id_room", room.getRoom_id())
+                .whereEqualTo("confirm", false).addSnapshotListener((v, e) -> {
             bookRooms.clear();
             if (e == null) {
                 for (QueryDocumentSnapshot value : v) {
@@ -286,9 +328,21 @@ public class RoomRecyclerView extends RecyclerView.Adapter<RoomRecyclerView.MyVi
                 adapter.notifyDataSetChanged();
             }
         });
-        builder.setPositiveButton("Ok", (dialog, which) -> dialog.dismiss());
+    }
 
-        builder.show();
+    private static void BookRoomConfirm(BookRoomRecyclerView adapter, List<BookRoom> bookRooms, Room room) {
+        db.collection("BookRoom").whereEqualTo("id_room", room.getRoom_id())
+                .whereEqualTo("confirm", true).addSnapshotListener((v, e) -> {
+            bookRooms.clear();
+            if (e == null) {
+                for (QueryDocumentSnapshot value : v) {
+                    BookRoom bookRoom = value.toObject(BookRoom.class);
+                    bookRooms.add(bookRoom);
+                }
+                Collections.sort(bookRooms, (o1, o2) -> (int) (o2.getBookRoomAdded().getSeconds() - o1.getBookRoomAdded().getSeconds()));
+                adapter.notifyDataSetChanged();
+            }
+        });
     }
 
 

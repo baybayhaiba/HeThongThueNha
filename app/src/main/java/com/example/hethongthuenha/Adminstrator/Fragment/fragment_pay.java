@@ -3,64 +3,119 @@ package com.example.hethongthuenha.Adminstrator.Fragment;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.hethongthuenha.Adapter.PayRecyclerView;
+import com.example.hethongthuenha.Model.BookRoom;
+import com.example.hethongthuenha.Model.Commission;
+import com.example.hethongthuenha.Model.Person;
+import com.example.hethongthuenha.Model.Room;
 import com.example.hethongthuenha.R;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link fragment_pay#newInstance} factory method to
- * create an instance of this fragment.
- */
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
+
 public class fragment_pay extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    public fragment_pay() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment fragment_pay.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static fragment_pay newInstance(String param1, String param2) {
-        fragment_pay fragment = new fragment_pay();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
+    private RecyclerView recyclerView;
+    private PayRecyclerView adapter;
+    private List<Commission> commissions;
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private double price = 0;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_pay, container, false);
+        View view = inflater.inflate(R.layout.fragment_pay, container, false);
+        recyclerView = view.findViewById(R.id.payRecyclerview);
+        commissions = new ArrayList<>();
+        adapter = new PayRecyclerView(getActivity(), commissions);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        recyclerView.setAdapter(adapter);
+
+        db.collection("User").get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot value : task.getResult()) {
+                            String idCommission = db.collection("Commissions").document().getId();
+                            Commission commission = new Commission();
+                            commission.setId(idCommission);
+                            commission.setId_person(value.toObject(Person.class).getUid());
+
+                            db.collection("Room")
+                                    .whereEqualTo("person_id", commission.getId_person())
+                                    .get().addOnCompleteListener(task1 -> {
+
+                                if (task1.isSuccessful()) {
+
+                                    for (QueryDocumentSnapshot value1 : task1.getResult()) {
+                                        Room room = value1.toObject(Room.class);
+
+                                        db.collection("BookRoom")
+                                                .whereEqualTo("id_room", room.getRoom_id())
+                                                .get().addOnCompleteListener(task2 -> {
+                                            if (task2.isSuccessful()) {
+                                                price = 0;
+                                                for (QueryDocumentSnapshot value2 : task2.getResult()) {
+                                                    BookRoom bookRoom = value2.toObject(BookRoom.class);
+
+                                                    Calendar calBookRoom = Calendar.getInstance();
+                                                    calBookRoom.setTime(bookRoom.getBookRoomAdded().toDate());
+
+                                                    Calendar calNow = Calendar.getInstance();
+                                                    calNow.setTime(new Date());
+
+                                                    if (calBookRoom.get(Calendar.DAY_OF_MONTH) < calNow.get(Calendar.DAY_OF_MONTH)) {
+                                                        db.collection("Commission").get()
+                                                                .addOnSuccessListener(queryDocumentSnapshots -> {
+                                                                    if (!queryDocumentSnapshots.isEmpty()) {
+                                                                        for (QueryDocumentSnapshot value3 : queryDocumentSnapshots) {
+                                                                            price += room.getStage1().getPrice() * Double.parseDouble(value3.get("commission").toString());
+                                                                        }
+                                                                    }
+                                                                });
+                                                    }
+                                                }
+                                            }
+                                        });
+                                    }
+
+                                    if (task1.isComplete()) {
+                                        {
+                                            commission.setPrice(price);
+                                            commissions.add(commission);
+                                            adapter.notifyDataSetChanged();
+                                        }
+                                    }
+
+                                }
+                            });
+                        }
+
+
+                    }
+                });
+
+
+        return view;
     }
 }

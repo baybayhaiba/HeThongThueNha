@@ -1,5 +1,6 @@
 package com.example.hethongthuenha.Adapter;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
@@ -7,18 +8,26 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hethongthuenha.Model.Ads;
+import com.example.hethongthuenha.Model.BookRoom;
+import com.example.hethongthuenha.Model.CreditCard;
+import com.example.hethongthuenha.Model.Notification;
 import com.example.hethongthuenha.Model.Room;
 import com.example.hethongthuenha.R;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.squareup.picasso.Picasso;
 
 import java.text.NumberFormat;
+import java.util.Date;
 import java.util.List;
 
 public class AdsRecyclerView extends RecyclerView.Adapter<AdsRecyclerView.MyViewHolder> {
@@ -78,6 +87,37 @@ public class AdsRecyclerView extends RecyclerView.Adapter<AdsRecyclerView.MyView
         String timeFuture = (String) DateUtils.getRelativeTimeSpanString(ads.getCount_down()
                 .getSeconds() * 1000);
         holder.tvCountDown.setText(timeFuture);
+
+        holder.imgRemove.setOnClickListener(v -> {
+            NotificationChooseDelete(ads);
+        });
+
+    }
+
+    private AlertDialog NotificationChooseDelete(Ads ads) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("Thông báo xóa");
+        builder.setMessage("Bạn có thật sự muốn xóa ?");
+
+        builder.setNegativeButton("Không", (dialog, which) -> dialog.dismiss());
+
+        builder.setPositiveButton("Có", (dialog, which) -> {
+            db.collection("Ads").whereEqualTo("id", ads.getId())
+                    .get().addOnSuccessListener(queryDocumentSnapshots -> {
+                if (!queryDocumentSnapshots.isEmpty()) {
+                    for (QueryDocumentSnapshot value : queryDocumentSnapshots) {
+                        db.collection("Ads").document(value.getId())
+                                .delete().addOnSuccessListener(v -> {
+                            Toast.makeText(context, "Xóa thành phòng !", Toast.LENGTH_SHORT).show();
+                        });
+                    }
+                }
+            });
+        });
+
+        AlertDialog show = builder.show();
+
+        return show;
     }
 
     @Override

@@ -16,6 +16,7 @@ import com.example.hethongthuenha.Model.Refund;
 import com.example.hethongthuenha.R;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -56,10 +57,11 @@ public class fragment_refund extends Fragment {
         progressDialog.setMessage("Vui lòng đợi một lát");
         progressDialog.show();
 
-        db.collection("Refund").orderBy("refundAdded").get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    if (!queryDocumentSnapshots.isEmpty()) {
-                        for (QueryDocumentSnapshot value : queryDocumentSnapshots) {
+        db.collection("Refund").orderBy("refundAdded", Query.Direction.DESCENDING).addSnapshotListener(
+                (v, e) -> {
+                    if (e == null) {
+                        refunds.clear();
+                        for (QueryDocumentSnapshot value : v) {
                             Refund refund = value.toObject(Refund.class);
                             refunds.add(refund);
                         }

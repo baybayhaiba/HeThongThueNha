@@ -1,56 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    app:cardCornerRadius="10sp"
-    android:layout_width="match_parent"
-    app:contentPadding="16sp"
     android:id="@+id/cv_custom_person_chat"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:backgroundTint="@color/yellow_100"
+    app:cardCornerRadius="10sp"
     app:cardUseCompatPadding="true"
-    android:backgroundTint="@color/endGColor"
-    android:layout_height="wrap_content">
+    app:contentPadding="16sp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center"
         android:orientation="horizontal">
 
         <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/img_custom_person_chat"
+            android:id="@+id/img_avatar_pay"
             android:layout_width="80sp"
             android:layout_height="80sp"
-            android:src="@drawable/ic_baseline_person_24"/>
+            android:layout_gravity="center"
+            android:src="@drawable/ic_baseline_person_24" />
+
         <LinearLayout
             android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginLeft="10sp"
-            android:layout_height="match_parent"
+            android:layout_weight="1"
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/tv_custom_name_chat"
+                android:id="@+id/tv_custom_name_pay"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Pham Thanh Huy"
-                android:gravity="bottom"
-                android:textSize="18sp"
                 android:fontFamily="@font/belleza"
+                android:gravity="bottom"
+                android:text=""
                 android:textColor="@color/black"
-                android:textStyle="bold"
-                android:layout_marginBottom="10sp"
-                android:layout_weight="1"/>
+                android:textSize="18sp"
+                android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/tv_custom_last_chat"
-                android:layout_marginBottom="15sp"
+                android:id="@+id/tv_price_pay"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:lines="1"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10sp"
                 android:layout_weight="1"
                 android:gravity="bottom"
-                android:text="Toi muon thue nha"/>
+                android:text=""
+                android:textSize="12sp" />
 
 
         </LinearLayout>
 
+        <ImageView
+            android:layout_gravity="center"
+            android:id="@+id/img_remove_pay"
+            android:layout_width="20sp"
+            android:layout_height="20sp"
+            android:src="@drawable/ic_baseline_remove_circle_24" />
     </LinearLayout>
 
 </androidx.cardview.widget.CardView>
