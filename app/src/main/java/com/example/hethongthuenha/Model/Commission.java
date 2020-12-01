@@ -2,28 +2,46 @@ package com.example.hethongthuenha.Model;
 
 import com.google.firebase.Timestamp;
 
+import java.util.List;
+
 public class Commission {
-    private String id;
     private String id_person;
-    private Double price;
-    private Timestamp commissionAdded;
+    private double price;
+    private int totalDay;
+    private Timestamp lastPaid;
+
+    public Commission(String id_person, double price, int totalDay, Timestamp lastPaid) {
+        this.id_person = id_person;
+        this.price = price;
+        this.totalDay = totalDay;
+        this.lastPaid = lastPaid;
+    }
+
+    public Timestamp getLastPaid() {
+        return lastPaid;
+    }
+
+    public void setLastPaid(Timestamp lastPaid) {
+        this.lastPaid = lastPaid;
+    }
+
+    public int getTotalDay() {
+        return totalDay;
+    }
+
+    public void setTotalDay(int totalDay) {
+        this.totalDay = totalDay;
+    }
 
     public Commission() {
     }
 
-    public Commission(String id, String id_person, Double price, Timestamp commissionAdded) {
-        this.id = id;
-        this.id_person = id_person;
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
         this.price = price;
-        this.commissionAdded = commissionAdded;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 
     public String getId_person() {
@@ -34,19 +52,12 @@ public class Commission {
         this.id_person = id_person;
     }
 
-    public Double getPrice() {
-        return price;
-    }
 
-    public void setPrice(Double price) {
-        this.price = price;
-    }
-
-    public Timestamp getCommissionAdded() {
-        return commissionAdded;
-    }
-
-    public void setCommissionAdded(Timestamp commissionAdded) {
-        this.commissionAdded = commissionAdded;
+    @Override
+    public String toString() {
+        return "Commission{" +
+                "id_person='" + id_person + '\'' +
+                ", price=" + price +
+                '}';
     }
 }

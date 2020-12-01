@@ -104,11 +104,13 @@ public class Room implements Serializable {
     public String toString() {
         return "Room{" +
                 "room_id='" + room_id + '\'' +
-                ", stage1=" + stage1.toString() +
-                ", stage2=" + stage2.toString() +
-                ", stage3=" + stage3.toString() +
-                ", stage4=" + stage4.toString() +
+                ", person_id='" + person_id + '\'' +
+                ", order=" + order +
+                ", stage1=" + stage1 +
+                ", stage2=" + stage2 +
+                ", stage3=" + stage3 +
+                ", stage4=" + stage4 +
+                ", timeAdded=" + timeAdded +
                 '}';
     }
-
 }

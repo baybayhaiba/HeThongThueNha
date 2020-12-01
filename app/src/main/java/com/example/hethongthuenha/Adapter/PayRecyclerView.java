@@ -1,20 +1,29 @@
 package com.example.hethongthuenha.Adapter;
 
 import android.content.Context;
+import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.hethongthuenha.Model.BookRoom;
 import com.example.hethongthuenha.Model.Commission;
 import com.example.hethongthuenha.Model.Person;
+import com.example.hethongthuenha.Model.Room;
 import com.example.hethongthuenha.R;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.squareup.picasso.Picasso;
 
 import java.text.NumberFormat;
@@ -27,6 +36,7 @@ public class PayRecyclerView extends RecyclerView.Adapter<PayRecyclerView.MyView
     private List<Commission> commissions;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final NumberFormat formatter = NumberFormat.getCurrencyInstance();
+
     public PayRecyclerView(Context context, List<Commission> commissions) {
         this.context = context;
         this.commissions = commissions;
@@ -58,9 +68,44 @@ public class PayRecyclerView extends RecyclerView.Adapter<PayRecyclerView.MyView
                     holder.tvName.setText(person.getFullName());
                 }
             }
-        });
 
-        holder.tvPrice.setText(""+commission.getPrice());
+            holder.tvPrice.setText("" + formatter.format(commission.getPrice()));
+
+
+
+
+            db.collection("Commission").document(commission.getId_person())
+                    .get().addOnSuccessListener(documentSnapshot -> {
+                if (documentSnapshot.exists()) {
+                    Commission commissionUpdate = documentSnapshot.toObject(Commission.class);
+
+                    if (commissionUpdate.getTotalDay() < commission.getTotalDay())
+                        commissionUpdate.setTotalDay(commission.getTotalDay());
+                    if (commissionUpdate.getPrice() < commission.getPrice())
+                        commissionUpdate.setPrice(commission.getPrice());
+                    if (commissionUpdate.getLastPaid() == null)
+                        commissionUpdate.setLastPaid(commission.getLastPaid());
+                    db.collection("Commission").document(commission.getId_person())
+                            .set(commissionUpdate);
+
+                    String timeAgo = (String) DateUtils.getRelativeTimeSpanString(commissionUpdate.getLastPaid()
+                            .getSeconds() * 1000);
+
+                    holder.tvLastPaid.setText("Trả lần cuối:" + timeAgo);
+                    holder.tvPrice.setText("" + formatter.format(commissionUpdate.getPrice()));
+                    holder.tvTotalDay.setText("Tổng cộng:" + commissionUpdate.getTotalDay() + " ngày");
+                } else {
+                    //khi chua co !
+                    db.collection("Commission").document(commission.getId_person())
+                            .set(commission);
+                    holder.tvLastPaid.setText("Chưa trả lần nào");
+                    holder.tvPrice.setText("" + formatter.format(commission.getPrice()));
+                    holder.tvTotalDay.setText("Tổng cộng:" + commission.getTotalDay() + " ngày");
+                }
+            });
+
+
+        });
 
     }
 
@@ -71,7 +116,7 @@ public class PayRecyclerView extends RecyclerView.Adapter<PayRecyclerView.MyView
 
     public static class MyViewHolder extends RecyclerView.ViewHolder {
         private ImageView imgAvatar, imgRemove;
-        private TextView tvName, tvPrice;
+        private TextView tvName, tvPrice, tvTotalDay, tvLastPaid;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -80,6 +125,8 @@ public class PayRecyclerView extends RecyclerView.Adapter<PayRecyclerView.MyView
             imgRemove = itemView.findViewById(R.id.img_remove_pay);
             tvName = itemView.findViewById(R.id.tv_custom_name_pay);
             tvPrice = itemView.findViewById(R.id.tv_price_pay);
+            tvTotalDay = itemView.findViewById(R.id.tv_total_day_pay);
+            tvLastPaid = itemView.findViewById(R.id.tv_last_paid_pay);
         }
     }
 }

@@ -19,10 +19,15 @@
             android:layout_height="wrap_content"
             android:drawableLeft="@drawable/ic_baseline_search_24"
             android:hint="Search"
+            android:drawablePadding="10sp"
+            android:textColor="@color/white"
+            android:textColorHint="@color/white"
             android:imeOptions="actionDone"
             android:inputType="text" />
 
         <androidx.recyclerview.widget.RecyclerView
+            android:layout_marginLeft="10sp"
+            android:layout_marginRight="10sp"
             android:id="@+id/roomRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

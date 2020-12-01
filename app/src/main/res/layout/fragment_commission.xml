@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:fontFamily="@font/khand_light"
         android:text="Tất cả chủ trọ:341/Người"
-        android:textColor="@color/black"
+        android:textColor="@color/white"
         android:textSize="30sp" />
 
     <TextView
@@ -24,7 +24,7 @@
         android:layout_marginTop="25sp"
         android:fontFamily="@font/khand_light"
         android:text="Tất cả phòng trọ:421/Phòng"
-        android:textColor="@color/black"
+        android:textColor="@color/white"
         android:textSize="20sp" />
 
     <TextView
@@ -34,7 +34,7 @@
         android:layout_marginTop="25sp"
         android:fontFamily="@font/khand_light"
         android:text="Hoa hồng hiện tại:4.5%"
-        android:textColor="@color/black"
+        android:textColor="@color/white"
         android:textSize="20sp" />
 
     <com.google.android.material.textfield.TextInputLayout

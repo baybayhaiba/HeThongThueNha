@@ -2,6 +2,7 @@ package com.example.hethongthuenha.Adminstrator.Fragment;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
@@ -14,6 +15,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.hethongthuenha.R;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
@@ -76,7 +81,7 @@ public class fragment_commission extends Fragment {
             }
         });
 
-        db.collection("Commission").addSnapshotListener(new EventListener<QuerySnapshot>() {
+        db.collection("Scale_Commission").addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
                 if (error == null) {
@@ -89,11 +94,21 @@ public class fragment_commission extends Fragment {
 
         btnFinish.setOnClickListener(v -> {
             commission.put("commission", Double.parseDouble(edCommission.getText().toString()));
-            db.collection("Commission").document()
-                    .set(commission).addOnCompleteListener(c -> {
-                Toast.makeText(getActivity(), "Cập nhật thành công", Toast.LENGTH_SHORT).show();
-                edCommission.setText("");
-            });
+
+            db.collection("Scale_Commission").get()
+                    .addOnSuccessListener(queryDocumentSnapshots -> {
+                        if (!queryDocumentSnapshots.isEmpty()) {
+                            for (QueryDocumentSnapshot value : queryDocumentSnapshots) {
+                                db.collection("Scale_Commission").document(value.getId())
+                                        .set(commission);
+                            }
+                        } else {
+                            db.collection("Scale_Commission").add(commission);
+                        }
+                        Toast.makeText(getActivity(), "Cập nhật thành công",
+                                Toast.LENGTH_SHORT).show();
+                        edCommission.setText("");
+                    });
         });
 
         return view;

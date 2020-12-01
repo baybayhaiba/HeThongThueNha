@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
-    android:background="@drawable/background"
+    android:id="@+id/relativeLogin"
+    android:background="@drawable/gradient_bg"
     xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
     android:layout_height="match_parent">
     <LinearLayout
@@ -8,6 +9,7 @@
         android:id="@+id/login_layout_main"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true"
+
         android:orientation="vertical"
         android:layout_width="360dp"
         android:layout_height="400dp">

@@ -9,7 +9,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/darker_gray"
+        android:background="@drawable/gradient_bg"
         android:orientation="vertical"
         android:padding="16sp">
 
@@ -171,7 +171,7 @@
             android:layout_marginTop="20sp"
             android:fontFamily="@font/belleza"
             android:text="Tiện ích chung"
-            android:textColor="@color/black"
+            android:textColor="@color/white"
             android:textSize="20sp"
             android:textStyle="bold" />
 
@@ -211,7 +211,7 @@
             android:layout_marginTop="20sp"
             android:fontFamily="@font/belleza"
             android:text="Sinh hoạt"
-            android:textColor="@color/black"
+            android:textColor="@color/white"
             android:textSize="20sp"
             android:textStyle="bold" />
 
