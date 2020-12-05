@@ -68,7 +68,7 @@ public class fragment_living_expenses extends Fragment {
 
         Button btFinishStage2 = view.findViewById(R.id.btnFinishStage2);
 
-        if (CreateRoomActivity.roomExist != null) {
+        if (CreateRoomActivity.roomExist!= null) {
             Room room = CreateRoomActivity.roomExist;
             etWater.setText("" + room.getStage2().getmWater());
             etTV.setText("" + room.getStage2().getmTivi());

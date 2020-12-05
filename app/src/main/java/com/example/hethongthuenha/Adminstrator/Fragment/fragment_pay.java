@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.example.hethongthuenha.Adapter.PayRecyclerView;
 import com.example.hethongthuenha.Model.BookRoom;
@@ -143,9 +144,18 @@ public class fragment_pay extends Fragment {
                                 calNow.setTime(new Date());
                                 Calendar calBookRoom = Calendar.getInstance();
                                 calBookRoom.setTime(bookRoom.getBookRoomAdded().toDate());
+                                int dayWhenAccepted = 0;
+                                for (int i = calBookRoom.get(Calendar.YEAR); i < calNow.get(Calendar.YEAR); i++) {
+                                    dayWhenAccepted += 365;
+                                }
 
-                                int dayWhenAccepted = calNow.get(Calendar.DAY_OF_YEAR) - calBookRoom.get(Calendar.DAY_OF_YEAR);
+                                if (dayWhenAccepted >= 365) {
+                                    dayWhenAccepted += calBookRoom.get(Calendar.DAY_OF_YEAR);
+                                }else{
+                                    dayWhenAccepted = calNow.get(Calendar.DAY_OF_YEAR) - calBookRoom.get(Calendar.DAY_OF_YEAR);
+                                }
                                 totalDay += dayWhenAccepted;
+
                                 price += ((room.getStage1().getPrice() * scale_commission) / 100 * dayWhenAccepted) / 30;
                             }
                         }

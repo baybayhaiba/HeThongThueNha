@@ -1,5 +1,6 @@
 package com.example.hethongthuenha;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
@@ -38,11 +39,14 @@ import com.example.hethongthuenha.Model.Person;
 import com.example.hethongthuenha.Model.Report;
 import com.example.hethongthuenha.Model.Room;
 import com.example.hethongthuenha.Model.Utilities_Room;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.squareup.picasso.Picasso;
 
 import java.text.DecimalFormat;
@@ -81,6 +85,7 @@ ActivityRoomDetail extends AppCompatActivity {
     private NumberFormat formatter;
     private Spinner spReport;
     private ProgressDialog progressDialog;
+    private int count = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -164,6 +169,7 @@ ActivityRoomDetail extends AppCompatActivity {
         CheckBookRoom();
         ListBookRoom();
         ShowComment();
+        CountAccommodationRoom();
     }
 
     private void ListBookRoom() {
@@ -263,6 +269,10 @@ ActivityRoomDetail extends AppCompatActivity {
         btnBookRoom.setOnClickListener(v -> {
 
             if (btnBookRoom.getText().toString().equals("Đặt phòng")) {
+                if(count==room.getStage1().getAmout()) {
+                    Toast.makeText(this, "Phòng đã đầy !", Toast.LENGTH_SHORT).show();
+                    return;
+                }
 
                 AlertDialog.Builder builderSingle = new AlertDialog.Builder(ActivityRoomDetail.this);
                 builderSingle.setIcon(R.drawable.home);
@@ -291,6 +301,27 @@ ActivityRoomDetail extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void CountAccommodationRoom() {
+        db.collection("BookRoom").whereEqualTo("id_room", room.getRoom_id())
+                .whereEqualTo("confirm", true)
+                .get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                for (QueryDocumentSnapshot value : task.getResult()) {
+                    count++;
+
+
+                }
+
+                if (task.isComplete()) {
+                    tvAmout.setText("Số lượng:" + count + "/" + room.getStage1().getAmout());
+                }
+
+
+            }
+
+        });
     }
 
     private void CancelBookRoom() {
@@ -342,9 +373,9 @@ ActivityRoomDetail extends AppCompatActivity {
                 .whereEqualTo("id_person", PersonAPI.getInstance().getUid())
                 .whereEqualTo("id_room", room.getRoom_id())
                 .get().addOnSuccessListener(queryDocumentSnapshots -> {
-            if (queryDocumentSnapshots.isEmpty())
+            if (queryDocumentSnapshots.isEmpty()) {
                 btnBookRoom.setText("Đặt phòng");
-            else {
+            } else {
                 for (QueryDocumentSnapshot value : queryDocumentSnapshots) {
                     BookRoom bookRoom = value.toObject(BookRoom.class);
 
@@ -573,7 +604,6 @@ ActivityRoomDetail extends AppCompatActivity {
                     if (error == null) {
                         for (QueryDocumentSnapshot v : value) {
                             Comment comment = v.toObject(Comment.class);
-                            Log.d("SIMPLE", "ShowComment: " + comment.toString());
                             comments.add(comment);
                         }
                         Collections.sort(comments, (o1, o2) ->

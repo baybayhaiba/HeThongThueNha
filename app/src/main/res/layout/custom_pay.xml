@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/cv_custom_person_chat"
+    android:id="@+id/cv_custom_pay"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:backgroundTint="@color/yellow_100"
@@ -72,13 +72,6 @@
 
 
         </LinearLayout>
-
-        <ImageView
-            android:layout_gravity="center"
-            android:id="@+id/img_remove_pay"
-            android:layout_width="20sp"
-            android:layout_height="20sp"
-            android:src="@drawable/ic_baseline_remove_circle_24" />
     </LinearLayout>
 
 </androidx.cardview.widget.CardView>

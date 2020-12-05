@@ -27,9 +27,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.hethongthuenha.API.PersonAPI;
+import com.example.hethongthuenha.Model.BookRoom;
+import com.example.hethongthuenha.Model.Commission;
 import com.example.hethongthuenha.Model.CreditCard;
 import com.example.hethongthuenha.Model.Person;
 import com.example.hethongthuenha.Model.Refund;
+import com.example.hethongthuenha.Model.Room;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -37,6 +40,7 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
@@ -57,9 +61,9 @@ public class ActivitySettingPerson extends AppCompatActivity {
     private ListView lvSetting;
     private FirebaseAuth mAuth;
     private TextView tvName, tvPoint, tvEmail;
-    private EditText edMoney;
+    private EditText edMoney, edPasswordOld, edPasswordNew, edRepasswordNew;
     private ImageView imgAvatar;
-    private Button btnRefund, btnCancel;
+    private Button btnRefund, btnCancel, btnChange;
     private CreditCard card;
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final CollectionReference collectionReference = db.collection("User");
@@ -68,6 +72,7 @@ public class ActivitySettingPerson extends AppCompatActivity {
     private StorageReference storageReference;
     private static final int IMAGE_PICK_CODE = 1000;
     private static final int PERMISSION_CODE = 1001;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,8 +120,6 @@ public class ActivitySettingPerson extends AppCompatActivity {
         controls.add("Thanh toán hoa hồng");
         controls.add("Nạp tiền");
         controls.add("Rút tiền");
-        controls.add("Đổi ngôn ngữ");
-        controls.add("Thay đổi mật khẩu");
         controls.add("Đăng xuất");
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, controls);
@@ -128,11 +131,20 @@ public class ActivitySettingPerson extends AppCompatActivity {
                 Intent intent = new Intent(this, ActivityPerson.class);
                 intent.putExtra("id_person", PersonAPI.getInstance().getUid());
                 startActivity(intent);
+            } else if (position == 1) {
+                db.collection("Commission").document(PersonAPI.getInstance().getUid())
+                        .get().addOnSuccessListener(documentSnapshot -> {
+                    Commission commission = documentSnapshot.toObject(Commission.class);
+                    if (commission.getPrice() != 0)
+                        PayRoom(commission.getPrice());
+                    else
+                        Toast.makeText(this, "Bạn đã thanh toán rồi !", Toast.LENGTH_SHORT).show();
+                });
             } else if (position == 2) {
                 AddPoint("Nội dung cú pháp nạp tiền", ActivitySettingPerson.this);
             } else if (position == 3) {
                 ShowDialogRefund();
-            } else if (position == 6) {
+            } else if (position == 4) {
                 mAuth.signOut();
             }
         });
@@ -229,6 +241,81 @@ public class ActivitySettingPerson extends AppCompatActivity {
         builder.show();
     }
 
+    public void PayRoom(double price) {
+
+        String text = "\nHiện tiền hoa hồng bạn cần  phải trả là " + formatter.format(price) + "\n";
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Thông báo");
+        builder.setMessage(text);
+        builder.setNeutralButton("Đóng sau", (dialog, which) -> dialog.dismiss());
+        builder.setPositiveButton("Đóng tiền ngay", (dialog, which) -> {
+            if (PersonAPI.getInstance().getPoint() >= price) {
+                db.collection("CreditCard").whereEqualTo("id_person", PersonAPI.getInstance().getUid())
+                        .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot value : task.getResult()) {
+                                CreditCard card = value.toObject(CreditCard.class);
+                                card.setPoint(card.getPoint() - price);
+
+                                db.collection("CreditCard").document(value.getId())
+                                        .set(card);
+
+                                if (task.isComplete()) {
+                                    db.collection("Commission").document(PersonAPI.getInstance().getUid())
+                                            .get().addOnCompleteListener(task12 -> {
+                                        Commission commission = task12.getResult().toObject(Commission.class);
+                                        commission.setLastPaid(new Timestamp(new Date()));
+                                        commission.setPrice(0);
+                                        commission.setTotalDay(0);
+
+                                        db.collection("Commission").document(PersonAPI.getInstance().getUid())
+                                                .set(commission);
+
+                                        if (task12.isComplete()) {
+                                            db.collection("Room").whereEqualTo("person_id",
+                                                    PersonAPI.getInstance().getUid())
+                                                    .get().addOnCompleteListener(task1 -> {
+                                                if (task1.isSuccessful()) {
+                                                    for (QueryDocumentSnapshot value1 : task1.getResult()) {
+                                                        Room room = value1.toObject(Room.class);
+
+                                                        db.collection("BookRoom").whereEqualTo("id_room",
+                                                                room.getRoom_id()).whereEqualTo("confirm", true)
+                                                                .get().addOnCompleteListener(task2 -> {
+                                                            if (task2.isSuccessful()) {
+                                                                for (QueryDocumentSnapshot value2 : task2.getResult()) {
+                                                                    BookRoom bookRoom = value2.toObject(BookRoom.class);
+                                                                    bookRoom.setBookRoomAdded(new Timestamp(new Date()));
+
+                                                                    db.collection("BookRoom").document(value2.getId())
+                                                                            .set(bookRoom);
+
+                                                                    if (task2.isComplete()) {
+                                                                        Toast.makeText(ActivitySettingPerson.this, "Thanh toán thành công", Toast.LENGTH_SHORT).show();
+                                                                    }
+                                                                }
+                                                            }
+                                                        });
+                                                    }
+                                                }
+                                            });
+                                        }
+                                    });
+                                }
+                            }
+                        }
+                    }
+                });
+            } else {
+                AddPoint("Bạn không đủ tiền", this);
+            }
+        });
+        builder.show();
+    }
+
     public void ShowDialogRefund() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         View viewLayout = getLayoutInflater().inflate(R.layout.layout_refund, null);
@@ -305,6 +392,7 @@ public class ActivitySettingPerson extends AppCompatActivity {
             }
         });
     }
+
 
     private void NotificationRefund() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
