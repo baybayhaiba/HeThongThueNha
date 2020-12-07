@@ -168,8 +168,6 @@ public class ActivitySearchRoom extends AppCompatActivity {
                 btnTypeRoom.getText().toString().toLowerCase();
 
 
-        Log.d("SIMPLE", "Price" + price + "|Accommodation:" +
-                accommodation + "|Area:" + area + "|Type_room:" + type_room);
 
         db.collection("Room").orderBy("timeAdded", Query.Direction.DESCENDING)
                 .get().addOnSuccessListener(queryDocumentSnapshots -> {

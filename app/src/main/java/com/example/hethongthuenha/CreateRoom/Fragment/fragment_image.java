@@ -71,7 +71,8 @@ public class fragment_image extends Fragment {
 
     private static final int IMAGE_PICK_CODE = 1000;
     private static final int PERMISSION_CODE = 1001;
-    private ImageView[] listImgRoom = new ImageView[4];
+    private int lengthImg=4;
+    private ImageView[] listImgRoom = new ImageView[lengthImg];
     private Uri[] uri = new Uri[4];
     private int imagePosition = 0;
     private StorageReference mStorageRef;
@@ -93,7 +94,7 @@ public class fragment_image extends Fragment {
         progressDialog = new ProgressDialog(getActivity());
         progressDialog.setMessage("Làm ơn đợi");
         imageUrl = new ArrayList<>();
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < lengthImg; i++) {
             String textViewStageId = "imgRoom" + (i + 1);
             int resId = getResources().getIdentifier(textViewStageId, "id", getActivity().getPackageName());
             listImgRoom[i] = view.findViewById(resId);
@@ -228,7 +229,7 @@ public class fragment_image extends Fragment {
     private boolean isValid() {
         String errorImg = "";
         boolean valid = true;
-        for (int i = 0; i < listImgRoom.length; i++)
+        for (int i = 0; i < lengthImg; i++)
             if (listImgRoom[i].getContentDescription() == null) {
                 errorImg += "Bạn chưa chọn ảnh " + (i + 1) + "\n";
                 valid = false;
