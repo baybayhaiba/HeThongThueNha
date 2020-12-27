@@ -29,7 +29,6 @@ import java.util.Map;
 public class fragment_list_chat extends Fragment {
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private List<Person> personChat;
     private PersonChatRecyclerView adapter;
     private RecyclerView recyclerView;
     private List<Map<String, Object>> personChats;

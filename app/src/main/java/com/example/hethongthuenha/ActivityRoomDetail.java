@@ -193,9 +193,9 @@ ActivityRoomDetail extends AppCompatActivity {
 
     private void GoToPerson() {
         cvPerson.setOnClickListener(v -> {
-//            Intent intent = new Intent(ActivityRoomDetail.this, ActivityPerson.class);
-//            intent.putExtra("id_person", room.getPerson_id());
-//            startActivity(intent);
+            Intent intent = new Intent(ActivityRoomDetail.this, ActivityPerson.class);
+            intent.putExtra("id_person", room.getPerson_id());
+            startActivity(intent);
         });
     }
 
@@ -465,13 +465,13 @@ ActivityRoomDetail extends AppCompatActivity {
             if (value.isSuccessful()) {
                 for (QueryDocumentSnapshot persons : value.getResult()) {
                     Person person = persons.toObject(Person.class);
-//                    Intent intent = new Intent(ActivityRoomDetail.this, ActivityChat.class);
-//                    intent.putExtra("toId", person.getUid());
-//                    intent.putExtra("toEmail", person.getEmail());
-//                    intent.putExtra("toName", person.getFullName());
-//                    intent.putExtra("description_room", "Tôi muốn thuê căn nhà " + room.getStage1().getTitle());
-//                    intent.putExtra("url", room.getStage3().getImagesURL().get(0));
-//                    startActivity(intent);
+                    Intent intent = new Intent(ActivityRoomDetail.this, ActivityChat.class);
+                    intent.putExtra("toId", person.getUid());
+                    intent.putExtra("toEmail", person.getEmail());
+                    intent.putExtra("toName", person.getFullName());
+                    intent.putExtra("description_room", "Tôi muốn thuê căn nhà " + room.getStage1().getTitle());
+                    intent.putExtra("url", room.getStage3().getImagesURL().get(0));
+                    startActivity(intent);
                 }
             }
         });
