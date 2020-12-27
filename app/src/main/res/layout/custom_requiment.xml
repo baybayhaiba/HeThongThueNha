@@ -3,9 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:cardCornerRadius="10sp"
     android:layout_marginTop="15sp"
-    android:backgroundTint="@color/pink_300"
     android:layout_width="match_parent"
     app:contentPadding="16sp"
+    android:backgroundTint="@color/pink_300"
     android:id="@+id/cv_custom_requirement"
     app:cardUseCompatPadding="true"
     android:layout_height="wrap_content">

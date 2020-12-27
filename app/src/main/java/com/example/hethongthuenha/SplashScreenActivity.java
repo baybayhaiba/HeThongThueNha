@@ -72,7 +72,6 @@ public class SplashScreenActivity extends AppCompatActivity {
                             PersonAPI.getInstance().setEmail(person.getEmail());
                             PersonAPI.getInstance().setType_person(person.getType_person());
 
-
                             //Get Point
                             db.collection("CreditCard").whereEqualTo("email_person", person.getEmail())
                                     .get().addOnSuccessListener(v -> {

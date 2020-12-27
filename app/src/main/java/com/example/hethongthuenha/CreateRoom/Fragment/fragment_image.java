@@ -71,9 +71,10 @@ public class fragment_image extends Fragment {
 
     private static final int IMAGE_PICK_CODE = 1000;
     private static final int PERMISSION_CODE = 1001;
-    private ImageView[] listImgRoom = new ImageView[4];
+    private int lengthImg=4;
+    private ImageView[] listImgRoom = new ImageView[lengthImg];
     private Uri[] uri = new Uri[4];
-    private int imageAdded = 0;
+    private int imagePosition = 0;
     private StorageReference mStorageRef;
     private List<String> imageUrl;
     private ProgressDialog progressDialog;
@@ -93,12 +94,14 @@ public class fragment_image extends Fragment {
         progressDialog = new ProgressDialog(getActivity());
         progressDialog.setMessage("Làm ơn đợi");
         imageUrl = new ArrayList<>();
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < lengthImg; i++) {
             String textViewStageId = "imgRoom" + (i + 1);
             int resId = getResources().getIdentifier(textViewStageId, "id", getActivity().getPackageName());
             listImgRoom[i] = view.findViewById(resId);
 
+            int finalI = i;
             listImgRoom[i].setOnClickListener(v -> {
+                imagePosition = finalI;
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     if (getActivity().checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
                             == PackageManager.PERMISSION_DENIED) {
@@ -131,8 +134,11 @@ public class fragment_image extends Fragment {
                 progressDialog.show();
                 if (CreateRoomActivity.roomExist == null)
                     SaveImage();
-                else
+                else {
+                    ChangeImage(CreateRoomActivity.roomExist.getRoom_id());
                     ChangeFragment();
+                }
+
             }
 
         });
@@ -148,6 +154,27 @@ public class fragment_image extends Fragment {
         fragmentTransaction.commit();
         dataCommunication.Image(new Image_Room(imageUrl));
         progressDialog.dismiss();
+    }
+
+    private void ChangeImage(String id) {
+        StorageReference filepath;
+
+        for (int i = 0; i < uri.length; i++) {
+
+            filepath = mStorageRef.child("room_image").child(id + "room_" + i);
+            StorageReference finalFilepath = filepath;
+            if (uri[i] != null) {
+                filepath.putFile(uri[i])
+                        .addOnSuccessListener(taskSnapshot -> finalFilepath.getDownloadUrl().
+                                addOnSuccessListener(uri -> {
+                                    imageUrl.add(uri.toString());
+                                    if (imageUrl.size() == 4) {
+                                        ChangeFragment();
+                                    }
+                                })).
+                        addOnFailureListener(e -> Log.d("SIMPLE", "onFailure: " + e.getMessage()));
+            }
+        }
     }
 
     private void SaveImage() {
@@ -193,20 +220,16 @@ public class fragment_image extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK && requestCode == IMAGE_PICK_CODE) {
-            uri[imageAdded] = data.getData();
-
-            listImgRoom[imageAdded].setImageURI(uri[imageAdded]);
-
-            listImgRoom[imageAdded].setContentDescription("Added");
-
-            imageAdded++;
+            uri[imagePosition] = data.getData();
+            listImgRoom[imagePosition].setImageURI(uri[imagePosition]);
+            listImgRoom[imagePosition].setContentDescription("Added");
         }
     }
 
     private boolean isValid() {
         String errorImg = "";
         boolean valid = true;
-        for (int i = 0; i < listImgRoom.length; i++)
+        for (int i = 0; i < lengthImg; i++)
             if (listImgRoom[i].getContentDescription() == null) {
                 errorImg += "Bạn chưa chọn ảnh " + (i + 1) + "\n";
                 valid = false;

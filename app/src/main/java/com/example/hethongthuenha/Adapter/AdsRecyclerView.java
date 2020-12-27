@@ -2,6 +2,7 @@ package com.example.hethongthuenha.Adapter;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,8 +12,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.hethongthuenha.ActivityRoomDetail;
 import com.example.hethongthuenha.Model.Ads;
 import com.example.hethongthuenha.Model.BookRoom;
 import com.example.hethongthuenha.Model.CreditCard;
@@ -47,6 +50,7 @@ public class AdsRecyclerView extends RecyclerView.Adapter<AdsRecyclerView.MyView
     public static class MyViewHolder extends RecyclerView.ViewHolder {
         ImageView imgRoom, imgRemove;
         TextView tvTitle, tvPrice, tvCountDown;
+        CardView cvAds;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -56,6 +60,7 @@ public class AdsRecyclerView extends RecyclerView.Adapter<AdsRecyclerView.MyView
             tvTitle = itemView.findViewById(R.id.tv_title_ads);
             tvPrice = itemView.findViewById(R.id.tv_price_ads);
             tvCountDown = itemView.findViewById(R.id.tv_timestamp_ads);
+            cvAds = itemView.findViewById(R.id.cv_custom_ads);
         }
     }
 
@@ -80,9 +85,15 @@ public class AdsRecyclerView extends RecyclerView.Adapter<AdsRecyclerView.MyView
                     Picasso.with(context).load(room.getStage3().getImagesURL().get(0))
                             .placeholder(R.drawable.home).into(holder.imgRoom);
                     holder.tvTitle.setText(room.getStage1().getTitle());
+                    holder.cvAds.setOnClickListener(c -> {
+                        Intent intent = new Intent(context, ActivityRoomDetail.class);
+                        intent.putExtra("room", room);
+                        context.startActivity(intent);
+                    });
                 }
             }
         });
+
 
         holder.tvPrice.setText("" + formatter.format(ads.getPrice()));
 
@@ -93,7 +104,7 @@ public class AdsRecyclerView extends RecyclerView.Adapter<AdsRecyclerView.MyView
         holder.imgRemove.setOnClickListener(v -> {
             NotificationChooseDelete(ads);
         });
-
+        holder.cvAds.setOnClickListener(v -> Toast.makeText(context, "Phòng đã bị xóa hoặc bị lỗi", Toast.LENGTH_SHORT).show());
     }
 
     private AlertDialog NotificationChooseDelete(Ads ads) {

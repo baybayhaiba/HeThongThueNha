@@ -1,6 +1,7 @@
 package com.example.hethongthuenha.Adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,8 +11,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.hethongthuenha.ActivityPerson;
 import com.example.hethongthuenha.Model.BookRoom;
 import com.example.hethongthuenha.Model.Commission;
 import com.example.hethongthuenha.Model.Person;
@@ -66,12 +69,15 @@ public class PayRecyclerView extends RecyclerView.Adapter<PayRecyclerView.MyView
                                 .into(holder.imgAvatar);
 
                     holder.tvName.setText(person.getFullName());
+                    holder.cardView.setOnClickListener(c->{
+                        Intent intent=new Intent(context, ActivityPerson.class);
+                        intent.putExtra("id_person",person.getUid());
+                        context.startActivity(intent);
+                    });
                 }
             }
 
             holder.tvPrice.setText("" + formatter.format(commission.getPrice()));
-
-
 
 
             db.collection("Commission").document(commission.getId_person())
@@ -79,12 +85,16 @@ public class PayRecyclerView extends RecyclerView.Adapter<PayRecyclerView.MyView
                 if (documentSnapshot.exists()) {
                     Commission commissionUpdate = documentSnapshot.toObject(Commission.class);
 
-                    if (commissionUpdate.getTotalDay() < commission.getTotalDay())
+                    if (commissionUpdate.getTotalDay() < commission.getTotalDay()){
                         commissionUpdate.setTotalDay(commission.getTotalDay());
-                    if (commissionUpdate.getPrice() < commission.getPrice())
                         commissionUpdate.setPrice(commission.getPrice());
-                    if (commissionUpdate.getLastPaid() == null)
+                    }
+
+
+                    if (commissionUpdate.getLastPaid() == null) {
                         commissionUpdate.setLastPaid(commission.getLastPaid());
+                    }
+
                     db.collection("Commission").document(commission.getId_person())
                             .set(commissionUpdate);
 
@@ -115,18 +125,19 @@ public class PayRecyclerView extends RecyclerView.Adapter<PayRecyclerView.MyView
     }
 
     public static class MyViewHolder extends RecyclerView.ViewHolder {
-        private ImageView imgAvatar, imgRemove;
+        private ImageView imgAvatar;
         private TextView tvName, tvPrice, tvTotalDay, tvLastPaid;
+        private CardView cardView;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
 
             imgAvatar = itemView.findViewById(R.id.img_avatar_pay);
-            imgRemove = itemView.findViewById(R.id.img_remove_pay);
             tvName = itemView.findViewById(R.id.tv_custom_name_pay);
             tvPrice = itemView.findViewById(R.id.tv_price_pay);
             tvTotalDay = itemView.findViewById(R.id.tv_total_day_pay);
             tvLastPaid = itemView.findViewById(R.id.tv_last_paid_pay);
+            cardView = itemView.findViewById(R.id.cv_custom_pay);
         }
     }
 }

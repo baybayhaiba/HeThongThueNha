@@ -111,6 +111,11 @@ public class RoomRecyclerView extends RecyclerView.Adapter<RoomRecyclerView.MyVi
         holder.tvPrice.setText(price + "/" + type_date);
         holder.tvTypeRoom.setText(type_room);
 
+
+        if(room.getOrder()==2){
+            holder.tvTitle.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.vip,0,0,0);
+        }
+
         String timeAgo = (String) DateUtils.getRelativeTimeSpanString(room.getTimeAdded()
                 .getSeconds() * 1000);
 

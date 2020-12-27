@@ -16,10 +16,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.example.hethongthuenha.CreateRoom.CreateRoomActivity;
 import com.example.hethongthuenha.Model.Description_Room;
+import com.example.hethongthuenha.Model.Image_Room;
+import com.example.hethongthuenha.Model.LivingExpenses_Room;
 import com.example.hethongthuenha.Model.Room;
+import com.example.hethongthuenha.Model.Utilities_Room;
 import com.example.hethongthuenha.R;
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -137,6 +141,7 @@ public class fragment_description extends Fragment {
         });
         return view;
     }
+
 
 
     private boolean isValid() {
