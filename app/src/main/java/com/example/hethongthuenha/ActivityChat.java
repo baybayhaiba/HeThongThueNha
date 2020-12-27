@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.hethongthuenha.API.PersonAPI;
 import com.example.hethongthuenha.Adapter.ChatRecyclerView;
@@ -17,16 +18,30 @@ import com.example.hethongthuenha.Model.Chat;
 import com.example.hethongthuenha.Model.HistoryChat;
 import com.example.hethongthuenha.Model.Notification;
 import com.example.hethongthuenha.Model.Person;
+import com.example.hethongthuenha.Notification.Client;
+import com.example.hethongthuenha.Notification.Data;
+import com.example.hethongthuenha.Notification.MyResponse;
+import com.example.hethongthuenha.Notification.Sender;
+import com.example.hethongthuenha.Notification.Token;
+import com.example.hethongthuenha.Retrofit.APIService;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class ActivityChat extends AppCompatActivity {
 
@@ -46,6 +61,8 @@ public class ActivityChat extends AppCompatActivity {
     private CollectionReference history_chat_path;
     private CollectionReference refNotification;
 
+    private APIService apiService;
+
     public interface FireStoreCallBack {
         void onCallBack(String path);
     }
@@ -57,9 +74,11 @@ public class ActivityChat extends AppCompatActivity {
 
         fromEmail = PersonAPI.getInstance().getEmail();
         toEmail = getIntent().getStringExtra("toEmail");
-
+        updateToken(FirebaseInstanceId.getInstance().getToken());
         Init();
 
+
+        apiService = Client.getClient("https://fcm.googleapis.com/").create(APIService.class);
     }
 
     private void Init() {
@@ -111,6 +130,14 @@ public class ActivityChat extends AppCompatActivity {
             }
         });
     }
+
+
+    private void updateToken(String token) {
+        CollectionReference reference = FirebaseFirestore.getInstance().collection("Tokens");
+        Token token1 = new Token(token);
+        reference.document(PersonAPI.getInstance().getUid()).set(token1);
+    }
+
 
     private void GetPath() {
         FindPath(path -> {
@@ -238,8 +265,55 @@ public class ActivityChat extends AppCompatActivity {
                     }
                 });
             }
+
+            db.collection("User").whereEqualTo("uid", PersonAPI.getInstance().getUid())
+                    .get().addOnSuccessListener(queryDocumentSnapshots -> {
+                        if (!queryDocumentSnapshots.isEmpty())
+                            for (QueryDocumentSnapshot value : queryDocumentSnapshots) {
+                                Person person = value.toObject(Person.class);
+                                SendNotification(tvNamePerson.getText().toString(), PersonAPI.getInstance().getName(),
+                                        text);
+                            }
+                    });
             refChat.add(chat);
             edText.setText("");
         }
+    }
+
+    private void SendNotification(String toName, String name, String text) {
+        db.collection("User").whereEqualTo("fullName", toName)
+                .get().addOnSuccessListener(queryDocumentSnapshots -> {
+            if (!queryDocumentSnapshots.isEmpty())
+                for (QueryDocumentSnapshot value : queryDocumentSnapshots) {
+                    Person person = value.toObject(Person.class);
+                    db.collection("Tokens").document(person.getUid())
+                            .get().addOnSuccessListener(documentSnapshot -> {
+                                Token token = documentSnapshot.toObject(Token.class);
+                                Data data = new Data(PersonAPI.getInstance().getUid(), R.mipmap.ic_launcher, PersonAPI.getInstance().getName()
+                                        + ":" + text, "New Message", person.getUid());
+
+                                Sender sender = new Sender(data, token.getToken());
+
+                        Toast.makeText(this, token.getToken(), Toast.LENGTH_SHORT).show();
+
+                                apiService.sendNotification(sender)
+                                        .enqueue(new Callback<MyResponse>() {
+                                            @Override
+                                            public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
+                                                if (response.code() == 200) {
+                                                    if (response.body().success != 1) {
+                                                        Toast.makeText(ActivityChat.this, "Failed", Toast.LENGTH_SHORT).show();
+                                                    }
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onFailure(Call<MyResponse> call, Throwable t) {
+
+                                            }
+                                        });
+                            });
+                }
+        });
     }
 }

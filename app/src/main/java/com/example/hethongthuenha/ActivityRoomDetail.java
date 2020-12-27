@@ -1,5 +1,6 @@
 package com.example.hethongthuenha;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
@@ -9,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -26,6 +28,7 @@ import android.widget.Toast;
 import com.example.hethongthuenha.API.PersonAPI;
 import com.example.hethongthuenha.Adapter.CommentRecyclerView;
 import com.example.hethongthuenha.Adapter.RoomRecyclerView;
+import com.example.hethongthuenha.Adapter.SliderAdapterExample;
 import com.example.hethongthuenha.Adapter.UtilitieseRecyclerView;
 import com.example.hethongthuenha.Model.BookRoom;
 import com.example.hethongthuenha.Model.Comment;
@@ -37,12 +40,19 @@ import com.example.hethongthuenha.Model.Notification;
 import com.example.hethongthuenha.Model.Person;
 import com.example.hethongthuenha.Model.Report;
 import com.example.hethongthuenha.Model.Room;
+import com.example.hethongthuenha.Model.SliderItem;
 import com.example.hethongthuenha.Model.Utilities_Room;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.smarteist.autoimageslider.IndicatorView.animation.type.IndicatorAnimationType;
+import com.smarteist.autoimageslider.SliderAnimations;
+import com.smarteist.autoimageslider.SliderView;
 import com.squareup.picasso.Picasso;
 
 import java.text.DecimalFormat;
@@ -57,8 +67,8 @@ public class
 ActivityRoomDetail extends AppCompatActivity {
 
     //Component
-    private ImageView imgRoomMain, imgAvatar;
-    private ImageView[] images;
+    private SliderView sliderView;
+    private ImageView imgAvatar;
     private TextView tvTitle, tvDescription, tvPrice, tvAccommodation,
             tvAmout, tvAddress, tvArea, tvTypeRoom, tvNamePerson, tvContactPerson,
             tvWaterPrice, tvElectricityPrice, tvTvPrice, tvInternetPrice, tvParkingPrice;
@@ -81,6 +91,9 @@ ActivityRoomDetail extends AppCompatActivity {
     private NumberFormat formatter;
     private Spinner spReport;
     private ProgressDialog progressDialog;
+    private int count = 0;
+
+    SliderAdapterExample adapterSlider;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,23 +104,28 @@ ActivityRoomDetail extends AppCompatActivity {
         Init();
     }
 
+    private void Slider(){
+
+        adapterSlider = new SliderAdapterExample(this);
+        sliderView.setSliderAdapter(adapterSlider);
+        sliderView.setIndicatorAnimation(IndicatorAnimationType.WORM); //set indicator animation by using IndicatorAnimationType. :WORM or THIN_WORM or COLOR or DROP or FILL or NONE or SCALE or SCALE_DOWN or SLIDE and SWAP!!
+        sliderView.setSliderTransformAnimation(SliderAnimations.SIMPLETRANSFORMATION);
+        sliderView.setAutoCycleDirection(SliderView.AUTO_CYCLE_DIRECTION_BACK_AND_FORTH);
+        sliderView.setIndicatorSelectedColor(Color.WHITE);
+        sliderView.setIndicatorUnselectedColor(Color.GRAY);
+        sliderView.setScrollTimeInSec(4); //set scroll delay in seconds :
+
+        sliderView.startAutoCycle();
+
+    }
     private void Init() {
-        images = new ImageView[4];
         linearLiving = new LinearLayout[5];
         Description_Room description_room = room.getStage1();
         LivingExpenses_Room livingExpenses_room = room.getStage2();
         Image_Room image_room = room.getStage3();
         Utilities_Room utilities_room = room.getStage4();
-
-        imgRoomMain = findViewById(R.id.img_room_main_detail);
-
-
-        //init array image
-        for (int i = 0; i < 4; i++) {
-            String imgId = "img_room" + (i + 1) + "_detail";
-            int resId = getResources().getIdentifier(imgId, "id", getPackageName());
-            images[i] = findViewById(resId);
-        }
+        sliderView=findViewById(R.id.imageSlider);
+        Slider();
         //init linearlayout
         for (int i = 0; i < 5; i++) {
             String imgId = "layout_living" + (i + 1);
@@ -164,6 +182,7 @@ ActivityRoomDetail extends AppCompatActivity {
         CheckBookRoom();
         ListBookRoom();
         ShowComment();
+        CountAccommodationRoom();
     }
 
     private void ListBookRoom() {
@@ -174,9 +193,9 @@ ActivityRoomDetail extends AppCompatActivity {
 
     private void GoToPerson() {
         cvPerson.setOnClickListener(v -> {
-            Intent intent = new Intent(ActivityRoomDetail.this, ActivityPerson.class);
-            intent.putExtra("id_person", room.getPerson_id());
-            startActivity(intent);
+//            Intent intent = new Intent(ActivityRoomDetail.this, ActivityPerson.class);
+//            intent.putExtra("id_person", room.getPerson_id());
+//            startActivity(intent);
         });
     }
 
@@ -252,7 +271,7 @@ ActivityRoomDetail extends AppCompatActivity {
 
                 });
             } else {
-                ActivitySettingPerson.AddPoint("Bạn không đủ tiền", this);
+                //ActivitySettingPerson.AddPoint("Bạn không đủ tiền", this);
             }
         });
         builderSingle.show();
@@ -263,6 +282,10 @@ ActivityRoomDetail extends AppCompatActivity {
         btnBookRoom.setOnClickListener(v -> {
 
             if (btnBookRoom.getText().toString().equals("Đặt phòng")) {
+                    if(count==room.getStage1().getAmout()) {
+                        Toast.makeText(this, "Phòng đã đầy !", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
 
                 AlertDialog.Builder builderSingle = new AlertDialog.Builder(ActivityRoomDetail.this);
                 builderSingle.setIcon(R.drawable.home);
@@ -291,6 +314,27 @@ ActivityRoomDetail extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void CountAccommodationRoom() {
+        db.collection("BookRoom").whereEqualTo("id_room", room.getRoom_id())
+                .whereEqualTo("confirm", true)
+                .get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                for (QueryDocumentSnapshot value : task.getResult()) {
+                    count++;
+
+
+                }
+
+                if (task.isComplete()) {
+                    tvAmout.setText("Số lượng:" + count + "/" + room.getStage1().getAmout());
+                }
+
+
+            }
+
+        });
     }
 
     private void CancelBookRoom() {
@@ -342,9 +386,9 @@ ActivityRoomDetail extends AppCompatActivity {
                 .whereEqualTo("id_person", PersonAPI.getInstance().getUid())
                 .whereEqualTo("id_room", room.getRoom_id())
                 .get().addOnSuccessListener(queryDocumentSnapshots -> {
-            if (queryDocumentSnapshots.isEmpty())
+            if (queryDocumentSnapshots.isEmpty()) {
                 btnBookRoom.setText("Đặt phòng");
-            else {
+            } else {
                 for (QueryDocumentSnapshot value : queryDocumentSnapshots) {
                     BookRoom bookRoom = value.toObject(BookRoom.class);
 
@@ -421,13 +465,13 @@ ActivityRoomDetail extends AppCompatActivity {
             if (value.isSuccessful()) {
                 for (QueryDocumentSnapshot persons : value.getResult()) {
                     Person person = persons.toObject(Person.class);
-                    Intent intent = new Intent(ActivityRoomDetail.this, ActivityChat.class);
-                    intent.putExtra("toId", person.getUid());
-                    intent.putExtra("toEmail", person.getEmail());
-                    intent.putExtra("toName", person.getFullName());
-                    intent.putExtra("description_room", "Tôi muốn thuê căn nhà " + room.getStage1().getTitle());
-                    intent.putExtra("url", room.getStage3().getImagesURL().get(0));
-                    startActivity(intent);
+//                    Intent intent = new Intent(ActivityRoomDetail.this, ActivityChat.class);
+//                    intent.putExtra("toId", person.getUid());
+//                    intent.putExtra("toEmail", person.getEmail());
+//                    intent.putExtra("toName", person.getFullName());
+//                    intent.putExtra("description_room", "Tôi muốn thuê căn nhà " + room.getStage1().getTitle());
+//                    intent.putExtra("url", room.getStage3().getImagesURL().get(0));
+//                    startActivity(intent);
                 }
             }
         });
@@ -573,7 +617,6 @@ ActivityRoomDetail extends AppCompatActivity {
                     if (error == null) {
                         for (QueryDocumentSnapshot v : value) {
                             Comment comment = v.toObject(Comment.class);
-                            Log.d("SIMPLE", "ShowComment: " + comment.toString());
                             comments.add(comment);
                         }
                         Collections.sort(comments, (o1, o2) ->
@@ -585,20 +628,11 @@ ActivityRoomDetail extends AppCompatActivity {
 
 
     private void LoadImage(Image_Room image_room) {
-        for (int i = 0; i < 4; i++) {
-            Picasso.with(this).load(image_room.getImagesURL().get(i))
-                    .placeholder(R.drawable.home).error(R.drawable.home)
-                    .into(images[i]);
-
-
-            int indexImage = i;
-            images[i].setOnClickListener(v ->
-                    imgRoomMain.setImageDrawable(images[indexImage].getDrawable()));
+        List<SliderItem> sliderItems=new ArrayList<>();
+        for(String url:image_room.getImagesURL()){
+            sliderItems.add(new SliderItem("",url));
         }
-
-        Picasso.with(this).load(image_room.getImagesURL().get(0))
-                .placeholder(R.drawable.home).error(R.drawable.home)
-                .into(imgRoomMain);
+        adapterSlider.renewItems(sliderItems);
     }
 
 

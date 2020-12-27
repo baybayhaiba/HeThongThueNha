@@ -18,6 +18,7 @@ import com.example.hethongthuenha.MainActivity.Fragment.Chat.fragment_list_chat;
 import com.example.hethongthuenha.MainActivity.Fragment.MainRoom.fragment_main_room;
 import com.example.hethongthuenha.MainActivity.Fragment.Notification.fragment_notification;
 import com.example.hethongthuenha.MainActivity.Fragment.Requiment.fragment_requiment;
+import com.example.hethongthuenha.Model.Person;
 import com.example.hethongthuenha.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -50,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void SetBottomNavigation() {
         //neu khongg phai la admin
-        if (PersonAPI.getInstance().getType_person() == 1)
+        if (PersonAPI.getInstance().getType_person() != Person.ADMIN)
             bottomNavigationView.getMenu().removeItem(R.id.mnAdmin);
     }
 

@@ -9,68 +9,41 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/gradient_bg"
+        android:background="#CBEC8787"
         android:orientation="vertical"
         android:padding="16sp">
 
-        <ImageView
-            android:id="@+id/img_room_main_detail"
+        <androidx.cardview.widget.CardView
+            app:cardCornerRadius="6dp"
             android:layout_width="match_parent"
-            android:layout_height="300sp"
-            android:scaleType="fitXY"
-            android:src="@drawable/home" />
+            android:layout_height="wrap_content">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10sp"
-            android:orientation="horizontal">
+            <com.smarteist.autoimageslider.SliderView
+                android:id="@+id/imageSlider"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                app:sliderAnimationDuration="600"
+                app:sliderAutoCycleDirection="back_and_forth"
+                app:sliderAutoCycleEnabled="true"
+                app:sliderIndicatorAnimationDuration="600"
+                app:sliderIndicatorGravity="center_horizontal|bottom"
+                app:sliderIndicatorMargin="15dp"
+                app:sliderIndicatorOrientation="horizontal"
+                app:sliderIndicatorPadding="3dp"
+                app:sliderIndicatorRadius="2dp"
+                app:sliderIndicatorSelectedColor="#5A5A5A"
+                app:sliderIndicatorUnselectedColor="#FFF"
+                app:sliderScrollTimeInSec="1"
+                app:sliderStartAutoCycle="true" />
 
-            <ImageView
-                android:id="@+id/img_room1_detail"
-                android:layout_width="0dp"
-                android:layout_height="50sp"
-                android:layout_marginLeft="10sp"
-                android:layout_marginRight="10sp"
-                android:layout_weight="1"
-                android:scaleType="fitXY"
-                android:src="@drawable/home" />
-
-            <ImageView
-                android:id="@+id/img_room2_detail"
-                android:layout_width="0dp"
-                android:layout_height="50sp"
-                android:layout_marginLeft="10sp"
-                android:layout_marginRight="10sp"
-                android:layout_weight="1"
-                android:src="@drawable/home" />
-
-            <ImageView
-                android:id="@+id/img_room3_detail"
-                android:layout_width="0dp"
-                android:layout_height="50sp"
-                android:layout_marginLeft="10sp"
-                android:layout_marginRight="10sp"
-                android:layout_weight="1"
-                android:src="@drawable/home" />
-
-            <ImageView
-                android:id="@+id/img_room4_detail"
-                android:layout_width="0dp"
-                android:layout_height="50sp"
-                android:layout_marginLeft="10sp"
-                android:layout_marginRight="10sp"
-                android:layout_weight="1"
-                android:src="@drawable/home" />
-        </LinearLayout>
+        </androidx.cardview.widget.CardView>
 
         <TextView
             android:id="@+id/tv_title_detail_room"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20sp"
-            android:background="@color/white"
-            android:fontFamily="@font/alice"
+            android:background="@drawable/border_detail_room"
             android:padding="16sp"
             android:text="Nha thoang mat sach se"
             android:textColor="@color/black"
@@ -81,8 +54,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20sp"
-            android:background="@color/white"
-            android:fontFamily="@font/alice"
+            android:background="@drawable/border_detail_room"
             android:padding="16sp"
             android:text="Nha thoang mat sach se"
             android:textColor="@color/black"
@@ -92,7 +64,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20sp"
-            android:background="@color/white"
+            android:background="@drawable/border_detail_room"
             android:orientation="horizontal"
             android:padding="16sp">
 
@@ -118,7 +90,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20sp"
-            android:background="@color/white"
+            android:background="@drawable/border_detail_room"
             android:orientation="horizontal"
             android:padding="16sp">
 
@@ -145,8 +117,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20sp"
-            android:background="@color/white"
-            android:fontFamily="@font/alice"
+            android:background="@drawable/border_detail_room"
             android:padding="16sp"
             android:text="Nha thoang mat sach se"
             android:textColor="@color/black"
@@ -157,8 +128,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20sp"
-            android:background="@color/white"
-            android:fontFamily="@font/alice"
+            android:background="@drawable/border_detail_room"
             android:padding="16sp"
             android:text="Số lượng:12/15"
             android:textColor="@color/black"
@@ -169,7 +139,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20sp"
-            android:fontFamily="@font/belleza"
             android:text="Tiện ích chung"
             android:textColor="@color/white"
             android:textSize="20sp"
@@ -209,7 +178,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20sp"
-            android:fontFamily="@font/belleza"
             android:text="Sinh hoạt"
             android:textColor="@color/white"
             android:textSize="20sp"
@@ -261,7 +229,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="15sp"
-                        android:fontFamily="@font/bubbler_one"
                         android:text="Pham Thanh Huy"
                         android:textColor="@color/black"
                         android:textSize="20sp"
