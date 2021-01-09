@@ -69,9 +69,9 @@ public class PayRecyclerView extends RecyclerView.Adapter<PayRecyclerView.MyView
                                 .into(holder.imgAvatar);
 
                     holder.tvName.setText(person.getFullName());
-                    holder.cardView.setOnClickListener(c->{
-                        Intent intent=new Intent(context, ActivityPerson.class);
-                        intent.putExtra("id_person",person.getUid());
+                    holder.cardView.setOnClickListener(c -> {
+                        Intent intent = new Intent(context, ActivityPerson.class);
+                        intent.putExtra("id_person", person.getUid());
                         context.startActivity(intent);
                     });
                 }
@@ -85,7 +85,7 @@ public class PayRecyclerView extends RecyclerView.Adapter<PayRecyclerView.MyView
                 if (documentSnapshot.exists()) {
                     Commission commissionUpdate = documentSnapshot.toObject(Commission.class);
 
-                    if (commissionUpdate.getTotalDay() < commission.getTotalDay()){
+                    if (commissionUpdate.getTotalDay() < commission.getTotalDay()) {
                         commissionUpdate.setTotalDay(commission.getTotalDay());
                         commissionUpdate.setPrice(commission.getPrice());
                     }
@@ -95,6 +95,9 @@ public class PayRecyclerView extends RecyclerView.Adapter<PayRecyclerView.MyView
                         commissionUpdate.setLastPaid(commission.getLastPaid());
                     }
 
+                    if(commissionUpdate.getTotalDay()==0){
+                        holder.tvLastPaid.setVisibility(View.GONE);
+                    }
                     db.collection("Commission").document(commission.getId_person())
                             .set(commissionUpdate);
 

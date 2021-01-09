@@ -118,8 +118,6 @@ public class ChatRecyclerView extends RecyclerView.Adapter<ChatRecyclerView.MyVi
                     .into(holder.imgChat);
 
 
-            DocumentReference ref = db.collection("BookRoom").document();
-            Timestamp timestamp = new Timestamp(new Date());
             db.collection("Room").get()
                     .addOnCompleteListener(v -> {
                         if (v.isSuccessful()) {
@@ -133,42 +131,11 @@ public class ChatRecyclerView extends RecyclerView.Adapter<ChatRecyclerView.MyVi
 
 
                                         holder.cvChat.setOnClickListener(z -> {
-                                            Intent intent = new Intent(context, ActivityRoomDetail.class);
-                                            intent.putExtra("room", room);
-                                            context.startActivity(intent);
+                                            moveToRoomDetail(room);
                                         });
 
                                         holder.imgAgree.setOnClickListener(c -> {
-                                            db.collection("User").whereEqualTo("email", chat.getFrom_email_person())
-                                                    .get().addOnCompleteListener(task -> {
-                                                if (task.isSuccessful()) {
-                                                    for (QueryDocumentSnapshot users : task.getResult()) {
-                                                        Person person = users.toObject(Person.class);
-
-                                                        db.collection("BookRoom").whereEqualTo("id_person", person.getUid())
-                                                                .whereEqualTo("id_room", room.getRoom_id())
-                                                                .get().addOnSuccessListener(queryDocumentSnapshots -> {
-                                                            if (queryDocumentSnapshots.isEmpty()) {
-                                                                BookRoom bookRoom = new BookRoom(ref.getId(),
-                                                                        person.getUid(), room.getRoom_id(), "Trả sau", timestamp, false, 0);
-
-                                                                db.collection("BookRoom").add(bookRoom);
-
-                                                                Notification notification = new Notification(room.getPerson_id(),
-                                                                        person.getUid(), "Trả sau thành công tại phòng " + room.getStage1().getTitle(), 2, timestamp);
-
-                                                                db.collection("Notification").add(notification).addOnCompleteListener(x -> {
-                                                                    Toast.makeText(context, "Bạn đã đưa vào danh sách xem sau  ", Toast.LENGTH_SHORT).show();
-                                                                });
-                                                            } else {
-                                                                Toast.makeText(context, "Người này đã được đưa vào rồi ", Toast.LENGTH_SHORT).show();
-                                                            }
-                                                        });
-
-
-                                                    }
-                                                }
-                                            });
+                                            handleChooseAgree(room,chat);
                                         });
                                     }
                             }
@@ -186,6 +153,45 @@ public class ChatRecyclerView extends RecyclerView.Adapter<ChatRecyclerView.MyVi
         }
 
 
+    }
+
+    public void moveToRoomDetail(Room room) {
+        Intent intent = new Intent(context, ActivityRoomDetail.class);
+        intent.putExtra("room", room);
+        context.startActivity(intent);
+    }
+
+    public void handleChooseAgree(Room room,Chat chat) {
+        DocumentReference ref = db.collection("BookRoom").document();
+        Timestamp timestamp = new Timestamp(new Date());
+        db.collection("User").whereEqualTo("email", chat.getFrom_email_person())
+                .get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                for (QueryDocumentSnapshot users : task.getResult()) {
+                    Person person = users.toObject(Person.class);
+
+                    db.collection("BookRoom").whereEqualTo("id_person", person.getUid())
+                            .whereEqualTo("id_room", room.getRoom_id())
+                            .get().addOnSuccessListener(queryDocumentSnapshots -> {
+                        if (queryDocumentSnapshots.isEmpty()) {
+                            BookRoom bookRoom = new BookRoom(ref.getId(),
+                                    person.getUid(), room.getRoom_id(), "Trả sau", timestamp, false, 0);
+
+                            db.collection("BookRoom").add(bookRoom);
+
+                            Notification notification = new Notification(room.getPerson_id(),
+                                    person.getUid(), "Trả sau thành công tại phòng " + room.getStage1().getTitle(), 2, timestamp);
+
+                            db.collection("Notification").add(notification).addOnCompleteListener(x -> {
+                                Toast.makeText(context, "Bạn đã đưa vào danh sách xem sau  ", Toast.LENGTH_SHORT).show();
+                            });
+                        } else {
+                            Toast.makeText(context, "Người này đã được đưa vào rồi ", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+            }
+        });
     }
 
     @Override

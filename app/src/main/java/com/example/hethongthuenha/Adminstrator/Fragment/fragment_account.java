@@ -1,8 +1,10 @@
 package com.example.hethongthuenha.Adminstrator.Fragment;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.os.Bundle;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -14,8 +16,11 @@ import android.view.ViewGroup;
 import com.example.hethongthuenha.Adapter.AccountRecyclerView;
 import com.example.hethongthuenha.Model.Person;
 import com.example.hethongthuenha.R;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,19 +57,23 @@ public class fragment_account extends Fragment {
 
 
         db.collection("User").whereEqualTo("type_person", 1)
-                .get().addOnCompleteListener(v -> {
-            if (v.isSuccessful()) {
-                for (QueryDocumentSnapshot value : v.getResult()) {
-                    Person person = value.toObject(Person.class);
-                    persons.add(person);
-                }
-                if (v.isComplete()){
-                    adapter.notifyDataSetChanged();
-                    progressDialog.dismiss();
-                }
-            }
-        });
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                        if(error==null){
+                            persons.clear();
+                            for (QueryDocumentSnapshot v:value){
+                                Person person = v.toObject(Person.class);
+                                persons.add(person);
+                            }
+                            adapter.notifyDataSetChanged();
+                            progressDialog.dismiss();
+                        }
+                    }
+                });
+
 
         return view;
     }
+
 }

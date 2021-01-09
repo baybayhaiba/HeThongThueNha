@@ -144,16 +144,11 @@ public class fragment_pay extends Fragment {
                                 calNow.setTime(new Date());
                                 Calendar calBookRoom = Calendar.getInstance();
                                 calBookRoom.setTime(bookRoom.getBookRoomAdded().toDate());
-                                int dayWhenAccepted = 0;
-                                for (int i = calBookRoom.get(Calendar.YEAR); i < calNow.get(Calendar.YEAR); i++) {
-                                    dayWhenAccepted += 365;
-                                }
+                                int dayWhenAccepted;
 
-                                if (dayWhenAccepted >= 365) {
-                                    dayWhenAccepted += calBookRoom.get(Calendar.DAY_OF_YEAR);
-                                }else{
-                                    dayWhenAccepted = calNow.get(Calendar.DAY_OF_YEAR) - calBookRoom.get(Calendar.DAY_OF_YEAR);
-                                }
+                                long diff = calNow.getTime().getTime()-calBookRoom.getTime().getTime();
+
+                                dayWhenAccepted = (int) (diff / (1000 * 60 * 60 * 24));
                                 totalDay += dayWhenAccepted;
 
                                 price += ((room.getStage1().getPrice() * scale_commission) / 100 * dayWhenAccepted) / 30;
@@ -171,6 +166,5 @@ public class fragment_pay extends Fragment {
 
         });
     }
-
 
 }

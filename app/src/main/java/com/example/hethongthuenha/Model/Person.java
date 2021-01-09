@@ -14,6 +14,9 @@ public class Person {
     public static int NORMAL=1;
     public static int ADMIN=2;
 
+
+
+
     public Person() {
     }
 

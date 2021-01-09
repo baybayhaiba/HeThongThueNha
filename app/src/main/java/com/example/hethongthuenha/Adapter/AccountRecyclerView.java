@@ -1,10 +1,14 @@
 package com.example.hethongthuenha.Adapter;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -15,8 +19,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hethongthuenha.Model.Person;
 import com.example.hethongthuenha.R;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -34,8 +42,8 @@ public class AccountRecyclerView extends RecyclerView.Adapter<AccountRecyclerVie
 
     public static class MyViewHolder extends RecyclerView.ViewHolder {
         private ImageView imgAccount;
-        private TextView tvName, tvEmail;
-        private Spinner spLock;
+        private TextView tvName, tvEmail, tvState;
+        private ImageButton imgStateAccount;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -43,7 +51,8 @@ public class AccountRecyclerView extends RecyclerView.Adapter<AccountRecyclerVie
             imgAccount = itemView.findViewById(R.id.img_custom_account);
             tvName = itemView.findViewById(R.id.tv_custom_account_name);
             tvEmail = itemView.findViewById(R.id.tv_custom_account_email);
-            spLock = itemView.findViewById(R.id.sp_type_account);
+            tvState = itemView.findViewById(R.id.tv_custom_account_state);
+            imgStateAccount = itemView.findViewById(R.id.img_custom_setting_state);
         }
     }
 
@@ -64,41 +73,65 @@ public class AccountRecyclerView extends RecyclerView.Adapter<AccountRecyclerVie
         if (!person.getUrl().equals(""))
             Picasso.with(context)
                     .load(person.getUrl())
-                    .placeholder(R.drawable.border_person_room)
+                    .error(R.drawable.person_image_infomation)
+                    .placeholder(R.drawable.person_image_infomation)
                     .into(holder.imgAccount);
         else
             holder.imgAccount.setImageResource(R.drawable.ic_baseline_person_24);
 
-        if (person.isLocked())
-            holder.spLock.setSelection(1);
-        else
-            holder.spLock.setSelection(0);
-
-        holder.spLock.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                db.collection("User").whereEqualTo("uid", person.getUid())
-                        .addSnapshotListener((value, error) -> {
-                            int item = holder.spLock.getSelectedItemPosition();
-                            if (error == null) {
-                                for (QueryDocumentSnapshot v : value) {
-                                    Person person1 = v.toObject(Person.class);
-                                    person1.setLocked(item != 0);
-
-                                    db.collection("User").document(v.getId())
-                                            .set(person1).addOnSuccessListener(aVoid -> {
-                                        Toast.makeText(context, "Thiết lập thành công", Toast.LENGTH_SHORT).show();
-                                    });
-                                }
-                            }
-                        });
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
+        holder.tvState.setText(person.isLocked() ? "Đã khóa" : "Không khóa");
+        holder.imgStateAccount.setOnClickListener(v -> {
+            showSettingStateAccount(person);
         });
+    }
+
+    private void setAccountToFirebase(Person person, boolean lock) {
+
+        db.collection("User").whereEqualTo("uid", person.getUid())
+                .get().addOnCompleteListener(task -> {
+                    for (QueryDocumentSnapshot v : task.getResult()) {
+                        Person person1 = v.toObject(Person.class);
+                        person1.setLocked(lock);
+
+                        if(task.isComplete()){
+                            db.collection("User").document(v.getId())
+                                    .set(person1).addOnSuccessListener(aVoid -> {
+                                Toast.makeText(context, "Thiết lập thành công", Toast.LENGTH_SHORT).show();
+                            });
+                        }
+                    }
+
+                });
+    }
+
+    private void showSettingStateAccount(Person person) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View viewLayout = inflater.inflate(R.layout.layout_select_account, null);
+        builder.setView(viewLayout);
+
+        TextView tvEmail = viewLayout.findViewById(R.id.layout_account_email);
+        Button btnLock = viewLayout.findViewById(R.id.layout_btn_lock);
+        Button btnUnlock = viewLayout.findViewById(R.id.layout_btn_unlock);
+
+        final AlertDialog show = builder.show();
+
+        tvEmail.setText(person.getEmail());
+        if (person.isLocked()) {
+            btnLock.setBackgroundColor(R.drawable.border_selected_account);
+        } else {
+            btnUnlock.setBackgroundColor(R.drawable.border_selected_account);
+        }
+
+        btnUnlock.setOnClickListener(v -> {
+            setAccountToFirebase(person, false);
+            show.dismiss();
+        });
+        btnLock.setOnClickListener(v -> {
+            setAccountToFirebase(person, true);
+            show.dismiss();
+        });
+
     }
 
     @Override

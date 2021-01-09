@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
@@ -80,12 +81,12 @@ public class NotficationRecyclerView extends RecyclerView.Adapter<NotficationRec
 
                     holder.cvNotfication.setOnClickListener(v -> {
 
-                        if (notification.getType_notification() == 1) {
+                        if (notification.getType_notification() == Notification.CHAT) {
                             Intent intent = new Intent(context, ActivityChat.class);
                             intent.putExtra("toEmail", person.getEmail());
                             intent.putExtra("toName", person.getFullName());
                             context.startActivity(intent);
-                        } else {
+                        } else if(notification.getType_notification() == Notification.ROOM) {
                             Intent intent = new Intent(context, ActivityPerson.class);
                             intent.putExtra("id_person", notification.getId_person_provide());
                             context.startActivity(intent);
