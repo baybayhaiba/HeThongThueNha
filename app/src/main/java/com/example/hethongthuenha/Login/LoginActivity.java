@@ -63,7 +63,7 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Vi
 
     @Override
     public void loginSuccess() {
-        progressDialog.dismiss();
+        progressDialog.dismiss();finish();
     }
 
     public static void isUnlocked(Context context){

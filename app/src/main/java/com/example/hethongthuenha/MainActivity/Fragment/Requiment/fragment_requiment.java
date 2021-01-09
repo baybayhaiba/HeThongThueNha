@@ -2,37 +2,45 @@ package com.example.hethongthuenha.MainActivity.Fragment.Requiment;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.text.format.DateUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.hethongthuenha.API.PersonAPI;
 import com.example.hethongthuenha.ActivityChat;
+import com.example.hethongthuenha.ActivityRoomDetail;
 import com.example.hethongthuenha.Adapter.RequimentRecyclerView;
+import com.example.hethongthuenha.Adapter.RoomRequirementRecyclerView;
 import com.example.hethongthuenha.Model.Person;
 import com.example.hethongthuenha.Model.Requirement;
+import com.example.hethongthuenha.Model.Room;
 import com.example.hethongthuenha.R;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -47,10 +55,13 @@ public class fragment_requiment extends Fragment {
     private TextView tvRequirementAdded, tvDescription;
     private ProgressDialog progressDialog;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private DocumentReference ref = db.collection("Requirement").document();
+    private DocumentReference refRequirement = db.collection("Requirement").document();
+    private Query refRoom = db.collection("Room").
+            whereEqualTo("person_id", PersonAPI.getInstance().getUid());
     private RequimentRecyclerView adapter;
     private RecyclerView recyclerView;
     private List<Requirement> requirements;
+    private List<Room> rooms;
     NumberFormat formatter;
 
     public fragment_requiment() {
@@ -96,6 +107,7 @@ public class fragment_requiment extends Fragment {
         recyclerView = view.findViewById(R.id.requimentRecyclerview);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         requirements = new ArrayList<>();
+        rooms = new ArrayList<>();
         adapter = new RequimentRecyclerView(getActivity(), requirements);
         adapter.setListenerEdit(requirement ->
                 SelectUserChoose(requirement));
@@ -136,37 +148,65 @@ public class fragment_requiment extends Fragment {
         tvRequirementAdded.setText(timeAgo);
         tvDescription.setText(requirement.getDescription());
 
-
-        String description = "Hiện tại bên mình có " + requirement.getType_room() + " ở " + requirement.getAddress()
-                + " với giá " + formatter.format(requirement.getPrice());
-
-        //edDescription.setText("HAHAHHA TEST !!!");
-
         final AlertDialog show = builder.show();
 
         btnCancel.setOnClickListener(v -> {
             show.dismiss();
         });
         btnContact.setOnClickListener(v -> {
-            if (!requirement.getId_person().equals(PersonAPI.getInstance().getUid())) {
-                db.collection("User").whereEqualTo("uid", requirement.getId_person())
-                        .get().addOnCompleteListener(value -> {
-                    if (value.isSuccessful()) {
-                        for (QueryDocumentSnapshot persons : value.getResult()) {
-                            Person person = persons.toObject(Person.class);
+            ShowDialogSelectRoom(requirement);
+            show.dismiss();
+        });
+    }
+
+    private void ShowDialogSelectRoom(Requirement requirement) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        View viewLayout = getLayoutInflater().inflate(R.layout.layout_room_requiment, null);
+        builder.setView(viewLayout);
+        RecyclerView recyclerViewRoomRequirement = viewLayout.findViewById(R.id.recyclerViewRoomRequirement);
+        ProgressBar progressDialogRoomRequirement = viewLayout.findViewById(R.id.progressBarRoomRequirement);
+        Button btnBack = viewLayout.findViewById(R.id.btn_turn_off_room_requirement);
+        recyclerViewRoomRequirement.setLayoutManager(new LinearLayoutManager(getActivity()));
+        RoomRequirementRecyclerView adapter = new RoomRequirementRecyclerView(getActivity(), rooms);
+        adapter.setListener(room ->{
+            db.collection("User").whereEqualTo("uid", requirement.getId_person())
+                    .get().addOnCompleteListener(value -> {
+                if (value.isSuccessful()) {
+                    for (QueryDocumentSnapshot persons : value.getResult()) {
+                        Person person = persons.toObject(Person.class);
+                        if(!requirement.getId_person().equals(PersonAPI.getInstance().getUid())){
                             Intent intent = new Intent(getActivity(), ActivityChat.class);
                             intent.putExtra("toId", person.getUid());
                             intent.putExtra("toEmail", person.getEmail());
                             intent.putExtra("toName", person.getFullName());
-                            intent.putExtra("description", description);
+                            intent.putExtra("description_room", "Tôi có thể đáp ứng cho bạn " + room.getStage1().getTitle());
+                            intent.putExtra("url", room.getStage3().getImagesURL().get(0));
                             startActivity(intent);
                         }
                     }
-                });
-            } else
-                Toast.makeText(getActivity(), "Không thể liên lạc với chính mình", Toast.LENGTH_SHORT).show();
+                }
+            });
+        });
+        recyclerViewRoomRequirement.setAdapter(adapter);
+        final AlertDialog show = builder.show();
 
+        btnBack.setOnClickListener(v -> {
             show.dismiss();
+        });
+
+        refRoom.get().addOnCompleteListener(task -> {
+            if (rooms.isEmpty()) {
+                for (QueryDocumentSnapshot value : task.getResult()) {
+                    rooms.add(value.toObject(Room.class));
+                }
+                if (task.isComplete()) {
+                    adapter.notifyDataSetChanged();
+                    progressDialogRoomRequirement.setVisibility(View.GONE);
+                }
+
+            } else {
+                progressDialogRoomRequirement.setVisibility(View.GONE);
+            }
         });
     }
 
@@ -200,13 +240,14 @@ public class fragment_requiment extends Fragment {
             db.collection("Requirement").whereEqualTo("id", requirement.getId())
                     .get().addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
-                    for (QueryDocumentSnapshot value : task.getResult()) {
-                        db.collection("Requirement").document(value.getId())
-                                .set(requirement).addOnCompleteListener(x -> {
-                            Toast.makeText(getActivity(), "Sửa thành công", Toast.LENGTH_SHORT).show();
-                            progressDialog.dismiss();
-                        });
-                    }
+                    if (rooms.isEmpty())
+                        for (QueryDocumentSnapshot value : task.getResult()) {
+                            db.collection("Requirement").document(value.getId())
+                                    .set(requirement).addOnCompleteListener(x -> {
+                                Toast.makeText(getActivity(), "Sửa thành công", Toast.LENGTH_SHORT).show();
+                                progressDialog.dismiss();
+                            });
+                        }
                 }
             });
             show.dismiss();
@@ -289,7 +330,7 @@ public class fragment_requiment extends Fragment {
             String description = edDescription.getText().toString();
             String type_room = spTypeRoom.getSelectedItem().toString();
             String uid = PersonAPI.getInstance().getUid();
-            String id = ref.getId();
+            String id = refRequirement.getId();
             Timestamp requirementAdded = new Timestamp(new Date());
 
             Requirement requirement = new Requirement(uid, id, price, description, address, type_room, requirementAdded);

@@ -88,10 +88,10 @@ public class ChatRecyclerView extends RecyclerView.Adapter<ChatRecyclerView.MyVi
 
 
         if (!fromUser.equals(fromUserChat)) {
-            holder.linearChat.setGravity(Gravity.LEFT);
+            holder.linearChat.setGravity(Gravity.START);
             holder.tvChat.setBackgroundResource(R.drawable.border_chat_left);
         } else {
-            holder.linearChat.setGravity(Gravity.RIGHT);
+            holder.linearChat.setGravity(Gravity.END);
             holder.tvChat.setBackgroundResource(R.drawable.border_chat_right);
         }
 
@@ -129,6 +129,9 @@ public class ChatRecyclerView extends RecyclerView.Adapter<ChatRecyclerView.MyVi
                                         holder.tvPrice.setText("Giá:" + formatter.format(room.getStage1().getPrice()));
                                         holder.tvTypeRoom.setText(room.getStage1().getType_room());
 
+                                        //neu day chi la gioi thieu phong
+                                        if(chat.getText().equals("Tôi có thể đáp ứng cho bạn " + room.getStage1().getTitle()))
+                                            holder.imgAgree.setVisibility(View.GONE);
 
                                         holder.cvChat.setOnClickListener(z -> {
                                             moveToRoomDetail(room);

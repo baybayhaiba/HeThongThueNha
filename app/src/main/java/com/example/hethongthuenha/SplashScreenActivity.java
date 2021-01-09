@@ -85,16 +85,8 @@ public class SplashScreenActivity extends AppCompatActivity {
                                 }
 
                                 //Set Lock Account
-                                if (person.isLocked()){
-                                    try {
-                                        LoginActivity.isUnlocked(this);
-                                    }catch (Exception e){}
-                                }
-
-                                else {
-                                    startActivity(new Intent(SplashScreenActivity.this, MainActivity.class));
-                                    finish();
-                                }
+                                startActivity(new Intent(SplashScreenActivity.this, MainActivity.class));
+                                finish();
                             });
 
                         }

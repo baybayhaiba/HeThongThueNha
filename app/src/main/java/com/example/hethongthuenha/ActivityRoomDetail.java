@@ -465,13 +465,18 @@ ActivityRoomDetail extends AppCompatActivity {
             if (value.isSuccessful()) {
                 for (QueryDocumentSnapshot persons : value.getResult()) {
                     Person person = persons.toObject(Person.class);
-                    Intent intent = new Intent(ActivityRoomDetail.this, ActivityChat.class);
-                    intent.putExtra("toId", person.getUid());
-                    intent.putExtra("toEmail", person.getEmail());
-                    intent.putExtra("toName", person.getFullName());
-                    intent.putExtra("description_room", "Tôi muốn thuê căn nhà " + room.getStage1().getTitle());
-                    intent.putExtra("url", room.getStage3().getImagesURL().get(0));
-                    startActivity(intent);
+                    if(!room.getPerson_id().equals(PersonAPI.getInstance().getUid())){
+                        Intent intent = new Intent(ActivityRoomDetail.this, ActivityChat.class);
+                        intent.putExtra("toId", person.getUid());
+                        intent.putExtra("toEmail", person.getEmail());
+                        intent.putExtra("toName", person.getFullName());
+                        intent.putExtra("description_room", "Tôi muốn thuê căn nhà " + room.getStage1().getTitle());
+                        intent.putExtra("url", room.getStage3().getImagesURL().get(0));
+                        startActivity(intent);
+                    }else{
+                        Toast.makeText(this, "Không thể đặt phòng của chính mình !", Toast.LENGTH_SHORT).show();
+                    }
+
                 }
             }
         });

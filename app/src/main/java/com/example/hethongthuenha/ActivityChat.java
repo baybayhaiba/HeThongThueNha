@@ -1,5 +1,6 @@
 package com.example.hethongthuenha;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -12,6 +13,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.hethongthuenha.API.PersonAPI;
 import com.example.hethongthuenha.Adapter.ChatRecyclerView;
@@ -19,13 +21,16 @@ import com.example.hethongthuenha.Model.Chat;
 import com.example.hethongthuenha.Model.HistoryChat;
 import com.example.hethongthuenha.Model.Notification;
 import com.example.hethongthuenha.Model.Person;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayDeque;
@@ -118,49 +123,15 @@ public class ActivityChat extends AppCompatActivity {
         });
     }
 
-
-    //I dont wanna see >.<
-//    private void GetInformRequirement() {
-//
-//        String description = getIntent().getStringExtra("description");
-//        if (description != null) {
-//            //add last chat
-//            FindPath(path -> {
-//                refChat = db.collection(path);
-//                refChat.orderBy("id_chat").limitToLast(10).get()
-//                        .addOnCompleteListener(task -> {
-//                            List<Chat> chats1 = new ArrayList<>();
-//                            if (task.isSuccessful()) {
-//                                for (QueryDocumentSnapshot query : task.getResult())
-//                                    chats1.add(query.toObject(Chat.class));
-//                                if (task.isComplete()) {
-//                                    if (description != null)
-//                                        SendChat(chats1, description, "");
-//                                }
-//                            }
-//                        });
-//            });
-//            //add notification
-//            String uid = getIntent().getStringExtra("toId");
-//            Timestamp notificationAdded = new Timestamp(new Date());
-//            Notification notification = new Notification(PersonAPI.getInstance().getUid(), uid, description, 1, notificationAdded);
-//
-//            refNotification.add(notification);
-//
-//        }
-//
-//
-//        //add notification
-//    }
-
     private void GetInFormRoomDetail() {
         //add last chat
         FindPath(path -> {
+
+
             String description = getIntent().getStringExtra("description_room");
             String url = getIntent().getStringExtra("url");
             if (description != null) {
                 SendChat(HandleChat(description, url));
-
                 String uid = getIntent().getStringExtra("toId");
                 Timestamp notificationAdded = new Timestamp(new Date());
                 Notification notification = new Notification(PersonAPI.getInstance().getUid(), uid, description, 1, notificationAdded);
@@ -221,7 +192,6 @@ public class ActivityChat extends AppCompatActivity {
 
     private void SendChat(Chat chat) {
         if (chat != null) {
-
             historyChat.setPathChat(refChat.getPath());
             historyChat.setFromATo(tvNamePerson.getText().toString() + "-" + PersonAPI.getInstance().getName());
             if (chats.isEmpty()) {
