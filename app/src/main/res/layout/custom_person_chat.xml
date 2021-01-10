@@ -6,7 +6,7 @@
     app:contentPadding="16sp"
     android:id="@+id/cv_custom_person_chat"
     app:cardUseCompatPadding="true"
-    android:backgroundTint="@color/endGColor"
+    android:backgroundTint="@color/yellow_100"
     android:layout_height="wrap_content">
 
     <LinearLayout
@@ -17,7 +17,7 @@
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/img_custom_person_chat"
             android:layout_width="80sp"
-            android:layout_height="80sp"
+            android:layout_height="100sp"
             android:src="@drawable/ic_baseline_person_24"/>
         <LinearLayout
             android:layout_width="match_parent"
@@ -42,12 +42,21 @@
                 android:id="@+id/tv_custom_last_chat"
                 android:layout_marginBottom="15sp"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
+                android:layout_height="10sp"
                 android:lines="1"
                 android:layout_weight="1"
                 android:gravity="bottom"
                 android:text="Toi muon thue nha"/>
 
+            <TextView
+                android:id="@+id/tv_custom_time_last_chat"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="bottom"
+                android:textSize="10sp"
+                android:fontFamily="@font/alice"
+                android:text="12/09/2020 18:23"/>
 
         </LinearLayout>
 

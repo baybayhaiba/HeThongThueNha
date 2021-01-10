@@ -14,6 +14,7 @@ import android.widget.Toast;
 import com.example.hethongthuenha.API.PersonAPI;
 import com.example.hethongthuenha.ActivitySettingPerson;
 import com.example.hethongthuenha.Adminstrator.ActivityAdmintrators;
+import com.example.hethongthuenha.Login.LoginActivity;
 import com.example.hethongthuenha.MainActivity.Fragment.Chat.fragment_list_chat;
 import com.example.hethongthuenha.MainActivity.Fragment.MainRoom.fragment_main_room;
 import com.example.hethongthuenha.MainActivity.Fragment.Notification.fragment_notification;
@@ -37,8 +38,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Init();
-
-
         Event();
     }
 
@@ -66,8 +65,6 @@ public class MainActivity extends AppCompatActivity {
             setFragment(v.getItemId());
             return true;
         });
-
-
     }
 
 
@@ -118,4 +115,11 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (PersonAPI.getInstance() != null && PersonAPI.getInstance().isLocked()) {
+            LoginActivity.locked(this);
+        }
+    }
 }

@@ -1,16 +1,27 @@
 package com.example.hethongthuenha;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,22 +39,30 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Queue;
+import java.util.UUID;
 
 public class ActivityChat extends AppCompatActivity {
 
     private RecyclerView recyclerView;
     private EditText edText;
-    private Button btnSend;
+    private ImageButton btnSend;
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private String fromEmail;
     private String toEmail;
@@ -52,11 +71,24 @@ public class ActivityChat extends AppCompatActivity {
     private ChatRecyclerView adapter;
     private TextView tvNamePerson;
     private List<Chat> path;
-    private ImageView imgAvatar, imgBack;
+    private ImageView imgAvatar, imgBack, chooseImage;
     private HistoryChat historyChat;
     private final CollectionReference refHistoryChat = db.collection("History-chat");
     private final CollectionReference refNotification = db.collection("Notification");
+    private String description, url;
+    private Uri selectedImage;
+    private StorageReference mStorageRef;
+    private final int PICK_IMAGE_CAMERA = 1, PICK_IMAGE_GALLERY = 2;
 
+    public interface OnGetDataListener {
+        void onSuccess(QuerySnapshot dataSnapshotValue);
+
+        void onStart(String path);
+
+        void onComplete();
+
+        void onFailure(String error);
+    }
 
     public interface FireStoreCallBack {
         void onCallBack(String path);
@@ -74,6 +106,7 @@ public class ActivityChat extends AppCompatActivity {
 
     }
 
+
     private void Init() {
         chats = new ArrayList<>();
         recyclerView = findViewById(R.id.chatRecyclerView);
@@ -86,16 +119,118 @@ public class ActivityChat extends AppCompatActivity {
         imgBack = findViewById(R.id.imgBackChat);
         historyChat = new HistoryChat();
         imgAvatar = findViewById(R.id.imgPersonChat);
+        chooseImage = findViewById(R.id.imgChoosePicture);
+        mStorageRef = FirebaseStorage.getInstance().getReference();
+
         tvNamePerson.setText(getIntent().getStringExtra("toName"));
         imgBack.setOnClickListener(v -> {
             onBackPressed();
         });
-        GetPath();
         LoadInformPerson();
-        GetInFormRoomDetail();
         btnSend.setOnClickListener(v -> {
             SendChat(HandleChat(edText.getText().toString(), ""));
         });
+        chooseImage.setOnClickListener(v -> {
+            showDialogChooseImage();
+        });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        description = getIntent().getStringExtra("description_room");
+        url = getIntent().getStringExtra("url");
+
+        readData(new OnGetDataListener() {
+            @Override
+            public void onSuccess(QuerySnapshot dataSnapshotValue) {
+                chats.clear();
+                for (QueryDocumentSnapshot value : dataSnapshotValue) {
+                    chats.add(value.toObject(Chat.class));
+                }
+            }
+
+            @Override
+            public void onStart(String path) {
+                refChat = db.collection(path);
+            }
+
+
+            @Override
+            public void onComplete() {
+                adapter.notifyDataSetChanged();
+                recyclerView.scrollToPosition(chats.size() - 1);
+                GetInFormRoomDetail();
+            }
+
+            @Override
+            public void onFailure(String error) {
+                Log.d("error", "onFailure: " + error);
+            }
+        });
+    }
+
+    private void showDialogChooseImage() {
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
+        View viewLayout = getLayoutInflater().inflate(R.layout.layout_choose_image, null);
+        builder.setView(viewLayout);
+
+        Button benGallery = viewLayout.findViewById(R.id.layout_choose_gallary);
+        Button btnCamera = viewLayout.findViewById(R.id.layout_choose_camera);
+
+        final AlertDialog show = builder.show();
+        benGallery.setOnClickListener(v -> {
+            Intent pickPhoto = new Intent(Intent.ACTION_PICK,
+                    android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            startActivityForResult(pickPhoto, PICK_IMAGE_GALLERY);
+
+            show.dismiss();
+        });
+
+        btnCamera.setOnClickListener(v -> {
+            Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            startActivityForResult(takePicture, PICK_IMAGE_CAMERA);
+            show.dismiss();
+        });
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PICK_IMAGE_GALLERY && resultCode == RESULT_OK && data != null) {
+            selectedImage = data.getData();
+            UpdateImageToFirebase(selectedImage);
+        } else if (requestCode == PICK_IMAGE_CAMERA && resultCode == RESULT_OK && data != null) {
+            Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
+            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+            thumbnail.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
+            UpdateImageBitmapToFirebase(bytes.toByteArray());
+        }
+    }
+
+
+    private void UpdateImageBitmapToFirebase(byte[] image) {
+        String path = "Chat/" + refChat.getPath() + "/" + UUID.randomUUID();
+        mStorageRef.child(path)
+                .putBytes(image)
+                .addOnSuccessListener(taskSnapshot -> mStorageRef.child(path).getDownloadUrl().
+                        addOnSuccessListener(url -> {
+                            SendChat(HandleChat("", url.toString()));
+                        })).
+                addOnFailureListener(e -> Log.d("SIMPLE", "onFailure: " + e.getMessage()));
+    }
+
+    private void UpdateImageToFirebase(Uri uri) {
+        String path = "Chat/" + refChat.getPath() + "/" + UUID.randomUUID();
+        mStorageRef.child(path)
+                .putFile(uri)
+                .addOnSuccessListener(taskSnapshot -> mStorageRef.child(path).getDownloadUrl().
+                        addOnSuccessListener(url -> {
+                            SendChat(HandleChat("", url.toString()));
+                        })).
+                addOnFailureListener(e -> Log.d("SIMPLE", "onFailure: " + e.getMessage()));
     }
 
     private void LoadInformPerson() {
@@ -123,39 +258,34 @@ public class ActivityChat extends AppCompatActivity {
         });
     }
 
-    private void GetInFormRoomDetail() {
-        //add last chat
+
+    public void readData(OnGetDataListener listener) {
         FindPath(path -> {
-
-
-            String description = getIntent().getStringExtra("description_room");
-            String url = getIntent().getStringExtra("url");
-            if (description != null) {
-                SendChat(HandleChat(description, url));
-                String uid = getIntent().getStringExtra("toId");
-                Timestamp notificationAdded = new Timestamp(new Date());
-                Notification notification = new Notification(PersonAPI.getInstance().getUid(), uid, description, 1, notificationAdded);
-
-                refNotification.add(notification);
-            }
-        });
-    }
-
-    private void GetPath() {
-        FindPath(path -> {
-            refChat = db.collection(path);
-
+            listener.onStart(path);
             refChat.orderBy("chatAdded").limitToLast(10).addSnapshotListener((value, error) -> {
-                chats.clear();
                 if (error == null) {
-                    for (QueryDocumentSnapshot query : value) {
-                        chats.add(query.toObject(Chat.class));
-                    }
-                    adapter.notifyDataSetChanged();
-                    recyclerView.scrollToPosition(chats.size() - 1);
-                }
+                    listener.onSuccess(value);
+                    listener.onComplete();
+                } else
+                    listener.onFailure(error.getMessage());
             });
         });
+
+    }
+
+
+    private void GetInFormRoomDetail() {
+        //add last chat
+        if (description != null) {
+            SendChat(HandleChat(description, url));
+            String uid = getIntent().getStringExtra("toId");
+            Timestamp notificationAdded = new Timestamp(new Date());
+            Notification notification = new Notification(PersonAPI.getInstance().getUid(), uid, description, 1, notificationAdded);
+
+            refNotification.add(notification);
+
+            description = null;
+        }
     }
 
 
@@ -177,7 +307,7 @@ public class ActivityChat extends AppCompatActivity {
 
     private Chat HandleChat(String text, String url) {
 
-        if (TextUtils.isEmpty(text))
+        if (TextUtils.isEmpty(text) && TextUtils.isEmpty(url))
             return null;
 
         Chat chat = new Chat();
@@ -199,6 +329,7 @@ public class ActivityChat extends AppCompatActivity {
                 historyChat.setLastChat(chat.getText());
                 refHistoryChat.add(historyChat);
             } else {
+                chats.size();
                 historyChat.setChatAdded(new Timestamp(new Date()));
                 historyChat.setLastChat(chat.getText());
                 refHistoryChat.whereEqualTo("pathChat", historyChat.getPathChat())

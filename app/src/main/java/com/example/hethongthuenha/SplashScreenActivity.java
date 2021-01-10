@@ -83,8 +83,6 @@ public class SplashScreenActivity extends AppCompatActivity {
                                         PersonAPI.getInstance().setPoint(creditCard.getPoint());
                                     }
                                 }
-
-                                //Set Lock Account
                                 startActivity(new Intent(SplashScreenActivity.this, MainActivity.class));
                                 finish();
                             });
@@ -94,6 +92,7 @@ public class SplashScreenActivity extends AppCompatActivity {
 
                 }).addOnFailureListener(e -> Log.d("SplashScreen-Error", "onCreate: " + e.getMessage()));
             } else {
+                PersonAPI.setInstance(null);
                 startActivity(new Intent(SplashScreenActivity.this, LoginActivity.class));
                 finish();
             }

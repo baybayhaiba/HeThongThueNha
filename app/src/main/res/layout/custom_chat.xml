@@ -6,7 +6,6 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="10sp"
-
     android:layout_marginTop="10sp"
     android:orientation="horizontal"
     android:weightSum="2">
@@ -35,18 +34,18 @@
             android:layout_height="wrap_content"
             android:backgroundTint="@android:color/darker_gray"
             app:cardCornerRadius="10sp"
-            app:cardUseCompatPadding="true"
-            app:contentPadding="20sp">
+            app:cardUseCompatPadding="true">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:id="@+id/linearImage"
                 android:orientation="vertical">
 
                 <ImageView
                     android:id="@+id/img_custom_chat"
-                    android:layout_width="150sp"
-                    android:layout_height="150sp"
+                    android:layout_width="200sp"
+                    android:layout_height="250sp"
                     android:layout_gravity="center"
                     android:scaleType="fitXY"
                     android:src="@drawable/home" />
@@ -71,6 +70,7 @@
                     android:textColor="@color/white" />
 
                 <LinearLayout
+                    android:id="@+id/linear_footer_custom_chat"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="15sp"

@@ -103,17 +103,18 @@ public class RoomRecyclerView extends RecyclerView.Adapter<RoomRecyclerView.MyVi
         String address = stage1.getAddress();
         String price = formatter.format(stage1.getPrice());
         String type_room = stage1.getType_room();
-        String type_date = stage1.getType_date();
         String urlImg = stage3.getImagesURL().get(0);
 
         holder.tvTitle.setText(title);
         holder.tvAddress.setText(address);
-        holder.tvPrice.setText(price + "/" + type_date);
+        holder.tvPrice.setText(price + "/Tháng" );
         holder.tvTypeRoom.setText(type_room);
 
 
         if(room.getOrder()==2){
             holder.tvTitle.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.vip,0,0,0);
+        }else{
+            holder.tvTitle.setCompoundDrawablesRelativeWithIntrinsicBounds(0,0,0,0);
         }
 
         String timeAgo = (String) DateUtils.getRelativeTimeSpanString(room.getTimeAdded()

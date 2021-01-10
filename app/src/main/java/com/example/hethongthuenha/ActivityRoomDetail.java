@@ -521,7 +521,7 @@ ActivityRoomDetail extends AppCompatActivity {
         tvAddress.setText("Địa chỉ:" + description_room.getAddress());
         tvAmout.setText("Số lượng:" + description_room.getAmout());
         tvAccommodation.setText("Sức chứa:" + description_room.getAccommodation() + "/người");
-        tvPrice.setText("Giá:" + formatter.format(description_room.getPrice()) + "/" + description_room.getType_date());
+        tvPrice.setText("Giá:" + formatter.format(description_room.getPrice()) + "/Tháng");
         tvArea.setText("Diện tích:" + description_room.getArea() + "m2");
         tvTypeRoom.setText("Loại:" + description_room.getType_room());
         tvDescription.setText("Mô tả:" + description_room.getDescription());

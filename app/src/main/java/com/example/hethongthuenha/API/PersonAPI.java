@@ -18,6 +18,9 @@ public class PersonAPI extends Application {
         return instance;
     }
 
+    public static void setInstance(PersonAPI instance) {
+        PersonAPI.instance = instance;
+    }
 
     public String getPassword() {
         return password;

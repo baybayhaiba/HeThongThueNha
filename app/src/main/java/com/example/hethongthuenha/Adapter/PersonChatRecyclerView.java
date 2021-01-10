@@ -18,11 +18,15 @@ import com.example.hethongthuenha.ActivityChat;
 import com.example.hethongthuenha.Model.HistoryChat;
 import com.example.hethongthuenha.Model.Person;
 import com.example.hethongthuenha.R;
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.auth.User;
 import com.squareup.picasso.Picasso;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -41,7 +45,7 @@ public class PersonChatRecyclerView extends RecyclerView.Adapter<PersonChatRecyc
 
     public static class MyViewHolder extends RecyclerView.ViewHolder{
         private CircleImageView imgChat;
-        private TextView tvName,tvLastChat;
+        private TextView tvName,tvLastChat,tvTime;
         private CardView cardView;
 
         public MyViewHolder(@NonNull View itemView) {
@@ -49,6 +53,7 @@ public class PersonChatRecyclerView extends RecyclerView.Adapter<PersonChatRecyc
             imgChat=itemView.findViewById(R.id.img_custom_person_chat);
             tvName=itemView.findViewById(R.id.tv_custom_name_chat);
             tvLastChat=itemView.findViewById(R.id.tv_custom_last_chat);
+            tvTime=itemView.findViewById(R.id.tv_custom_time_last_chat);
             cardView=itemView.findViewById(R.id.cv_custom_person_chat);
         }
     }
@@ -80,6 +85,12 @@ public class PersonChatRecyclerView extends RecyclerView.Adapter<PersonChatRecyc
 
         holder.tvName.setText(map.get("toName").toString());
         holder.tvLastChat.setText(map.get("lastChat").toString());
+
+        //date
+        Date date=((Timestamp)map.get("chatAdded")).toDate();
+        DateFormat f = new SimpleDateFormat("hh:mm:ss DD-MM-YYYY");
+        holder.tvTime.setText(f.format(date));
+
         holder.cardView.setOnClickListener(v -> {
             Intent intent=new Intent(context,ActivityChat.class);
             intent.putExtra("toEmail",map.get("toEmail").toString());

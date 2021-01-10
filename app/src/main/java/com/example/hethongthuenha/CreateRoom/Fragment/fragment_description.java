@@ -36,7 +36,6 @@ public class fragment_description extends Fragment {
     EditText etTitle, etDescription, etAddress, etPrice, etArea, etAccommodation, etAmout;
     TextInputLayout tipTitle, tipDescription, tipAddress, tipPrice, tipArea, tipAccommodation, tipAmout;
     RadioButton radPhongTro, radNhaNguyenCan, radOGhep;
-    Spinner spDate;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -72,7 +71,6 @@ public class fragment_description extends Fragment {
         radNhaNguyenCan = view.findViewById(R.id.radNhaNguyenCan);
         radOGhep = view.findViewById(R.id.radOGhep);
         radPhongTro = view.findViewById(R.id.radPhongTro);
-        spDate = view.findViewById(R.id.spDate);
         tipTitle = view.findViewById(R.id.filledTitle);
         tipAmout = view.findViewById(R.id.filledAmout);
         tipPrice = view.findViewById(R.id.filledPrice);
@@ -93,12 +91,6 @@ public class fragment_description extends Fragment {
             etAccommodation.setText("" + room.getStage1().getAccommodation());
             etAmout.setText("" + room.getStage1().getAmout());
 
-            if (room.getStage1().getType_date().equals("Ngày"))
-                spDate.setSelection(0);
-            else if (room.getStage1().getType_date().equals("Tháng"))
-                spDate.setSelection(1);
-            else
-                spDate.setSelection(2);
 
             if (room.getStage1().getType_room().equals("Phòng trọ"))
                 radPhongTro.setChecked(true);
@@ -118,7 +110,6 @@ public class fragment_description extends Fragment {
                 double area = Double.parseDouble(etArea.getText().toString());
                 int amout = Integer.parseInt(etAmout.getText().toString());
                 int accommodation = Integer.parseInt(etAccommodation.getText().toString());
-                String typeDate = spDate.getSelectedItem().toString();
                 String typeRoom;
                 if (radPhongTro.isChecked())
                     typeRoom = "Phòng trọ";
@@ -128,7 +119,7 @@ public class fragment_description extends Fragment {
                     typeRoom = "Nhà nguyên căn";
 
                 Description_Room dataStage1 = new Description_Room
-                        (title, description, address, typeDate, price, area, accommodation, amout, typeRoom);
+                        (title, description, address, price, area, accommodation, amout, typeRoom);
                 dataCommunication.Description(dataStage1);
 
                 fragment_living_expenses fragment = new fragment_living_expenses();

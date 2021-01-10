@@ -2,15 +2,12 @@ package com.example.hethongthuenha.Adapter;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,23 +16,18 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hethongthuenha.Model.Person;
 import com.example.hethongthuenha.R;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
-public class AccountRecyclerView extends RecyclerView.Adapter<AccountRecyclerView.MyViewHolder> {
-
+public class SettingMemberRecyclerView extends RecyclerView.Adapter<SettingMemberRecyclerView.MyViewHolder> {
     private Context context;
     private List<Person> persons;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-    public AccountRecyclerView(Context context, List<Person> persons) {
+    public SettingMemberRecyclerView(Context context, List<Person> persons) {
         this.context = context;
         this.persons = persons;
     }
@@ -79,29 +71,29 @@ public class AccountRecyclerView extends RecyclerView.Adapter<AccountRecyclerVie
         else
             holder.imgAccount.setImageResource(R.drawable.ic_baseline_person_24);
 
-        holder.tvState.setText(person.isLocked() ? "Đã khóa" : "Không khóa");
+        holder.tvState.setText(person.getType_person()==Person.ADMIN?"Quản trị viên":"Thành viên");
         holder.imgStateAccount.setOnClickListener(v -> {
             showSettingStateAccount(person);
         });
     }
 
-    private void setAccountToFirebase(Person person, boolean lock) {
+    private void setAccountToFirebase(Person person, int state) {
 
         db.collection("User").whereEqualTo("uid", person.getUid())
                 .get().addOnCompleteListener(task -> {
-                    for (QueryDocumentSnapshot v : task.getResult()) {
-                        Person person1 = v.toObject(Person.class);
-                        person1.setLocked(lock);
+            for (QueryDocumentSnapshot v : task.getResult()) {
+                Person person1 = v.toObject(Person.class);
+                person1.setType_person(state);
 
-                        if(task.isComplete()){
-                            db.collection("User").document(v.getId())
-                                    .set(person1).addOnSuccessListener(aVoid -> {
-                                Toast.makeText(context, "Thiết lập thành công", Toast.LENGTH_SHORT).show();
-                            });
-                        }
-                    }
+                if (task.isComplete()) {
+                    db.collection("User").document(v.getId())
+                            .set(person1).addOnSuccessListener(aVoid -> {
+                        Toast.makeText(context, "Thiết lập thành công", Toast.LENGTH_SHORT).show();
+                    });
+                }
+            }
 
-                });
+        });
     }
 
     private void showSettingStateAccount(Person person) {
@@ -111,24 +103,28 @@ public class AccountRecyclerView extends RecyclerView.Adapter<AccountRecyclerVie
         builder.setView(viewLayout);
 
         TextView tvEmail = viewLayout.findViewById(R.id.layout_account_email);
-        Button btnLock = viewLayout.findViewById(R.id.layout_btn_lock);
-        Button btnUnlock = viewLayout.findViewById(R.id.layout_btn_unlock);
+        Button btnAdmin = viewLayout.findViewById(R.id.layout_btn_lock);
+        Button btnMember = viewLayout.findViewById(R.id.layout_btn_unlock);
+
+        btnAdmin.setText("Quản trị viên");
+        btnMember.setText("Thành viên");
+
 
         final AlertDialog show = builder.show();
 
         tvEmail.setText(person.getEmail());
-        if (person.isLocked()) {
-            btnLock.setBackgroundColor(R.drawable.border_selected_account);
+        if (person.getType_person() == Person.ADMIN) {
+            btnAdmin.setBackgroundColor(R.drawable.border_selected_account);
         } else {
-            btnUnlock.setBackgroundColor(R.drawable.border_selected_account);
+            btnMember.setBackgroundColor(R.drawable.border_selected_account);
         }
 
-        btnUnlock.setOnClickListener(v -> {
-            setAccountToFirebase(person, false);
+        btnAdmin.setOnClickListener(v -> {
+            setAccountToFirebase(person, Person.ADMIN);
             show.dismiss();
         });
-        btnLock.setOnClickListener(v -> {
-            setAccountToFirebase(person, true);
+        btnMember.setOnClickListener(v -> {
+            setAccountToFirebase(person, Person.NORMAL);
             show.dismiss();
         });
 
@@ -138,5 +134,4 @@ public class AccountRecyclerView extends RecyclerView.Adapter<AccountRecyclerVie
     public int getItemCount() {
         return persons.size();
     }
-
 }

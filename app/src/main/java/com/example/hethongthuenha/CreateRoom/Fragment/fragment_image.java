@@ -164,6 +164,7 @@ public class fragment_image extends Fragment {
             filepath = mStorageRef.child("room_image").child(id + "room_" + i);
             StorageReference finalFilepath = filepath;
             if (uri[i] != null) {
+                Log.d("data", "ChangeImage: "+uri[i]);
                 filepath.putFile(uri[i])
                         .addOnSuccessListener(taskSnapshot -> finalFilepath.getDownloadUrl().
                                 addOnSuccessListener(uri -> {

@@ -92,6 +92,7 @@ public class fragment_list_chat extends Fragment {
                             maps.put("toName", getNamePerson);
                             maps.put("toEmail", getEmailPerson);
                             maps.put("lastChat", historyChat.getLastChat());
+                            maps.put("chatAdded",historyChat.getChatAdded());
                             personChats.add(maps);
 
                         }

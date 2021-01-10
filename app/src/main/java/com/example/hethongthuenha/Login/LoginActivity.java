@@ -18,6 +18,7 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.example.hethongthuenha.API.PersonAPI;
+import com.example.hethongthuenha.Model.Person;
 import com.example.hethongthuenha.R;
 import com.example.hethongthuenha.Register.RegisterActivity;
 import com.google.firebase.auth.FirebaseAuth;
@@ -29,7 +30,7 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Vi
     private Button btnLogin, btnRegister;
     private LoginPresenter loginPresenter;
     private ProgressDialog progressDialog;
-    private static FirebaseAuth mAuth=FirebaseAuth.getInstance();
+    private static FirebaseAuth mAuth = FirebaseAuth.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,10 +51,8 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Vi
     }
 
     private void HandlingLogin() {
-        if (PersonAPI.getInstance() != null && PersonAPI.getInstance().isLocked()){
-            isUnlocked(this);
-        }
-
+        if(PersonAPI.getInstance()!=null && PersonAPI.getInstance().isLocked())
+            locked(this);
         String email = etEmail.getText().toString();
         String password = etPassword.getText().toString();
         if (!TextUtils.isEmpty(email) && !TextUtils.isEmpty(password)) {
@@ -63,13 +62,18 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Vi
 
     @Override
     public void loginSuccess() {
-        progressDialog.dismiss();finish();
+        progressDialog.dismiss();
     }
 
-    public static void isUnlocked(Context context){
-
-
-
+    public static void locked(Context context) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("Thông báo");
+        builder.setMessage("Tài khoản của bạn đã bị khóa muốn biết chi tiết xin liên hệ ******");
+        builder.setPositiveButton("Ok", (dialog, which) -> {
+            dialog.dismiss();
+            mAuth.signOut();
+        });
+        builder.show();
     }
 
     @Override

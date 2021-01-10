@@ -13,6 +13,7 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hethongthuenha.ActivityRoomDetail;
+import com.example.hethongthuenha.Model.Person;
 import com.example.hethongthuenha.Model.Report;
 import com.example.hethongthuenha.Model.Room;
 import com.example.hethongthuenha.R;
@@ -35,13 +36,14 @@ public class ReportRecyclerView extends RecyclerView.Adapter<ReportRecyclerView.
     public static class MyViewHolder extends RecyclerView.ViewHolder {
 
         private CardView cardView;
-        private TextView tvNameRoom, tvTypeReport, tvDescriptionReport;
+        private TextView tvNameRoom, tvTypeReport, tvDescriptionReport,tvEmail;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
             cardView = itemView.findViewById(R.id.cv_custom_report);
             tvNameRoom = itemView.findViewById(R.id.tv_custom_title_report);
             tvTypeReport = itemView.findViewById(R.id.tv_custom_type_report);
+            tvEmail=itemView.findViewById(R.id.tv_custom_email_report);
             tvDescriptionReport = itemView.findViewById(R.id.tv_custom_description_report);
         }
     }
@@ -71,15 +73,25 @@ public class ReportRecyclerView extends RecyclerView.Adapter<ReportRecyclerView.
                     });
                 }
             }
+        });
 
+        db.collection("User").whereEqualTo("uid", report.getId_person())
+                .get().addOnCompleteListener(v -> {
+            if (v.isSuccessful()) {
+                for (QueryDocumentSnapshot value : v.getResult()) {
+                    Person person = value.toObject(Person.class);
+                    holder.tvEmail.setText(person.getEmail());
+                }
+            }
         });
 
         holder.tvTypeReport.setText(report.getType_report());
-        if (report.getDescription() != null)
+        if (report.getDescription() != null && !report.getDescription().equals("")){
             holder.tvDescriptionReport.setText(report.getDescription());
-        else{
-            holder.tvDescriptionReport.setVisibility(View.GONE);
-            holder.tvDescriptionReport.setText("");
+        }
+
+        else {
+            holder.tvDescriptionReport.setText("Không có nội dung !");
         }
 
         holder.cardView.setOnClickListener(v1 -> {

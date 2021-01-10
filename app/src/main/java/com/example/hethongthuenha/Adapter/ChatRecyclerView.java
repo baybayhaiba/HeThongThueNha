@@ -2,7 +2,7 @@ package com.example.hethongthuenha.Adapter;
 
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
+import android.graphics.Color;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,14 +24,10 @@ import com.example.hethongthuenha.Model.Notification;
 import com.example.hethongthuenha.Model.Person;
 import com.example.hethongthuenha.Model.Room;
 import com.example.hethongthuenha.R;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.squareup.picasso.Picasso;
 
 import java.text.NumberFormat;
@@ -53,7 +49,7 @@ public class ChatRecyclerView extends RecyclerView.Adapter<ChatRecyclerView.MyVi
 
     public static class MyViewHolder extends RecyclerView.ViewHolder {
         private TextView tvChat, tvAddress, tvPrice, tvTypeRoom;
-        private LinearLayout linearChat;
+        private LinearLayout linearChat, linearFooter, linearImage;
         private ImageView imgChat, imgAgree;
         private CardView cvChat;
 
@@ -61,6 +57,8 @@ public class ChatRecyclerView extends RecyclerView.Adapter<ChatRecyclerView.MyVi
             super(itemView);
             tvChat = itemView.findViewById(R.id.tv_custom_chat);
             linearChat = itemView.findViewById(R.id.linear_custom_chat);
+            linearFooter = itemView.findViewById(R.id.linear_footer_custom_chat);
+            linearImage = itemView.findViewById(R.id.linearImage);
             imgChat = itemView.findViewById(R.id.img_custom_chat);
             imgAgree = itemView.findViewById(R.id.img_agree_chat);
             tvAddress = itemView.findViewById(R.id.tv_address_chat);
@@ -90,11 +88,15 @@ public class ChatRecyclerView extends RecyclerView.Adapter<ChatRecyclerView.MyVi
         if (!fromUser.equals(fromUserChat)) {
             holder.linearChat.setGravity(Gravity.START);
             holder.tvChat.setBackgroundResource(R.drawable.border_chat_left);
+            holder.tvChat.setTextColor(Color.BLACK);
         } else {
             holder.linearChat.setGravity(Gravity.END);
             holder.tvChat.setBackgroundResource(R.drawable.border_chat_right);
+            holder.tvChat.setTextColor(Color.WHITE);
         }
 
+
+        //neu khong co hinh anh
         if (chat.getUrl().equals("")) {
             holder.imgChat.setVisibility(View.GONE);
             holder.imgAgree.setVisibility(View.GONE);
@@ -102,19 +104,42 @@ public class ChatRecyclerView extends RecyclerView.Adapter<ChatRecyclerView.MyVi
             holder.tvPrice.setVisibility(View.GONE);
             holder.tvTypeRoom.setVisibility(View.GONE);
             holder.cvChat.setVisibility(View.GONE);
-        } else {
+
+            holder.tvChat.setVisibility(View.VISIBLE);
+
+        } else if (chat.getText().equals("")) {
+            holder.tvChat.setVisibility(View.GONE);
+            holder.imgAgree.setVisibility(View.GONE);
+            holder.tvAddress.setVisibility(View.GONE);
+            holder.tvPrice.setVisibility(View.GONE);
+            holder.tvTypeRoom.setVisibility(View.GONE);
+            holder.linearFooter.setVisibility(View.GONE);
+            Picasso.with(context).load(chat.getUrl()).placeholder(R.drawable.loading)
+                    .into(holder.imgChat);
+            holder.linearImage.setPadding(0, 0, 0, 0);
+
+            holder.imgChat.setVisibility(View.VISIBLE);
+            holder.cvChat.setVisibility(View.VISIBLE);
+            holder.cvChat.setOnClickListener(null);
+        }
+        //neu co hinh anh va chu
+        else {
             holder.imgChat.setVisibility(View.VISIBLE);
             if (!chat.getFrom_email_person().equals(PersonAPI.getInstance().getEmail())) {
                 holder.imgAgree.setVisibility(View.VISIBLE);
             } else {
                 holder.imgAgree.setVisibility(View.GONE);
             }
+            holder.linearImage.setPadding(20, 20, 20, 20);
 
             holder.tvAddress.setVisibility(View.VISIBLE);
             holder.tvPrice.setVisibility(View.VISIBLE);
             holder.tvTypeRoom.setVisibility(View.VISIBLE);
             holder.cvChat.setVisibility(View.VISIBLE);
-            Picasso.with(context).load(chat.getUrl()).placeholder(R.drawable.home)
+            holder.tvChat.setVisibility(View.VISIBLE);
+            holder.linearFooter.setVisibility(View.VISIBLE);
+
+            Picasso.with(context).load(chat.getUrl()).placeholder(R.drawable.loading)
                     .into(holder.imgChat);
 
 
@@ -130,7 +155,7 @@ public class ChatRecyclerView extends RecyclerView.Adapter<ChatRecyclerView.MyVi
                                         holder.tvTypeRoom.setText(room.getStage1().getType_room());
 
                                         //neu day chi la gioi thieu phong
-                                        if(chat.getText().equals("Tôi có thể đáp ứng cho bạn " + room.getStage1().getTitle()))
+                                        if (chat.getText().equals("Tôi có thể đáp ứng cho bạn " + room.getStage1().getTitle()))
                                             holder.imgAgree.setVisibility(View.GONE);
 
                                         holder.cvChat.setOnClickListener(z -> {
@@ -138,7 +163,7 @@ public class ChatRecyclerView extends RecyclerView.Adapter<ChatRecyclerView.MyVi
                                         });
 
                                         holder.imgAgree.setOnClickListener(c -> {
-                                            handleChooseAgree(room,chat);
+                                            handleChooseAgree(room, chat);
                                         });
                                     }
                             }
@@ -164,7 +189,7 @@ public class ChatRecyclerView extends RecyclerView.Adapter<ChatRecyclerView.MyVi
         context.startActivity(intent);
     }
 
-    public void handleChooseAgree(Room room,Chat chat) {
+    public void handleChooseAgree(Room room, Chat chat) {
         DocumentReference ref = db.collection("BookRoom").document();
         Timestamp timestamp = new Timestamp(new Date());
         db.collection("User").whereEqualTo("email", chat.getFrom_email_person())

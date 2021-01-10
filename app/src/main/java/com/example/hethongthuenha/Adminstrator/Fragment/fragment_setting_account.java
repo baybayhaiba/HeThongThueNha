@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.hethongthuenha.Adapter.MemberRecyclerView;
+import com.example.hethongthuenha.Adapter.SettingMemberRecyclerView;
 import com.example.hethongthuenha.Model.Person;
 import com.example.hethongthuenha.R;
 import com.google.firebase.firestore.EventListener;
@@ -24,17 +25,14 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 import java.util.List;
 
-public class fragment_account extends Fragment {
+
+public class fragment_setting_account extends Fragment {
 
     private RecyclerView recyclerView;
-    private MemberRecyclerView adapter;
+    private SettingMemberRecyclerView adapter;
     private List<Person> persons;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private ProgressDialog progressDialog;
-    public fragment_account() {
-        // Required empty public constructor
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,15 +45,15 @@ public class fragment_account extends Fragment {
         progressDialog=new ProgressDialog(getActivity());
         progressDialog.setMessage("Xin đợi 1 lát");
         progressDialog.show();
-        View view = inflater.inflate(R.layout.fragment_account, container, false);
+        View view = inflater.inflate(R.layout.fragment_setting_account, container, false);
         recyclerView = view.findViewById(R.id.accountRecyclerview);
         persons = new ArrayList<>();
-        adapter = new MemberRecyclerView(getActivity(), persons);
+        adapter = new SettingMemberRecyclerView(getActivity(), persons);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setAdapter(adapter);
 
 
-        db.collection("User").whereEqualTo("type_person", 1)
+        db.collection("User")
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
@@ -74,5 +72,4 @@ public class fragment_account extends Fragment {
 
         return view;
     }
-
 }
