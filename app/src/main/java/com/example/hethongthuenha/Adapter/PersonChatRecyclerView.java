@@ -88,13 +88,12 @@ public class PersonChatRecyclerView extends RecyclerView.Adapter<PersonChatRecyc
 
         //date
         Date date=((Timestamp)map.get("chatAdded")).toDate();
-        DateFormat f = new SimpleDateFormat("hh:mm:ss DD-MM-YYYY");
+        DateFormat f = new SimpleDateFormat("hh:mm:ss DD-MM-yyyy");
         holder.tvTime.setText(f.format(date));
 
         holder.cardView.setOnClickListener(v -> {
             Intent intent=new Intent(context,ActivityChat.class);
             intent.putExtra("toEmail",map.get("toEmail").toString());
-            intent.putExtra("toName",map.get("toName").toString());
             context.startActivity(intent);
         });
     }

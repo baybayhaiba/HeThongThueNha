@@ -388,6 +388,7 @@ ActivityRoomDetail extends AppCompatActivity {
                 .get().addOnSuccessListener(queryDocumentSnapshots -> {
             if (queryDocumentSnapshots.isEmpty()) {
                 btnBookRoom.setText("Đặt phòng");
+                etComment.setVisibility(View.GONE);
             } else {
                 for (QueryDocumentSnapshot value : queryDocumentSnapshots) {
                     BookRoom bookRoom = value.toObject(BookRoom.class);
@@ -410,10 +411,12 @@ ActivityRoomDetail extends AppCompatActivity {
                         } else {
                             btnBookRoom.setText("Hủy đặt phòng");
                         }
+                        etComment.setVisibility(View.VISIBLE);
 
 
                     } else {
                         btnBookRoom.setText("Hủy đặt phòng");
+                        etComment.setVisibility(View.VISIBLE);
                     }
                 }
             }
@@ -575,6 +578,7 @@ ActivityRoomDetail extends AppCompatActivity {
     }
 
     private void CommentRoom() {
+
 
         etComment.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_SEARCH ||

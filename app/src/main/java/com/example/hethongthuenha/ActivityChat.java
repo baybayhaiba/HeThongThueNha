@@ -32,6 +32,13 @@ import com.example.hethongthuenha.Model.Chat;
 import com.example.hethongthuenha.Model.HistoryChat;
 import com.example.hethongthuenha.Model.Notification;
 import com.example.hethongthuenha.Model.Person;
+import com.example.hethongthuenha.Notification.Client;
+import com.example.hethongthuenha.Notification.Data;
+import com.example.hethongthuenha.Notification.MyFirebaseMessaging;
+import com.example.hethongthuenha.Notification.MyResponse;
+import com.example.hethongthuenha.Notification.Sender;
+import com.example.hethongthuenha.Notification.Token;
+import com.example.hethongthuenha.Retrofit.APIService;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -44,6 +51,11 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.installations.FirebaseInstallations;
+import com.google.firebase.installations.InstallationTokenResult;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
@@ -58,7 +70,12 @@ import java.util.List;
 import java.util.Queue;
 import java.util.UUID;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class ActivityChat extends AppCompatActivity {
+
 
     private RecyclerView recyclerView;
     private EditText edText;
@@ -79,6 +96,11 @@ public class ActivityChat extends AppCompatActivity {
     private Uri selectedImage;
     private StorageReference mStorageRef;
     private final int PICK_IMAGE_CAMERA = 1, PICK_IMAGE_GALLERY = 2;
+    private APIService apiService;
+
+    public interface FireStoreCallBack {
+        void onCallBack(String path);
+    }
 
     public interface OnGetDataListener {
         void onSuccess(QuerySnapshot dataSnapshotValue);
@@ -90,9 +112,6 @@ public class ActivityChat extends AppCompatActivity {
         void onFailure(String error);
     }
 
-    public interface FireStoreCallBack {
-        void onCallBack(String path);
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,6 +123,21 @@ public class ActivityChat extends AppCompatActivity {
 
         Init();
 
+
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(task -> {
+                    if (!task.isSuccessful()) {
+                        Log.w("test", "Fetching FCM registration token failed", task.getException());
+                        return;
+                    }
+
+                    // Get new FCM registration token
+                    String token = task.getResult();
+
+                    // Log and toast
+                    String msg = getString(R.string.msg, token);
+                    Log.d("test", msg);
+                });
     }
 
 
@@ -121,8 +155,9 @@ public class ActivityChat extends AppCompatActivity {
         imgAvatar = findViewById(R.id.imgPersonChat);
         chooseImage = findViewById(R.id.imgChoosePicture);
         mStorageRef = FirebaseStorage.getInstance().getReference();
+        apiService = Client.getClient("https://fcm.googleapis.com/").create(APIService.class);
 
-        tvNamePerson.setText(getIntent().getStringExtra("toName"));
+
         imgBack.setOnClickListener(v -> {
             onBackPressed();
         });
@@ -132,6 +167,47 @@ public class ActivityChat extends AppCompatActivity {
         });
         chooseImage.setOnClickListener(v -> {
             showDialogChooseImage();
+        });
+
+    }
+
+
+    private void SendNotification(String emailTo, String emailFrom, String text) {
+        db.collection("User").whereEqualTo("email", emailTo)
+                .get().addOnSuccessListener(queryDocumentSnapshots -> {
+            if (!queryDocumentSnapshots.isEmpty())
+                for (QueryDocumentSnapshot value : queryDocumentSnapshots) {
+                    Person person = value.toObject(Person.class);
+                    db.collection("Tokens").document(person.getUid())
+                            .get().addOnSuccessListener(documentSnapshot -> {
+                        Token token = documentSnapshot.toObject(Token.class);
+
+
+                        Data data = new Data
+                                (PersonAPI.getInstance().getUid(), R.mipmap.ic_launcher, text, emailFrom, person.getUid());
+
+                        Sender sender = new Sender(data, token.getToken());
+
+                        Log.d("data", "SendNotification: " + token.getToken());
+
+                        apiService.sendNotification(sender)
+                                .enqueue(new Callback<MyResponse>() {
+                                    @Override
+                                    public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
+                                        if (response.code() == 200) {
+                                            if (response.body().success != 1) {
+                                                Log.d("data", "onResponse: Fail");
+                                            }
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<MyResponse> call, Throwable t) {
+
+                                    }
+                                });
+                    });
+                }
         });
     }
 
@@ -242,10 +318,9 @@ public class ActivityChat extends AppCompatActivity {
 
                     if (!person.getUrl().equals("")) {
                         Picasso.with(this)
-                                .load(person.getUrl()).placeholder(R.drawable.ic_baseline_person_24)
+                                .load(person.getUrl()).placeholder(R.mipmap.ic_launcher)
                                 .into(imgAvatar);
                     }
-
                     tvNamePerson.setText(person.getFullName());
 
                     imgAvatar.setOnClickListener(v -> {
@@ -343,7 +418,10 @@ public class ActivityChat extends AppCompatActivity {
                 });
             }
 
-            refChat.add(chat);
+            refChat.add(chat)
+                    .addOnSuccessListener(documentReference -> {
+                        SendNotification(toEmail, PersonAPI.getInstance().getEmail(), chat.getText());
+                    });
             edText.setText("");
         }
     }

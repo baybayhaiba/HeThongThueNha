@@ -31,14 +31,17 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
 
+
         String sented = remoteMessage.getData().get("sented");
 
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
-        if (firebaseUser != null && sented.equals(firebaseUser.getUid())) {
+        if (firebaseUser != null && sented != null && sented.equals(firebaseUser.getUid())) {
             sendNotification(remoteMessage);
         }
     }
+
+
 
     private void sendNotification(RemoteMessage remoteMessage) {
 
@@ -51,9 +54,9 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
 
         int j = Integer.parseInt(user.replaceAll("[\\D]", ""));
 
-        Intent intent = new Intent(this, MainActivity.class);
-        //CollectionReference ref = FirebaseFirestore.getInstance().collection("User");
+        Intent intent = new Intent(this, ActivityChat.class);
         Bundle bundle = new Bundle();
+        bundle.putString("toEmail",title);
         intent.putExtras(bundle);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, j, intent, PendingIntent.FLAG_ONE_SHOT);
@@ -75,7 +78,7 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
             i = j;
         }
 
-        noti.notify(i,builder.build());
+        noti.notify(i, builder.build());
 
     }
 }

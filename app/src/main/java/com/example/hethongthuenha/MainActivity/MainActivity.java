@@ -20,8 +20,12 @@ import com.example.hethongthuenha.MainActivity.Fragment.MainRoom.fragment_main_r
 import com.example.hethongthuenha.MainActivity.Fragment.Notification.fragment_notification;
 import com.example.hethongthuenha.MainActivity.Fragment.Requiment.fragment_requiment;
 import com.example.hethongthuenha.Model.Person;
+import com.example.hethongthuenha.Notification.Token;
 import com.example.hethongthuenha.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -46,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         setFragment(R.id.mnRoom);
         SetBottomNavigation();
+        updateToken(FirebaseInstanceId.getInstance().getToken());
     }
 
     private void SetBottomNavigation() {
@@ -121,5 +126,11 @@ public class MainActivity extends AppCompatActivity {
         if (PersonAPI.getInstance() != null && PersonAPI.getInstance().isLocked()) {
             LoginActivity.locked(this);
         }
+    }
+
+    private void updateToken(String token) {
+        CollectionReference reference = FirebaseFirestore.getInstance().collection("Tokens");
+        Token token1 = new Token(token);
+        reference.document(PersonAPI.getInstance().getUid()).set(token1);
     }
 }
