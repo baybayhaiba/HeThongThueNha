@@ -279,10 +279,14 @@ public class ActivityChat extends AppCompatActivity {
             selectedImage = data.getData();
             UpdateImageToFirebase(selectedImage);
         } else if (requestCode == PICK_IMAGE_CAMERA && resultCode == RESULT_OK && data != null) {
-            Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
-            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-            thumbnail.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
-            UpdateImageBitmapToFirebase(bytes.toByteArray());
+            try {
+                Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
+                ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                thumbnail.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
+                UpdateImageBitmapToFirebase(bytes.toByteArray());
+            }catch (Exception e){
+                Toast.makeText(this, "Lấy ảnh thất bại hãy thử lại", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
