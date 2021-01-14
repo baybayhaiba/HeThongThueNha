@@ -69,6 +69,7 @@ public class MemberRecyclerView extends RecyclerView.Adapter<MemberRecyclerView.
                     .error(R.drawable.person_image_infomation)
                     .placeholder(R.drawable.person_image_infomation)
                     .into(holder.imgAccount);
+
         else
             holder.imgAccount.setImageResource(R.drawable.ic_baseline_person_24);
 

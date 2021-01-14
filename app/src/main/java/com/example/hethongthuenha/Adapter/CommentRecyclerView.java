@@ -66,6 +66,8 @@ public class CommentRecyclerView extends RecyclerView.Adapter<CommentRecyclerVie
                     if (!person.getUrl().equals(""))
                         Picasso.with(context).load(person.getUrl())
                                 .placeholder(R.drawable.ic_baseline_person_24).into(holder.imgAvatar);
+                    else
+                        holder.imgAvatar.setImageResource(R.drawable.ic_baseline_person_24);
 
                     holder.tvName.setText(person.getFullName());
                 }
@@ -139,9 +141,9 @@ public class CommentRecyclerView extends RecyclerView.Adapter<CommentRecyclerVie
                         }
 
                     });
-                    }
                 }
-            }).addOnFailureListener(e -> Toast.makeText(context,
+            }
+        }).addOnFailureListener(e -> Toast.makeText(context,
                 "Bình luận bị lỗi hoặc bị không có mạng", Toast.LENGTH_SHORT).show());
 
         cancel.setOnClickListener(v ->

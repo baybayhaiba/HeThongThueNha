@@ -31,7 +31,7 @@
             android:id="@+id/tvNameChat"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="HAHAHHA"
+            android:text=""
             android:layout_marginLeft="10sp"
             android:textColor="@color/black"
             android:fontFamily="@font/chewy"/>

@@ -74,21 +74,10 @@ public class fragment_list_chat extends Fragment {
                         if (checkUser.contains(PersonAPI.getInstance().getEmail())) {
                             String[] emails = checkUser.split("-");
                             String[] names = historyChat.getFromATo().split("-");
-                            String getEmailPerson = "";
-                            String getNamePerson = "";
+                            String getEmailPerson = emails[0].equals(PersonAPI.getInstance().getEmail())?emails[1]:emails[0];
+                            String getNamePerson = names[0].equals(PersonAPI.getInstance().getEmail())?names[0]:names[1];
                             Map<String, Object> maps = new HashMap<>();
-
-
-                            if (emails[0].equals(PersonAPI.getInstance().getEmail())) {
-                                getEmailPerson = emails[1];
-                                getNamePerson = names[1];
-
-                            } else {
-                                getEmailPerson = emails[0];
-                                getNamePerson = names[0];
-                            }
-
-
+                            
                             maps.put("toName", getNamePerson);
                             maps.put("toEmail", getEmailPerson);
                             maps.put("lastChat", historyChat.getLastChat());

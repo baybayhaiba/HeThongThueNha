@@ -6,7 +6,7 @@
     app:contentPadding="16sp"
     android:id="@+id/cv_custom_person_chat"
     app:cardUseCompatPadding="true"
-    android:backgroundTint="@color/endGColor"
+    android:backgroundTint="@color/yellow_100"
     android:layout_height="wrap_content">
 
     <LinearLayout

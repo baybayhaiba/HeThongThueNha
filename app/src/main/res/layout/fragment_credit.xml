@@ -7,9 +7,10 @@
     android:padding="16sp"
     tools:context=".Adminstrator.Fragment.fragment_add_point">
 
-    <Spinner
+    <com.toptoche.searchablespinnerlibrary.SearchableSpinner
         android:id="@+id/sp_email_person_credit"
         android:layout_width="match_parent"
+        android:background="@color/white"
         android:layout_height="wrap_content"
         android:paddingTop="10sp"
         android:entries="@array/spAccount"
@@ -22,6 +23,7 @@
         android:id="@+id/sp_id_person_credit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/white"
         android:entries="@array/spAccount"
         android:paddingTop="10sp"
         android:clickable="false"
@@ -36,6 +38,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:imeOptions="actionNext"
+        android:textColor="@color/white"
+        android:textColorHint="@color/white"
         android:inputType="text"
         android:hint="Số tài khoản" />
 

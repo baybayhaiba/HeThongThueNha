@@ -67,6 +67,8 @@ public class PayRecyclerView extends RecyclerView.Adapter<PayRecyclerView.MyView
                         Picasso.with(context).load(person.getUrl())
                                 .placeholder(R.drawable.ic_baseline_person_24)
                                 .into(holder.imgAvatar);
+                    else
+                        holder.imgAvatar.setImageResource(R.drawable.ic_baseline_person_24);
 
                     holder.tvName.setText(person.getFullName());
                     holder.cardView.setOnClickListener(c -> {

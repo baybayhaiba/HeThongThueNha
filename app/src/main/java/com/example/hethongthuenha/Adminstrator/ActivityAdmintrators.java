@@ -13,7 +13,11 @@ import androidx.fragment.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 
+import com.example.hethongthuenha.API.PersonAPI;
 import com.example.hethongthuenha.Adminstrator.Fragment.fragment_account;
 import com.example.hethongthuenha.Adminstrator.Fragment.fragment_ads;
 import com.example.hethongthuenha.Adminstrator.Fragment.fragment_commission;
@@ -23,9 +27,13 @@ import com.example.hethongthuenha.Adminstrator.Fragment.fragment_add_point;
 import com.example.hethongthuenha.Adminstrator.Fragment.fragment_report;
 import com.example.hethongthuenha.Adminstrator.Fragment.fragmment_history_credit;
 import com.example.hethongthuenha.MainActivity.MainActivity;
+import com.example.hethongthuenha.Model.Person;
 import com.example.hethongthuenha.R;
 import com.example.hethongthuenha.Adminstrator.Fragment.fragment_setting_account;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.squareup.picasso.Picasso;
 
 public class ActivityAdmintrators extends AppCompatActivity {
 
@@ -34,6 +42,9 @@ public class ActivityAdmintrators extends AppCompatActivity {
     private DrawerLayout drawerLayout;
     private Toolbar toolbar;
     private Fragment fragment;
+    private ImageView imgAvatar;
+    private TextView tvName;
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +66,25 @@ public class ActivityAdmintrators extends AppCompatActivity {
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.nav_view);
         //dung cai nay de get id tu drawlayout
-        //View view=navigationView.getHeaderView(0);
+        View view = navigationView.getHeaderView(0);
+        imgAvatar = view.findViewById(R.id.img_avatar_admin);
+        tvName = view.findViewById(R.id.name_admin);
+
+        db.collection("User").whereEqualTo("uid", PersonAPI.getInstance().getUid())
+                .get().addOnSuccessListener(queryDocumentSnapshots -> {
+            if (!queryDocumentSnapshots.isEmpty()) {
+                for (QueryDocumentSnapshot value : queryDocumentSnapshots) {
+                    Person person = value.toObject(Person.class);
+                    if (!person.getUrl().equals(""))
+                        Picasso.with(this).load(person.getUrl())
+                                .placeholder(R.drawable.ic_baseline_person_24)
+                                .into(imgAvatar);
+                    else
+                        imgAvatar.setImageResource(R.drawable.ic_baseline_person_24);
+                    tvName.append(person.getFullName());
+                }
+            }
+        });
         //bt_person=view.findViewById(R.id.bt_person);
     }
 
@@ -108,7 +137,7 @@ public class ActivityAdmintrators extends AppCompatActivity {
                 fragment = new fragmment_history_credit();
                 toolbar.setTitle("Lịch sử giao dịch");
                 break;
-                case R.id.mnExit:
+            case R.id.mnExit:
                 startActivity(new Intent(ActivityAdmintrators.this, MainActivity.class));
                 finish();
                 break;

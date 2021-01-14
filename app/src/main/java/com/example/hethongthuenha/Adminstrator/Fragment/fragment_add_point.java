@@ -2,8 +2,10 @@ package com.example.hethongthuenha.Adminstrator.Fragment;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,12 +21,15 @@ import com.example.hethongthuenha.Model.HistoryCreditCard;
 import com.example.hethongthuenha.Model.Notification;
 import com.example.hethongthuenha.Model.Person;
 import com.example.hethongthuenha.R;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -41,13 +46,14 @@ public class fragment_add_point extends Fragment {
     private EditText edEmailPerson, edNumberBankCard, edNumberAddPoint;
     private Button btnFinish;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private CollectionReference refPerson = db.collection("User");
     private CollectionReference refCreditCard = db.collection("CreditCard");
     private CollectionReference refHistoryCard = db.collection("History-CreditCard");
     private CollectionReference refNotification = db.collection("Notification");
     private List<Person> persons;
     private ArrayAdapter<String> adapterId, adapterEmail;
-    private ArrayList<String> convertIDToAdapter;
-    private ArrayList<String> convertEmailToAdapter;
+    private ArrayList<String> convertIDToAdapter, convertEmailToAdapter;
+    private ArrayList<CreditCard> creditCards;
     private Spinner spUID, spEmail;
 
     @Override
@@ -65,6 +71,7 @@ public class fragment_add_point extends Fragment {
         edNumberAddPoint = view.findViewById(R.id.etNumberPointAdded);
         convertIDToAdapter = new ArrayList<String>();
         convertEmailToAdapter = new ArrayList<String>();
+        creditCards = new ArrayList<>();
         adapterId = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_dropdown_item, convertIDToAdapter);
         adapterEmail = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_dropdown_item, convertEmailToAdapter);
         btnFinish = view.findViewById(R.id.btnFinishCredit);
@@ -73,7 +80,7 @@ public class fragment_add_point extends Fragment {
         spUID.setAdapter(adapterId);
         spUID.setEnabled(false);
         spEmail.setAdapter(adapterEmail);
-        db.collection("User").orderBy("email").get()
+        refPerson.orderBy("email").get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         for (QueryDocumentSnapshot value : task.getResult()) {
@@ -92,10 +99,17 @@ public class fragment_add_point extends Fragment {
                     }
                 });
 
+        refCreditCard.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful())
+                for (QueryDocumentSnapshot value : task.getResult())
+                    creditCards.add(value.toObject(CreditCard.class));
+        });
+
         spEmail.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 spUID.setSelection(position);
+                assignCreditCard(spUID.getSelectedItem().toString());
             }
 
             @Override
@@ -107,7 +121,13 @@ public class fragment_add_point extends Fragment {
 
         btnFinish.setOnClickListener(v ->
         {
-            db.collection("CreditCard").whereEqualTo("email_person", spEmail.getSelectedItem().toString())
+            if (TextUtils.isEmpty(edNumberBankCard.getText().toString()) || TextUtils.isEmpty(edNumberAddPoint.getText().toString())) {
+                Toast.makeText(getActivity(), "Làm ơn không bỏ trống", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+
+            refCreditCard.whereEqualTo("email_person", spEmail.getSelectedItem().toString())
                     .whereEqualTo("id_person", spUID.getSelectedItem().toString())
                     .get().addOnSuccessListener(queryDocumentSnapshots -> {
                 double point = Double.parseDouble(edNumberAddPoint.getText().toString());
@@ -117,7 +137,6 @@ public class fragment_add_point extends Fragment {
                         card.setPoint(card.getPoint() + point);
                         card.setNumber_bankcard(edNumberBankCard.getText().toString());
                         refCreditCard.document(value.getId()).set(card);
-
                     }
                 } else {
                     DocumentReference id = refCreditCard.document();
@@ -131,7 +150,7 @@ public class fragment_add_point extends Fragment {
                         Double.parseDouble(edNumberAddPoint.getText().toString()), new Timestamp(new Date()));
 
                 Notification notification = new Notification(null, spUID.getSelectedItem().toString(), historyCreditCard
-                        .getDescription() + historyCreditCard.getPoint(), 3, new Timestamp(new Date()));
+                        .getDescription() + historyCreditCard.getPoint(), Notification.NOTHING, new Timestamp(new Date()));
 
                 refNotification.add(notification);
 
@@ -147,8 +166,16 @@ public class fragment_add_point extends Fragment {
         return view;
     }
 
-    private void ClearField() {
+    private void assignCreditCard(String id) {
+        for (CreditCard card : creditCards)
+            if (card.getId_person().equals(id)) {
+                edNumberBankCard.setText(card.getNumber_bankcard());
+                return;
+            }
         edNumberBankCard.setText("");
+    }
+
+    private void ClearField() {
         edNumberAddPoint.setText("");
     }
 }

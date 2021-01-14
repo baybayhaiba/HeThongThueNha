@@ -53,7 +53,7 @@ public class fragment_setting_account extends Fragment {
         recyclerView.setAdapter(adapter);
 
 
-        db.collection("User")
+        db.collection("User").whereEqualTo("locked",false)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {

@@ -76,6 +76,8 @@ public class NotficationRecyclerView extends RecyclerView.Adapter<NotficationRec
                     if (!person.getUrl().equals(""))
                         Picasso.with(context).load(person.getUrl())
                                 .placeholder(R.drawable.ic_baseline_person_24).into(holder.imgPerson);
+                    else
+                        holder.imgPerson.setImageResource(R.drawable.ic_baseline_person_24);
 
                     holder.tvName.setText(person.getFullName());
 
@@ -86,7 +88,7 @@ public class NotficationRecyclerView extends RecyclerView.Adapter<NotficationRec
                             intent.putExtra("toEmail", person.getEmail());
                             intent.putExtra("toName", person.getFullName());
                             context.startActivity(intent);
-                        } else if(notification.getType_notification() == Notification.ROOM) {
+                        } else if (notification.getType_notification() == Notification.ROOM) {
                             Intent intent = new Intent(context, ActivityPerson.class);
                             intent.putExtra("id_person", notification.getId_person_provide());
                             context.startActivity(intent);
